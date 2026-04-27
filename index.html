@@ -7,6 +7,7 @@
 <!-- Home Screen Icon + iOS App Mode -->
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -233,62 +234,6 @@
     cursor: pointer;
   }
 
-  /* Loading Screen */
-  #loadingScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #111;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: opacity .4s ease;
-  }
-
-  .loadingIcon {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 20px;
-  }
-
-  .loadingText {
-    color: #eee;
-    font-size: 16px;
-    font-weight: bold;
-    opacity: .8;
-  }
-
-  /* Neon Loading Bar */
-  .loadingBar {
-    width: 70%;
-    height: 6px;
-    background: #222;
-    border-radius: 4px;
-    overflow: hidden;
-    box-shadow: 0 0 10px #0f0;
-    margin-top: 20px;
-  }
-
-  .loadingFill {
-    width: 0%;
-    height: 100%;
-    background: #00ff00;
-    box-shadow: 0 0 12px #00ff00, 0 0 20px #00ff00;
-    animation: loadAnim 5s ease-out forwards;
-  }
-
-  @keyframes loadAnim {
-    0%   { width: 0%;   opacity: 0.4; }
-    20%  { width: 25%;  opacity: 1; }
-    50%  { width: 55%;  opacity: 1; }
-    80%  { width: 85%;  opacity: 1; }
-    100% { width: 100%; opacity: 1; }
-  }
-
   /* PRINT MODE — SINGLE PAGE FIX */
   @media print {
     @page {
@@ -304,7 +249,6 @@
       padding: 0 !important;
     }
 
-    #loadingScreen,
     #unitContainer,
     .top {
       display: none !important;
@@ -351,13 +295,6 @@
 </head>
 
 <body>
-
-<!-- Loading Screen -->
-<div id="loadingScreen">
-  <img src="icon.png" class="loadingIcon">
-  <div class="loadingText">Loading…</div>
-  <div class="loadingBar"><div class="loadingFill"></div></div>
-</div>
 
 <div id="root">
   <div class="shell">
@@ -605,3 +542,42 @@ function buildReport() {
           w.appendChild(i);
           f2.appendChild(w);
         });
+      }
+
+      g.appendChild(f2);
+    });
+  }
+
+  r.appendChild(g);
+
+  const nav = document.createElement("div");
+  nav.className = "reportNav";
+
+  const pdf = document.createElement("button");
+  pdf.textContent = "Export PDF";
+  pdf.onclick = () => window.print();
+
+  const back = document.createElement("button");
+  back.textContent = "Back";
+  back.onclick = ()=>{
+    currentScreen = 5;
+    renderScreen();
+  };
+
+  const reset = document.createElement("button");
+  reset.textContent = "New Test";
+  reset.onclick = ()=>{
+    location.reload();
+  };
+
+  nav.appendChild(pdf);
+  nav.appendChild(back);
+  nav.appendChild(reset);
+  r.appendChild(nav);
+}
+
+renderScreen();
+</script>
+
+</body>
+</html>
