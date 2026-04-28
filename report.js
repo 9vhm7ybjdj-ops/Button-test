@@ -5,6 +5,7 @@ function el(tag, cls, html) {
   return e;
 }
 
+// Read data from URL
 const params = new URLSearchParams(location.search);
 const raw = params.get("data");
 const parsed = JSON.parse(decodeURIComponent(raw));
@@ -13,6 +14,7 @@ const storeName = parsed.store;
 const units = parsed.units;
 const lastScreen = parsed.lastScreen ?? 0;
 
+// Insert store + time + title
 document.getElementById("reportStore").textContent = storeName;
 document.getElementById("reportTime").textContent = new Date().toLocaleString();
 document.getElementById("reportTitle").textContent =
@@ -27,12 +29,19 @@ const unitNames = {
   3: "Right UHC"
 };
 
+// QR generator
+function generateQR(url) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+}
+
+// Render each unit
 [1,2,3].forEach(u => {
   const unit = units[u];
   const row = el("div", "unitRow");
 
   ["front", "back"].forEach(side => {
     const face = el("div", "reportFace");
+
     face.appendChild(el("div", "sectionHeader",
       `${unitNames[u]} — ${side === "front" ? "Front" : "Back"}`));
 
@@ -72,13 +81,26 @@ const unitNames = {
   full.appendChild(row);
 });
 
+// Insert total failures
 document.getElementById("totalFailures").textContent =
   `Total Failures: ${totalFails}`;
 
+// BACK → return to last unit/face
 document.getElementById("backToTest").onclick = () => {
   window.location.href = `app.html?screen=${lastScreen}`;
 };
 
+// NEW TEST → restart
 document.getElementById("newTest").onclick = () => {
   window.location.href = "app.html";
+};
+
+// SHARE APP → generate QR code on page
+document.getElementById("shareAppBtn").onclick = () => {
+  const appURL = "https://9vhm7ybjdj-ops.github.io/Button-test/";
+  const qrURL = generateQR(appURL);
+
+  const img = document.getElementById("appQR");
+  img.src = qrURL;
+  img.style.display = "block";
 };
