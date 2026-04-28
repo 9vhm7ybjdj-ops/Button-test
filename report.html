@@ -2,9 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>UHC Report</title>
-<link rel="stylesheet" href="style.css">
+
+<link rel="stylesheet" href="style.css?v=5">
 <script src="report.js" defer></script>
 </head>
 
@@ -13,30 +15,33 @@
 <div class="report">
 
     <div id="reportTitle"></div>
-
     <div id="reportStore" style="margin-top:10px; font-size:20px;"></div>
     <div id="reportTime" style="margin-bottom:20px; opacity:0.8;"></div>
 
-    <div id="totalFailures"
-         style="font-size:22px; margin-bottom:20px; color:#ffeb3b; text-shadow:0 0 10px #ffeb3b;">
-    </div>
+    <!-- FAIL COUNTS -->
+    <div id="totalFailures"></div>
 
+    <!-- 2×3 GRID -->
     <div id="fullGridView"></div>
 
+    <!-- NAV -->
     <div class="reportNav">
         <button id="backToTest">Back</button>
         <button id="newTest">New Test</button>
     </div>
 
+    <!-- QR -->
     <button id="shareAppBtn">Share App</button>
-
-    <!-- QR CODE DISPLAY -->
     <img id="appQR" style="width:200px; margin:20px auto; display:none;" />
 
+    <!-- PDF -->
     <button id="pdfBtn">Download PDF</button>
     <button id="sharePdfBtn">Share PDF</button>
 
 </div>
+
+<!-- PDF LIBRARY -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 </body>
 </html>
