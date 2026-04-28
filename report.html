@@ -36,6 +36,14 @@
     opacity: 0.8;
   }
 
+  .timestamp {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    opacity: 0.7;
+    font-size: 16px;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -57,7 +65,6 @@
     background: #1a1a1a;
   }
 
-  /* Print Button */
   #printBtn {
     padding: 12px 24px;
     font-size: 18px;
@@ -78,7 +85,6 @@
     transform: scale(0.97);
   }
 
-  /* Totals block */
   #totalsBlock {
     margin-top: 30px;
     text-align: center;
@@ -87,7 +93,6 @@
     text-shadow: 0 0 6px #ff0000;
   }
 
-  /* Print Layout */
   @media print {
     #printBtn {
       display: none;
@@ -118,6 +123,9 @@
   <h1>UHC Test Report</h1>
   <h2 id="storeHeader"></h2>
 
+  <!-- ⭐ NEW TIMESTAMP LINE -->
+  <div id="timestamp" class="timestamp"></div>
+
   <table id="reportTable">
     <tr>
       <th>Unit</th>
@@ -126,7 +134,6 @@
     </tr>
   </table>
 
-  <!-- ⭐ NEW TOTALS BLOCK -->
   <div id="totalsBlock"></div>
 
 </div>
@@ -136,10 +143,15 @@
   const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
   const storeName = sessionStorage.getItem("storeName") || "";
   const storeNumber = sessionStorage.getItem("storeNumber") || "";
+  const timestamp = sessionStorage.getItem("timestamp") || "";
 
   // Set store header
   document.getElementById("storeHeader").textContent =
     `${storeName} — ${storeNumber}`;
+
+  // Insert timestamp under header
+  document.getElementById("timestamp").textContent =
+    timestamp ? `Completed: ${timestamp}` : "";
 
   // Populate table
   const table = document.getElementById("reportTable");
@@ -158,14 +170,13 @@
 
     table.appendChild(row);
 
-    // Count totals
     if (item.status === "FAIL") {
       if (item.face === "front") totalFrontFails++;
       if (item.face === "back") totalBackFails++;
     }
   });
 
-  // Insert totals
+  // Totals block
   document.getElementById("totalsBlock").innerHTML = `
     TOTAL FRONT FAILED ROWS: ${totalFrontFails}<br>
     TOTAL BACK FAILED ROWS: ${totalBackFails}
