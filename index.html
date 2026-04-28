@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UHC Test</title>
+
+    <!-- html2canvas for report export -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,7 +41,18 @@
             <h2 id="unitTitle"></h2>
             <h3 id="faceTitle"></h3>
 
-            <div id="uhcFace" class="steel-face"></div>
+            <div id="uhcFace" class="steel-face">
+                <!-- 3×3 glowing circles -->
+                <div class="circle" id="c1"></div>
+                <div class="circle" id="c2"></div>
+                <div class="circle" id="c3"></div>
+                <div class="circle" id="c4"></div>
+                <div class="circle" id="c5"></div>
+                <div class="circle" id="c6"></div>
+                <div class="circle" id="c7"></div>
+                <div class="circle" id="c8"></div>
+                <div class="circle" id="c9"></div>
+            </div>
 
             <div id="testButtons">
                 <button id="failBtn" class="fail">FAIL</button>
@@ -53,7 +68,7 @@
 
             <button id="backToTest">Back</button>
             <button id="newTest">New Test</button>
-            <button id="downloadPDF">Generate PDF</button>
+            <button id="downloadPDF">Generate Image</button>
         </div>
 
     </div>
