@@ -20,6 +20,11 @@ window.addEventListener("DOMContentLoaded", () => {
 
     if (p === 100) {
       clearInterval(interval);
+
+      // ⭐ Fade in version label
+      const v = document.getElementById("versionLabel");
+      if (v) v.style.opacity = "1";
+
       setTimeout(() => {
         screen.style.opacity = "0";
         setTimeout(() => screen.remove(), 800);
