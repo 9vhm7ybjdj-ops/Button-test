@@ -1,8 +1,3 @@
-// Read ?screen= from URL to resume last unit/face
-const params = new URLSearchParams(location.search);
-const startScreen = parseInt(params.get("screen"));
-let currentScreen = !isNaN(startScreen) ? startScreen : 0;
-
 function el(tag, cls, html) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -11,20 +6,24 @@ function el(tag, cls, html) {
 }
 
 function makeFace() {
-  return Array.from({ length: 6 }, () => ["UN", "UN", "UN"]);
+  return Array.from({ length: 6 }, () => ["UN", "UN", "UN", "UN"]);
 }
 
-const unitNames = {
-  1: "Left UHC",
-  2: "Middle UHC",
-  3: "Right UHC"
-};
+const unitNames = [
+  "Left UHC",
+  "Middle UHC",
+  "Right UHC"
+];
 
-const units = {
-  1: { skip: false, front: makeFace(), back: makeFace() },
-  2: { skip: false, front: makeFace(), back: makeFace() },
-  3: { skip: false, front: makeFace(), back: makeFace() }
-};
+const units = [
+  { skip: false, front: makeFace(), back: makeFace() },
+  { skip: false, front: makeFace(), back: makeFace() },
+  { skip: false, front: makeFace(), back: makeFace() }
+];
+
+const params = new URLSearchParams(location.search);
+const startScreen = parseInt(params.get("screen"));
+let currentScreen = !isNaN(startScreen) ? startScreen : 0;
 
 function getSelectedStore() {
   return document.getElementById("store").value || "No Store Selected";
@@ -34,20 +33,25 @@ function renderScreen() {
   const c = document.getElementById("unitContainer");
   c.innerHTML = "";
 
-  const u = Math.floor(currentScreen / 2) + 1;
-  const f = currentScreen % 2 === 0 ? "front" : "back";
-  const l = f === "front" ? "Front Face" : "Back Face";
+  const unitIndex = Math.floor(currentScreen / 2); // 0,1,2
+  const sideKey = currentScreen % 2 === 0 ? "front" : "back";
+  const sideLabel = sideKey === "front" ? "Front Face" : "Back Face";
 
-  const unit = units[u];
+  const unit = units[unitIndex];
+
   const wrap = el("div", "faceWrap");
   const face = el("div", "face");
 
-  face.appendChild(el("h3", "", `${unitNames[u]} — ${l}`));
+  face.appendChild(el("h3", "", `${unitNames[unitIndex]} — ${sideLabel}`));
 
   if (unit.skip) {
-    face.appendChild(el("div", "", "SKIPPED"));
+    const skipped = el("div", "", "SKIPPED");
+    skipped.style.textAlign = "center";
+    skipped.style.fontSize = "24px";
+    skipped.style.padding = "40px 0";
+    face.appendChild(skipped);
   } else {
-    unit[f].forEach((row, rIndex) => {
+    unit[sideKey].forEach((row, rIndex) => {
       const rowDiv = el("div", "row");
       if (row.some(v => v === "FAIL")) rowDiv.classList.add("rowFail");
 
@@ -70,9 +74,12 @@ function renderScreen() {
 
         btn.onclick = () => {
           if (unit.skip) return;
-          const now = units[u][f][rIndex][cIndex];
-          units[u][f][rIndex][cIndex] =
-            now === "UN" ? "PASS" : now === "PASS" ? "FAIL" : "UN";
+          const current = units[unitIndex][sideKey][rIndex][cIndex];
+          const next =
+            current === "UN" ? "PASS" :
+            current === "PASS" ? "FAIL" :
+            "UN";
+          units[unitIndex][sideKey][rIndex][cIndex] = next;
           renderScreen();
         };
 
@@ -102,9 +109,16 @@ function renderScreen() {
   const nav = el("div", "navBtns");
   const backBtn = el("button", "", "Back");
   backBtn.disabled = currentScreen === 0;
-  backBtn.onclick = () => { currentScreen--; renderScreen(); };
+  backBtn.onclick = () => {
+    if (currentScreen > 0) {
+      currentScreen--;
+      renderScreen();
+    }
+  };
 
-  const nextBtn = el("button", "", currentScreen === 5 ? "Finish" : "Next");
+  const nextBtn = el("button", "",
+    currentScreen === 5 ? "Finish" : "Next"
+  );
   nextBtn.onclick = () => {
     if (currentScreen === 5) {
       const store = getSelectedStore();
@@ -114,10 +128,10 @@ function renderScreen() {
         lastScreen: currentScreen
       }));
       window.location.href = `report.html?data=${data}`;
-      return;
+    } else {
+      currentScreen++;
+      renderScreen();
     }
-    currentScreen++;
-    renderScreen();
   };
 
   nav.append(backBtn, nextBtn);
