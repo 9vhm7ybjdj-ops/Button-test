@@ -179,7 +179,8 @@
 
     table.appendChild(row);
 
-    const isFail = String(item.status).toUpperCase().includes("FAIL");
+    // ⭐ Only count TRUE fails (fixes your 3+3 issue)
+    const isFail = String(item.status).toUpperCase().trim() === "FAIL";
 
     // ⭐ Bulletproof face detection
     const face = item.face.toLowerCase();
