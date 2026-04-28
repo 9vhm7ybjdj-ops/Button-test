@@ -1,4 +1,3 @@
-/* GLOBAL */
 body {
   margin: 0;
   background: #000;
@@ -43,8 +42,10 @@ body {
 }
 
 .rowFail {
-  background: rgba(255,0,0,0.15);
-  padding: 5px;
+  background: rgba(255, 0, 0, 0.35);
+  border: 2px solid #ff0000;
+  box-shadow: 0 0 15px #ff0000;
+  padding: 6px;
   border-radius: 6px;
 }
 
@@ -58,7 +59,7 @@ body {
   cursor: pointer;
 }
 
-/* PASS / FAIL / UN COLORS */
+/* PASS / FAIL / UN */
 .btn.pass {
   background: #00c853;
   border-color: #00c853;
@@ -74,19 +75,19 @@ body {
 }
 
 .btn.un {
-  background: #ffeb3b;
-  border-color: #ffeb3b;
-  box-shadow: 0 0 10px #ffeb3b;
-  color: #000;
+  background: #000;
+  border: 2px solid #ffeb3b;
+  box-shadow: 0 0 12px #ffeb3b;
+  color: #ffeb3b;
 }
 
-/* SKIP CHECKBOX */
+/* SKIP */
 .skipBox {
   margin-top: 20px;
   font-size: 18px;
 }
 
-/* NAV BUTTONS */
+/* NAV */
 .navBtns {
   display: flex;
   gap: 12px;
@@ -103,14 +104,32 @@ body {
   border: 2px solid #555;
 }
 
-/* REPORT PAGE */
+/* REPORT */
 .report {
   padding: 20px;
 }
 
-.sectionHeader {
-  font-size: 20px;
-  margin: 10px 0;
+#reportTitle {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 15px;
+  color: #ffeb3b;
+  text-shadow: 0 0 12px #ffeb3b;
+  font-weight: bold;
+}
+
+.unitRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.reportFace {
+  background: #111;
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #444;
 }
 
 .gridRowWrapper {
@@ -123,8 +142,10 @@ body {
 }
 
 .gridRowInner.rowFail {
-  background: rgba(255,0,0,0.2);
-  padding: 4px;
+  background: rgba(255, 0, 0, 0.35);
+  border: 2px solid #ff0000;
+  box-shadow: 0 0 15px #ff0000;
+  padding: 6px;
   border-radius: 6px;
 }
 
@@ -137,7 +158,7 @@ body {
   border: 1px solid #444;
 }
 
-/* REPORT NAV BUTTONS */
+/* REPORT NAV */
 .reportNav {
   display: flex;
   gap: 12px;
@@ -154,14 +175,17 @@ body {
   border: 2px solid #555;
 }
 
-/* PDF BUTTONS */
-#pdfBtn, #sharePdfBtn {
+/* SHARE + PDF */
+#shareAppBtn,
+#pdfBtn,
+#sharePdfBtn {
   width: 100%;
   padding: 16px;
   margin-top: 10px;
   font-size: 18px;
   border-radius: 8px;
-  background: #444;
-  color: #fff;
-  border: 2px solid #666;
+  background: #222;
+  color: #ffeb3b;
+  border: 2px solid #ffeb3b;
+  box-shadow: 0 0 10px #ffeb3b;
 }
