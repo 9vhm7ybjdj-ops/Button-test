@@ -6,15 +6,24 @@
     margin-bottom: 8px;
 }
 
-/* Centre FAIL rows */
-.gridRowInner.rowFail {
-    justify-content: center !important;
-}
-
 /* Grid row container */
 .gridRowInner {
     display: flex;
     gap: 6px;
+}
+
+/* Highlight FAIL rows */
+.gridRowInner.rowFail {
+    justify-content: center !important;
+    box-shadow: 0 0 20px #ff0000;
+    border-radius: 6px;
+}
+
+/* Highlight PASS rows */
+.gridRowInner.rowPass {
+    justify-content: center !important;
+    box-shadow: 0 0 20px #00ff00;
+    border-radius: 6px;
 }
 
 /* Cells */
