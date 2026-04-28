@@ -19,8 +19,35 @@
     overflow: hidden;
   }
 
+  /* ---------------------- LOADING SCREEN ---------------------- */
+
   #loadingScreen {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #logoWrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 100px; /* ⭐ EXACT GAP YOU REQUESTED */
+  }
+
+  #badgeLogo {
+    width: 260px;
+    height: auto;
+    filter:
+      drop-shadow(0 0 6px #00ff00)
+      drop-shadow(0 0 12px #00ff00);
+    animation: flicker 2.4s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 0.92; }
+    94% { opacity: 0.85; }
+    96% { opacity: 0.95; }
   }
 
   #progressBar {
@@ -29,7 +56,6 @@
     background: #222;
     border-radius: 6px;
     overflow: hidden;
-    margin-top: 20px;
   }
 
   #progressFill {
@@ -37,8 +63,10 @@
     height: 100%;
     background: #00ff00;
     box-shadow: 0 0 10px #00ff00;
-    transition: width 1.2s linear;
+    transition: width 1.5s linear;
   }
+
+  /* ---------------------- STORE SELECT SCREEN ---------------------- */
 
   #storeSelectScreen {
     display: none;
@@ -68,18 +96,27 @@
     box-shadow: 0 0 12px #00ff00;
     cursor: pointer;
   }
+
+  button:active {
+    transform: scale(0.97);
+  }
 </style>
 </head>
 
 <body>
 
+<!-- ---------------------- LOADING SCREEN ---------------------- -->
 <div id="loadingScreen">
-  <h1>Loading...</h1>
+  <div id="logoWrapper">
+    <img src="IMG_4088.png" id="badgeLogo">
+  </div>
+
   <div id="progressBar">
     <div id="progressFill"></div>
   </div>
 </div>
 
+<!-- ---------------------- STORE SELECT SCREEN ---------------------- -->
 <div id="storeSelectScreen">
   <h2>Select Store</h2>
 
@@ -101,18 +138,18 @@
   const dropdown      = document.getElementById("storeDropdown");
   const startBtn      = document.getElementById("startBtn");
 
-  // ⭐ Run loading animation
+  /* ⭐ Animate loading bar */
   setTimeout(() => {
     progressFill.style.width = "100%";
   }, 100);
 
-  // ⭐ After animation, show store select
+  /* ⭐ After animation, show store select */
   setTimeout(() => {
     loadingScreen.style.display = "none";
     storeScreen.style.display = "flex";
-  }, 1500);
+  }, 1600);
 
-  // ⭐ Start Test button
+  /* ⭐ Start Test button */
   startBtn.onclick = () => {
     const val = dropdown.value;
     if (!val) return;
