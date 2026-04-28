@@ -63,10 +63,16 @@ let backFails = 0;
       const wrap = el("div", "gridRowWrapper");
       const inner = el("div", "gridRowInner");
 
+      // FAIL row
       if (r.some(v => v === "FAIL")) {
         inner.classList.add("rowFail");
         if (side === "front") frontFails++;
         else backFails++;
+      }
+
+      // PASS row (all PASS)
+      if (r.every(v => v === "PASS")) {
+        inner.classList.add("rowPass");
       }
 
       r.forEach(v => {
