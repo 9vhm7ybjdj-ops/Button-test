@@ -70,7 +70,6 @@ html, body {
     gap: 10px;
     margin-bottom: 10px;
 
-    /* Pre-allocate space so FAIL doesn't resize */
     padding: 6px;
     border: 2px solid transparent;
     border-radius: 6px;
@@ -216,7 +215,6 @@ html, body {
     display: flex;
     gap: 6px;
 
-    /* Pre-allocate space */
     padding: 6px;
     border: 2px solid transparent;
     border-radius: 6px;
