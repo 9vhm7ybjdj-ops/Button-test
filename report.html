@@ -83,18 +83,26 @@
     text-shadow: 0 0 6px #00ff00;
     box-shadow: 0 0 12px #00ff00;
     cursor: pointer;
-    margin-top: 20px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
   }
 
   .actionBtn:active {
     transform: scale(0.97);
   }
 
+  /* ⭐ New Test + Print on same line */
+  .actionRow {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+  }
+
+  .smallBtn {
+    width: 180px;
+  }
+
   @media print {
-    .actionBtn {
+    .actionRow {
       display: none;
     }
 
@@ -123,9 +131,11 @@
 
   <div id="totalsBlock"></div>
 
-  <button id="backBtn" class="actionBtn">Back</button>
-  <button id="newTestBtn" class="actionBtn">New Test</button>
-  <button id="printBtn" class="actionBtn">Print Report</button>
+  <!-- ⭐ New Test + Print on same line -->
+  <div class="actionRow">
+    <button id="newTestBtn" class="actionBtn smallBtn">New Test</button>
+    <button id="printBtn" class="actionBtn smallBtn">Print Report</button>
+  </div>
 
 </div>
 
@@ -133,8 +143,6 @@
   const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
   const storeName = sessionStorage.getItem("storeName") || "";
   const storeNumber = sessionStorage.getItem("storeNumber") || "";
-  const lastUnit = sessionStorage.getItem("lastUnit") || 1;
-  const lastFace = sessionStorage.getItem("lastFace") || "front";
 
   const now = new Date();
   const timestamp = now.toLocaleString("en-AU", {
@@ -171,16 +179,13 @@
 
     table.appendChild(row);
 
+    // ⭐ Extract number of failed rows
     const status = String(item.status).toLowerCase();
     const match = status.match(/^(\d+)\s+failed rows/);
     const failedRows = match ? parseInt(match[1], 10) : 0;
 
-    const face = item.face.toLowerCase();
-    const isFront = face === "front";
-    const isBack = face === "back";
-
-    if (failedRows > 0 && isFront) totalFrontFailedRows += failedRows;
-    if (failedRows > 0 && isBack) totalBackFailedRows += failedRows;
+    if (item.face === "front") totalFrontFailedRows += failedRows;
+    if (item.face === "back") totalBackFailedRows += failedRows;
   });
 
   document.getElementById("totalsBlock").innerHTML = `
@@ -189,11 +194,6 @@
   `;
 
   document.getElementById("printBtn").onclick = () => window.print();
-
-  document.getElementById("backBtn").onclick = () => {
-    window.location.href =
-      `app.html?resume=1&unit=${lastUnit}&face=${lastFace}`;
-  };
 
   document.getElementById("newTestBtn").onclick = () => {
     sessionStorage.clear();
