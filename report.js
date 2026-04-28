@@ -5,10 +5,6 @@ function el(tag, cls, html) {
   return e;
 }
 
-function generateQR(url) {
-  return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
-}
-
 const params = new URLSearchParams(location.search);
 const raw = params.get("data");
 const parsed = JSON.parse(decodeURIComponent(raw));
@@ -18,7 +14,8 @@ const units = parsed.units;
 
 document.getElementById("reportStore").textContent = storeName;
 document.getElementById("reportTime").textContent = new Date().toLocaleString();
-document.getElementById("pdfQR").src = generateQR(window.location.href);
+document.getElementById("reportTitle").textContent =
+  `UHC Button Test – ${storeName}`;
 
 const full = document.getElementById("fullGridView");
 let totalFails = 0;
@@ -35,7 +32,8 @@ const unitNames = {
 
   ["front", "back"].forEach(side => {
     const face = el("div", "reportFace");
-    face.appendChild(el("div", "sectionHeader", `${unitNames[u]} — ${side === "front" ? "Front" : "Back"}`));
+    face.appendChild(el("div", "sectionHeader",
+      `${unitNames[u]} — ${side === "front" ? "Front" : "Back"}`));
 
     unit[side].forEach(r => {
       const wrap = el("div", "gridRowWrapper");
@@ -61,7 +59,8 @@ const unitNames = {
   full.appendChild(row);
 });
 
-document.getElementById("totalFailures").textContent = `Total Failures: ${totalFails}`;
+document.getElementById("totalFailures").textContent =
+  `Total Failures: ${totalFails}`;
 
 document.getElementById("backToTest").onclick = () => {
   window.location.href = "index.html";
@@ -71,9 +70,29 @@ document.getElementById("newTest").onclick = () => {
   window.location.href = "index.html";
 };
 
+document.getElementById("shareAppBtn").onclick = () => {
+  const appURL = "https://m7ybjdj-ops.github.io/";
+  if (navigator.share) {
+    navigator.share({
+      title: "UHC Button Test App",
+      text: "Open the UHC Button Test App.",
+      url: appURL
+    });
+  } else {
+    window.open(appURL, "_blank");
+  }
+};
+
 document.getElementById("pdfBtn").onclick = async () => {
   const report = document.getElementById("report");
-  await new Promise(r => setTimeout(r, 200));
+
+  await new Promise(r => requestAnimationFrame(r));
+  await new Promise(r => requestAnimationFrame(r));
+  await new Promise(r => setTimeout(r, 150));
+
+  window.scrollTo(0, document.body.scrollHeight);
+  await new Promise(r => setTimeout(r, 100));
+  window.scrollTo(0, 0);
 
   const canvas = await html2canvas(report, {
     scale: 2,
@@ -94,7 +113,14 @@ document.getElementById("pdfBtn").onclick = async () => {
 
 document.getElementById("sharePdfBtn").onclick = async () => {
   const report = document.getElementById("report");
-  await new Promise(r => setTimeout(r, 200));
+
+  await new Promise(r => requestAnimationFrame(r));
+  await new Promise(r => requestAnimationFrame(r));
+  await new Promise(r => setTimeout(r, 150));
+
+  window.scrollTo(0, document.body.scrollHeight);
+  await new Promise(r => setTimeout(r, 100));
+  window.scrollTo(0, 0);
 
   const canvas = await html2canvas(report, {
     scale: 2,
