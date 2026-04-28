@@ -333,6 +333,9 @@
       <button id="nextBtn">Next</button>
     </div>
   </div>
+</div>
+
+<script>
   const TOTAL_UNITS = 3;
 
   const testScreen    = document.getElementById('testScreen');
@@ -487,7 +490,6 @@
     renderCurrentFace();
   }
 
-  // ⭐ NEW — Redirect to report.html with summary-only data
   function showReport() {
     const summary = [];
 
@@ -524,7 +526,6 @@
     window.location.href = "report.html";
   }
 
-  // Touchscreen skip handler
   touchscreenToggle.onchange = () => {
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
@@ -539,12 +540,10 @@
     }
   };
 
-  // Manual Next button
   nextBtn.onclick = () => {
     advanceStep();
   };
 
-  // Manual Back button
   backBtn.onclick = () => {
     if (currentStepIndex > 0) {
       currentStepIndex--;
@@ -552,14 +551,12 @@
     }
   };
 
-  // Parse URL parameters
   function getParams() {
     const params = new URLSearchParams(window.location.search);
     storeName = params.get('store') || 'Store';
     storeNumber = params.get('num') || '0000';
   }
 
-  // Init
   getParams();
   storeHeader.textContent = `${storeName} — ${storeNumber}`;
   initUnits();
