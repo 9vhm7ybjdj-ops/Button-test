@@ -38,3 +38,16 @@ html, body {
     border: 2px solid #ff0000;
     box-shadow: 0 0 15px #ff0000;
 }
+
+/* SHARE APP BUTTON */
+#shareAppBtn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 10px;
+  font-size: 18px;
+  border-radius: 8px;
+  background: #222;
+  color: #ffeb3b;
+  border: 2px solid #ffeb3b;
+  box-shadow: 0 0 10px #ffeb3b;
+}
