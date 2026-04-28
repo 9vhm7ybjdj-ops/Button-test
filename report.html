@@ -123,24 +123,19 @@
 
   <div id="totalsBlock"></div>
 
-  <!-- ⭐ BACK + NEW TEST ABOVE PRINT -->
   <button id="backBtn" class="actionBtn">Back</button>
   <button id="newTestBtn" class="actionBtn">New Test</button>
-
-  <!-- ⭐ PRINT BUTTON LAST -->
   <button id="printBtn" class="actionBtn">Print Report</button>
 
 </div>
 
 <script>
-  // Load stored data
   const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
   const storeName = sessionStorage.getItem("storeName") || "";
   const storeNumber = sessionStorage.getItem("storeNumber") || "";
   const lastUnit = sessionStorage.getItem("lastUnit") || 1;
   const lastFace = sessionStorage.getItem("lastFace") || "front";
 
-  // Auto-generate timestamp
   const now = new Date();
   const timestamp = now.toLocaleString("en-AU", {
     day: "2-digit",
@@ -151,19 +146,16 @@
     hour12: false
   });
 
-  // Set store header
   document.getElementById("storeHeader").textContent =
     `${storeName} — ${storeNumber}`;
 
-  // Insert timestamp
   document.getElementById("timestamp").textContent =
     `Completed: ${timestamp}`;
 
-  // Populate table + totals
   const table = document.getElementById("reportTable");
 
-  let totalFrontFails = 0;
-  let totalBackFails = 0;
+  let totalFrontFailedRows = 0;
+  let totalBackFailedRows = 0;
 
   summary.forEach(item => {
     const row = document.createElement("tr");
@@ -179,33 +171,30 @@
 
     table.appendChild(row);
 
-    // ⭐ Only count TRUE fails (fixes your 3+3 issue)
-    const isFail = String(item.status).toUpperCase().trim() === "FAIL";
+    const status = String(item.status).toLowerCase();
+    const match = status.match(/^(\d+)\s+failed rows/);
+    const failedRows = match ? parseInt(match[1], 10) : 0;
 
-    // ⭐ Bulletproof face detection
     const face = item.face.toLowerCase();
-    const isFront = face.includes("front");
-    const isBack = face.includes("back") || face.includes("rear");
+    const isFront = face === "front";
+    const isBack = face === "back";
 
-    if (isFail && isFront) totalFrontFails++;
-    if (isFail && isBack) totalBackFails++;
+    if (failedRows > 0 && isFront) totalFrontFailedRows += failedRows;
+    if (failedRows > 0 && isBack) totalBackFailedRows += failedRows;
   });
 
   document.getElementById("totalsBlock").innerHTML = `
-    TOTAL FRONT FAILED ROWS: ${totalFrontFails}<br>
-    TOTAL BACK FAILED ROWS: ${totalBackFails}
+    TOTAL FRONT FAILED ROWS: ${totalFrontFailedRows}<br>
+    TOTAL BACK FAILED ROWS: ${totalBackFailedRows}
   `;
 
-  // Print
   document.getElementById("printBtn").onclick = () => window.print();
 
-  // Back button → return to last unit/face
   document.getElementById("backBtn").onclick = () => {
     window.location.href =
       `app.html?resume=1&unit=${lastUnit}&face=${lastFace}`;
   };
 
-  // New Test button → reset + go to store select
   document.getElementById("newTestBtn").onclick = () => {
     sessionStorage.clear();
     window.location.href = "index.html";
