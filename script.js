@@ -3,7 +3,6 @@ function updateVH() {
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
 window.addEventListener('resize', updateVH);
-updateVH();
 
 /* LOADING BAR */
 window.addEventListener("DOMContentLoaded", () => {
@@ -23,7 +22,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
       setTimeout(() => {
         screen.style.opacity = "0";
-        setTimeout(() => screen.remove(), 800);
+
+        setTimeout(() => {
+          screen.remove();
+
+          // ⭐ Apply vh fix AFTER loading screen is gone
+          updateVH();
+
+        }, 800);
+
       }, 300);
     }
   }, 100);
@@ -164,17 +171,4 @@ function renderScreen() {
   c.appendChild(wrap);
 }
 
-/* REPORT (CLASSIC STYLE, 6x3, ROW HIGHLIGHT) */
-function buildReport() {
-  const full = document.getElementById("fullGridView");
-  full.innerHTML = "";
-
-  const storeName = getSelectedStore();
-  const timestamp = new Date().toLocaleString();
-  const qrURL = generateQR(window.location.href);
-
-  document.getElementById("pdfStoreName").textContent = storeName;
-  document.getElementById("pdfTimestamp").textContent = timestamp;
-  document.getElementById("pdfQR").src = qrURL;
-
-  document.getElementById("reportStore
+/* REPORT (CLASSIC STYLE, 6x3, ROW H
