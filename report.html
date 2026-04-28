@@ -6,7 +6,6 @@
 <title>UHC Report</title>
 <link rel="stylesheet" href="style.css">
 
-<!-- PDF Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -17,10 +16,9 @@
 
 <div id="report" class="report">
 
+    <h1 id="reportTitle"></h1>
     <h2 id="reportStore"></h2>
     <div id="reportTime"></div>
-
-    <img id="pdfQR" />
 
     <div id="fullGridView"></div>
 
@@ -31,6 +29,7 @@
         <button id="newTest">New Test</button>
     </div>
 
+    <button id="shareAppBtn">Share App</button>
     <button id="pdfBtn">Download PDF</button>
     <button id="sharePdfBtn">Share PDF</button>
 
