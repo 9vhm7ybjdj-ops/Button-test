@@ -1,4 +1,3 @@
-// Helper to create elements
 function el(tag, cls, html) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -6,41 +5,35 @@ function el(tag, cls, html) {
   return e;
 }
 
-// CORRECT 6×3 FACE GENERATOR
 function makeFace() {
   return Array.from({ length: 6 }, () => ["UN", "UN", "UN"]);
 }
 
-// Unit names (0,1,2)
 const unitNames = [
   "Left UHC",
   "Middle UHC",
   "Right UHC"
 ];
 
-// Data structure (3 units)
 const units = [
   { skip: false, front: makeFace(), back: makeFace() },
   { skip: false, front: makeFace(), back: makeFace() },
   { skip: false, front: makeFace(), back: makeFace() }
 ];
 
-// Read screen index from URL
 const params = new URLSearchParams(location.search);
 const startScreen = parseInt(params.get("screen"));
 let currentScreen = !isNaN(startScreen) ? startScreen : 0;
 
-// Store selector
 function getSelectedStore() {
   return document.getElementById("store").value || "No Store Selected";
 }
 
-// Render the current screen
 function renderScreen() {
   const c = document.getElementById("unitContainer");
   c.innerHTML = "";
 
-  const unitIndex = Math.floor(currentScreen / 2); // 0,1,2
+  const unitIndex = Math.floor(currentScreen / 2);
   const sideKey = currentScreen % 2 === 0 ? "front" : "back";
   const sideLabel = sideKey === "front" ? "Front Face" : "Back Face";
 
@@ -51,7 +44,6 @@ function renderScreen() {
 
   face.appendChild(el("h3", "", `${unitNames[unitIndex]} — ${sideLabel}`));
 
-  // SKIPPED UNIT
   if (unit.skip) {
     const skipped = el("div", "", "SKIPPED");
     skipped.style.textAlign = "center";
@@ -59,7 +51,6 @@ function renderScreen() {
     skipped.style.padding = "40px 0";
     face.appendChild(skipped);
   } else {
-    // Render 6×3 grid
     unit[sideKey].forEach((row, rIndex) => {
       const rowDiv = el("div", "row");
 
@@ -102,7 +93,6 @@ function renderScreen() {
     });
   }
 
-  // SKIP CHECKBOX
   const skipBox = el("div", "skipBox");
   const skipCheck = document.createElement("input");
   skipCheck.type = "checkbox";
@@ -121,7 +111,6 @@ function renderScreen() {
   skipBox.append(" Skip entire unit");
   face.appendChild(skipBox);
 
-  // NAV BUTTONS
   const nav = el("div", "navBtns");
 
   const backBtn = el("button", "", "Back");
