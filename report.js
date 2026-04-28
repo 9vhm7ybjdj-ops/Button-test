@@ -12,7 +12,7 @@ const parsed = JSON.parse(decodeURIComponent(raw));
 
 const storeName = parsed.store;
 const units = parsed.units;
-const lastScreen = parsed.lastScreen ?? 0;
+const lastScreen = parseInt(params.get("screen")) || 0;
 
 // Insert store + time + title
 document.getElementById("reportStore").textContent = storeName;
@@ -21,12 +21,11 @@ document.getElementById("reportTitle").textContent =
   `UHC Button Test – ${storeName}`;
 
 const full = document.getElementById("fullGridView");
-let totalFails = 0;
 
 const unitNames = {
-  1: "Left UHC",
-  2: "Middle UHC",
-  3: "Right UHC"
+  0: "Left UHC",
+  1: "Middle UHC",
+  2: "Right UHC"
 };
 
 // QR generator
@@ -34,8 +33,12 @@ function generateQR(url) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
 }
 
-// Render each unit
-[1,2,3].forEach(u => {
+// FAIL COUNTS
+let frontFails = 0;
+let backFails = 0;
+
+// Render each unit (2×3 layout)
+[0,1,2].forEach(u => {
   const unit = units[u];
   const row = el("div", "unitRow");
 
@@ -63,7 +66,8 @@ function generateQR(url) {
 
       if (r.some(v => v === "FAIL")) {
         inner.classList.add("rowFail");
-        totalFails++;
+        if (side === "front") frontFails++;
+        else backFails++;
       }
 
       r.forEach(v => {
@@ -81,9 +85,10 @@ function generateQR(url) {
   full.appendChild(row);
 });
 
-// Insert total failures
-document.getElementById("totalFailures").textContent =
-  `Total Failures: ${totalFails}`;
+// Insert fail counts
+document.getElementById("totalFailures").innerHTML =
+  `<span style="color:#ff4444;">Front Fails: ${frontFails}</span> &nbsp;&nbsp; 
+   <span style="color:#ff4444;">Back Fails: ${backFails}</span>`;
 
 // BACK → return to last unit/face
 document.getElementById("backToTest").onclick = () => {
@@ -104,3 +109,23 @@ document.getElementById("shareAppBtn").onclick = () => {
   img.src = qrURL;
   img.style.display = "block";
 };
+
+// PDF GENERATOR
+function generatePDF() {
+  const report = document.querySelector(".report");
+
+  const opt = {
+    margin:       0,
+    filename:     `UHC-Report-${storeName}.pdf`,
+    image:        { type: 'jpeg', quality: 1 },
+    html2canvas:  { scale: 3, useCORS: true, backgroundColor: "#000" },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  setTimeout(() => {
+    html2pdf().set(opt).from(report).save();
+  }, 300);
+}
+
+document.getElementById("pdfBtn").onclick = generatePDF;
+document.getElementById("sharePdfBtn").onclick = generatePDF;
