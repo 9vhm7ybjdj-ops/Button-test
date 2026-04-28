@@ -1,13 +1,14 @@
-/* V1.1 LOADING SCREEN */
+/* V1.0 LOADING BAR */
 window.onload = () => {
     const bar = document.getElementById("loadingBar");
-    const loadingScreen = document.getElementById("loadingScreen");
+    const screen = document.getElementById("loadingScreen");
 
     setTimeout(() => { bar.style.width = "100%"; }, 100);
-    setTimeout(() => { loadingScreen.style.opacity = "0"; }, 3000);
+
     setTimeout(() => {
-        loadingScreen.style.display = "none";
-    }, 3600);
+        screen.style.opacity = "0";
+        setTimeout(() => screen.remove(), 600);
+    }, 2600);
 };
 
 /* TEST ORDER */
