@@ -1,3 +1,4 @@
+// Helper to create elements
 function el(tag, cls, html) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -5,30 +6,36 @@ function el(tag, cls, html) {
   return e;
 }
 
+// Correct 6×3 face generator
 function makeFace() {
-  return Array.from({ length: 6 }, () => ["UN", "UN", "UN", "UN"]);
+  return Array.from({ length: 6 }, () => ["UN", "UN", "UN"]);
 }
 
+// Unit names (0,1,2)
 const unitNames = [
   "Left UHC",
   "Middle UHC",
   "Right UHC"
 ];
 
+// Data structure (3 units)
 const units = [
   { skip: false, front: makeFace(), back: makeFace() },
   { skip: false, front: makeFace(), back: makeFace() },
   { skip: false, front: makeFace(), back: makeFace() }
 ];
 
+// Read screen index from URL
 const params = new URLSearchParams(location.search);
 const startScreen = parseInt(params.get("screen"));
 let currentScreen = !isNaN(startScreen) ? startScreen : 0;
 
+// Store selector
 function getSelectedStore() {
   return document.getElementById("store").value || "No Store Selected";
 }
 
+// Render the current screen
 function renderScreen() {
   const c = document.getElementById("unitContainer");
   c.innerHTML = "";
@@ -44,6 +51,7 @@ function renderScreen() {
 
   face.appendChild(el("h3", "", `${unitNames[unitIndex]} — ${sideLabel}`));
 
+  // SKIPPED UNIT
   if (unit.skip) {
     const skipped = el("div", "", "SKIPPED");
     skipped.style.textAlign = "center";
@@ -51,8 +59,10 @@ function renderScreen() {
     skipped.style.padding = "40px 0";
     face.appendChild(skipped);
   } else {
+    // Render 6×3 grid
     unit[sideKey].forEach((row, rIndex) => {
       const rowDiv = el("div", "row");
+
       if (row.some(v => v === "FAIL")) rowDiv.classList.add("rowFail");
 
       row.forEach((val, cIndex) => {
@@ -74,11 +84,13 @@ function renderScreen() {
 
         btn.onclick = () => {
           if (unit.skip) return;
+
           const current = units[unitIndex][sideKey][rIndex][cIndex];
           const next =
             current === "UN" ? "PASS" :
             current === "PASS" ? "FAIL" :
             "UN";
+
           units[unitIndex][sideKey][rIndex][cIndex] = next;
           renderScreen();
         };
@@ -90,10 +102,12 @@ function renderScreen() {
     });
   }
 
+  // SKIP CHECKBOX
   const skipBox = el("div", "skipBox");
   const skipCheck = document.createElement("input");
   skipCheck.type = "checkbox";
   skipCheck.checked = unit.skip;
+
   skipCheck.onchange = () => {
     unit.skip = skipCheck.checked;
     if (unit.skip) {
@@ -102,11 +116,14 @@ function renderScreen() {
     }
     renderScreen();
   };
+
   skipBox.appendChild(skipCheck);
   skipBox.append(" Skip entire unit");
   face.appendChild(skipBox);
 
+  // NAV BUTTONS
   const nav = el("div", "navBtns");
+
   const backBtn = el("button", "", "Back");
   backBtn.disabled = currentScreen === 0;
   backBtn.onclick = () => {
@@ -119,15 +136,19 @@ function renderScreen() {
   const nextBtn = el("button", "",
     currentScreen === 5 ? "Finish" : "Next"
   );
+
   nextBtn.onclick = () => {
     if (currentScreen === 5) {
       const store = getSelectedStore();
+
       const data = encodeURIComponent(JSON.stringify({
         store,
         units,
         lastScreen: currentScreen
       }));
-      window.location.href = `report.html?data=${data}`;
+
+      // Pass correct screen index to report
+      window.location.href = `report.html?data=${data}&screen=${currentScreen}`;
     } else {
       currentScreen++;
       renderScreen();
