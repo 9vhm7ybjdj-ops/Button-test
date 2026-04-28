@@ -59,7 +59,7 @@ body {
 
 /* STAINLESS STEEL FACE */
 .steel-face {
-    background: linear-gradient(180deg, #555, #333);
+    background: linear-gradient(180deg, #666, #333);
     border-radius: 12px;
     padding: 20px;
     margin-top: 20px;
@@ -67,8 +67,28 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: 1fr;
-    gap: 10px;
+    gap: 18px;
     box-shadow: inset 0 0 25px #000;
+}
+
+/* GLOWING CIRCLES */
+.circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #222, #000);
+    box-shadow: inset 0 0 12px #000;
+    transition: 0.2s;
+}
+
+.circle.pass {
+    background: radial-gradient(circle, #0f0, #030);
+    box-shadow: 0 0 18px #0f0;
+}
+
+.circle.fail {
+    background: radial-gradient(circle, #f00, #300);
+    box-shadow: 0 0 18px #f00;
 }
 
 /* PASS / FAIL BUTTONS */
