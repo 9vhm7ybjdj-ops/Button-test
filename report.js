@@ -5,7 +5,6 @@ function el(tag, cls, html) {
   return e;
 }
 
-// Read data from URL
 const params = new URLSearchParams(location.search);
 const raw = params.get("data");
 const parsed = JSON.parse(decodeURIComponent(raw));
@@ -14,7 +13,6 @@ const storeName = parsed.store;
 const units = parsed.units;
 const lastScreen = parseInt(params.get("screen")) || 0;
 
-// Insert store + time + title
 document.getElementById("reportTime").textContent = new Date().toLocaleString();
 document.getElementById("reportTitle").textContent =
   `UHC Button Test – ${storeName}`;
@@ -27,16 +25,13 @@ const unitNames = {
   2: "Right UHC"
 };
 
-// QR generator
 function generateQR(url) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
 }
 
-// FAIL COUNTS
 let frontFails = 0;
 let backFails = 0;
 
-// Render each unit (2×3 layout)
 [0,1,2].forEach(u => {
   const unit = units[u];
   const row = el("div", "unitRow");
@@ -63,14 +58,12 @@ let backFails = 0;
       const wrap = el("div", "gridRowWrapper");
       const inner = el("div", "gridRowInner");
 
-      // FAIL row
       if (r.some(v => v === "FAIL")) {
         inner.classList.add("rowFail");
         if (side === "front") frontFails++;
         else backFails++;
       }
 
-      // PASS row (all PASS)
       if (r.every(v => v === "PASS")) {
         inner.classList.add("rowPass");
       }
@@ -90,22 +83,18 @@ let backFails = 0;
   full.appendChild(row);
 });
 
-// Insert fail counts
 document.getElementById("totalFailures").innerHTML =
   `<span style="color:#ff4444;">Front Fails: ${frontFails}</span> &nbsp;&nbsp; 
    <span style="color:#ff4444;">Back Fails: ${backFails}</span>`;
 
-// BACK → return to last unit/face
 document.getElementById("backToTest").onclick = () => {
   window.location.href = `app.html?screen=${lastScreen}`;
 };
 
-// NEW TEST → restart
 document.getElementById("newTest").onclick = () => {
   window.location.href = "app.html";
 };
 
-// SHARE APP → generate QR code on page
 document.getElementById("shareAppBtn").onclick = () => {
   const appURL = "https://9vhm7ybjdj-ops.github.io/Button-test/";
   const qrURL = generateQR(appURL);
@@ -115,11 +104,9 @@ document.getElementById("shareAppBtn").onclick = () => {
   img.style.display = "block";
 };
 
-// ⭐ FIXED SHARE PDF — waits for full render, then shares
 async function sharePDF() {
   const report = document.querySelector(".report");
 
-  // Wait for Safari/iOS to finish painting the DOM
   await new Promise(resolve => setTimeout(resolve, 500));
 
   const opt = {
@@ -130,7 +117,6 @@ async function sharePDF() {
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
   };
 
-  // Generate PDF as Blob
   const pdfBlob = await html2pdf().set(opt).from(report).outputPdf("blob");
 
   const file = new File(
