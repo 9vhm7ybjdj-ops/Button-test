@@ -3,126 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>UHC Button Test</title>
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>UHC Loader</title>
 
 <style>
   body {
     margin: 0;
     background: #000;
-    height: 100vh;
-    width: 100vw;
-    overflow: hidden;
+    color: #fff;
+    font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    overflow: hidden;
   }
 
-  /* Fullscreen loading screen */
   #loadingScreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #000;
-    z-index: 9999;
+    text-align: center;
   }
 
-  .badge-wrapper {
-    position: relative;
-    width: 320px;
-  }
-
-  .badge-img {
-    width: 100%;
-    display: block;
-  }
-
-  .version-label {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    font-size: 14px;
-    font-family: monospace;
-    color: #7CFC00;
-    text-shadow:
-      0 0 6px #7CFC00,
-      0 0 12px #4cff00,
-      0 0 18px #2aff00;
-    animation: lcdFlicker 2s infinite;
-  }
-
-  .loading-bar {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 110px;
-    width: 65%;
-    height: 8px;
+  #progressBar {
+    width: 260px;
+    height: 10px;
     background: #222;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: 0 0 10px #00ff00;
+    margin-top: 20px;
   }
 
-  .loading-fill {
+  #progressFill {
     width: 0%;
     height: 100%;
     background: #00ff00;
     box-shadow: 0 0 10px #00ff00;
-    animation: loadAnim 3s forwards;
+    transition: width 1.2s linear;
   }
 
-  @keyframes lcdFlicker {
-    0%, 100% { opacity: 1; }
-    45% { opacity: 0.85; }
-    50% { opacity: 0.55; }
-    55% { opacity: 0.92; }
-    70% { opacity: 0.78; }
-  }
-
-  @keyframes loadAnim {
-    from { width: 0%; }
-    to   { width: 100%; }
-  }
-
-  /* Store selection screen */
   #storeSelectScreen {
     display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: #000;
-    color: #fff;
-    display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     gap: 20px;
-    padding: 20px;
-    box-sizing: border-box;
-    z-index: 9999;
+    text-align: center;
   }
 
-  #storeSelectScreen input {
-    width: 80%;
+  select {
     padding: 12px;
-    font-size: 16px;
+    font-size: 18px;
     border-radius: 6px;
-    border: none;
+    border: 1px solid #00ff00;
+    background: #111;
+    color: #7CFC00;
+    box-shadow: 0 0 10px #00ff00;
   }
 
-  #startTestBtn {
+  button {
     padding: 12px 24px;
     font-size: 18px;
     border-radius: 6px;
-    border: none;
-    background: #00ff00;
-    color: #000;
+    background: #111;
+    color: #7CFC00;
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 12px #00ff00;
     cursor: pointer;
   }
 </style>
@@ -130,46 +73,54 @@
 
 <body>
 
-<!-- Loading Screen -->
 <div id="loadingScreen">
-  <div class="badge-wrapper">
-    <img src="IMG_4088.png" class="badge-img">
-    <div class="version-label">v1.0.0</div>
-    <div class="loading-bar">
-      <div class="loading-fill"></div>
-    </div>
+  <h1>Loading...</h1>
+  <div id="progressBar">
+    <div id="progressFill"></div>
   </div>
 </div>
 
-<!-- Store Selection Screen -->
 <div id="storeSelectScreen">
   <h2>Select Store</h2>
 
-  <input id="storeNameInput" type="text" placeholder="Store Name">
-  <input id="storeNumberInput" type="text" placeholder="Store Number">
+  <select id="storeDropdown">
+    <option value="">Select Store</option>
+    <option value="0818 - Kuluin">0818 - Kuluin</option>
+    <option value="0892 - Nambour">0892 - Nambour</option>
+    <option value="0981 - Maroochydore">0981 - Maroochydore</option>
+    <option value="1614 - Sippy Downs">1614 - Sippy Downs</option>
+  </select>
 
-  <button id="startTestBtn">Start Test</button>
+  <button id="startBtn">Start Test</button>
 </div>
 
 <script>
-  // After loading bar completes, show store selection
+  const loadingScreen = document.getElementById("loadingScreen");
+  const storeScreen   = document.getElementById("storeSelectScreen");
+  const progressFill  = document.getElementById("progressFill");
+  const dropdown      = document.getElementById("storeDropdown");
+  const startBtn      = document.getElementById("startBtn");
+
+  // ⭐ Run loading animation
   setTimeout(() => {
-    document.getElementById("loadingScreen").style.display = "none";
-    document.getElementById("storeSelectScreen").style.display = "flex";
-  }, 3000);
+    progressFill.style.width = "100%";
+  }, 100);
 
-  // Start Test button → redirect with parameters
-  document.getElementById("startTestBtn").onclick = () => {
-    const store = document.getElementById("storeNameInput").value.trim();
-    const num   = document.getElementById("storeNumberInput").value.trim();
+  // ⭐ After animation, show store select
+  setTimeout(() => {
+    loadingScreen.style.display = "none";
+    storeScreen.style.display = "flex";
+  }, 1500);
 
-    if (!store || !num) {
-      alert("Please enter both store name and store number");
-      return;
-    }
+  // ⭐ Start Test button
+  startBtn.onclick = () => {
+    const val = dropdown.value;
+    if (!val) return;
+
+    const [num, name] = val.split(" - ");
 
     window.location.href =
-      `app.html?store=${encodeURIComponent(store)}&num=${encodeURIComponent(num)}`;
+      `app.html?store=${encodeURIComponent(name)}&num=${encodeURIComponent(num)}`;
   };
 </script>
 
