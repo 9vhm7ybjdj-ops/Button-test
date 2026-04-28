@@ -3,76 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>UHC Loader</title>
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>UHC Button Test</title>
 
 <style>
   body {
     margin: 0;
     background: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: 100vh;
+    width: 100vw;
     overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: #7CFC00;
   }
 
-  /* ---------------------- LOADING SCREEN ---------------------- */
+  /* ---------------- LOADING SCREEN ---------------- */
 
   #loadingScreen {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #logoWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
-    margin-bottom: 100px; /* ⭐ EXACT GAP YOU REQUESTED */
+    align-items: center;
+    background: #000;
+    z-index: 9999;
   }
 
-  #badgeLogo {
-    width: 260px;
-    height: auto;
-    filter:
-      drop-shadow(0 0 6px #00ff00)
-      drop-shadow(0 0 12px #00ff00);
-    animation: flicker 2.4s infinite;
+  .badge-wrapper {
+    position: relative;
+    width: 320px;
   }
 
-  @keyframes flicker {
-    0%, 100% { opacity: 1; }
-    92% { opacity: 0.92; }
-    94% { opacity: 0.85; }
-    96% { opacity: 0.95; }
+  .badge-img {
+    width: 100%;
+    display: block;
   }
 
-  #progressBar {
-    width: 260px;
-    height: 10px;
+  .version-label {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 14px;
+    font-family: monospace;
+    color: #7CFC00;
+    text-shadow:
+      0 0 6px #7CFC00,
+      0 0 12px #4cff00,
+      0 0 18px #2aff00;
+    animation: lcdFlicker 2s infinite;
+  }
+
+  .loading-bar {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 110px; /* ✔ EXACT POSITION */
+    width: 65%;
+    height: 8px;
     background: #222;
-    border-radius: 6px;
+    border-radius: 4px;
     overflow: hidden;
+    box-shadow: 0 0 10px #00ff00;
   }
 
-  #progressFill {
+  .loading-fill {
     width: 0%;
     height: 100%;
     background: #00ff00;
     box-shadow: 0 0 10px #00ff00;
-    transition: width 1.5s linear;
+    animation: loadAnim 3s forwards;
   }
 
-  /* ---------------------- STORE SELECT SCREEN ---------------------- */
+  @keyframes lcdFlicker {
+    0%, 100% { opacity: 1; }
+    45% { opacity: 0.85; }
+    50% { opacity: 0.55; }
+    55% { opacity: 0.92; }
+    70% { opacity: 0.78; }
+  }
+
+  @keyframes loadAnim {
+    from { width: 0%; }
+    to   { width: 100%; }
+  }
+
+  /* ---------------- STORE SELECT SCREEN ---------------- */
 
   #storeSelectScreen {
     display: none;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
-    text-align: center;
+    margin-top: 80px;
   }
 
   select {
@@ -105,18 +130,19 @@
 
 <body>
 
-<!-- ---------------------- LOADING SCREEN ---------------------- -->
+<!-- ---------------- LOADING SCREEN ---------------- -->
 <div id="loadingScreen">
-  <div id="logoWrapper">
-    <img src="IMG_4088.png" id="badgeLogo">
-  </div>
+  <div class="badge-wrapper">
+    <img src="IMG_4088.png" class="badge-img">
+    <div class="version-label">v1.0.0</div>
 
-  <div id="progressBar">
-    <div id="progressFill"></div>
+    <div class="loading-bar">
+      <div class="loading-fill"></div>
+    </div>
   </div>
 </div>
 
-<!-- ---------------------- STORE SELECT SCREEN ---------------------- -->
+<!-- ---------------- STORE SELECT SCREEN ---------------- -->
 <div id="storeSelectScreen">
   <h2>Select Store</h2>
 
@@ -132,26 +158,17 @@
 </div>
 
 <script>
-  const loadingScreen = document.getElementById("loadingScreen");
-  const storeScreen   = document.getElementById("storeSelectScreen");
-  const progressFill  = document.getElementById("progressFill");
-  const dropdown      = document.getElementById("storeDropdown");
-  const startBtn      = document.getElementById("startBtn");
+  /* ⭐ NO SOUND — CLEAN */
 
-  /* ⭐ Animate loading bar */
+  /* After loading animation completes, show store select */
   setTimeout(() => {
-    progressFill.style.width = "100%";
-  }, 100);
+    document.getElementById("loadingScreen").style.display = "none";
+    document.getElementById("storeSelectScreen").style.display = "flex";
+  }, 3000);
 
-  /* ⭐ After animation, show store select */
-  setTimeout(() => {
-    loadingScreen.style.display = "none";
-    storeScreen.style.display = "flex";
-  }, 1600);
-
-  /* ⭐ Start Test button */
-  startBtn.onclick = () => {
-    const val = dropdown.value;
+  /* Start Test button */
+  document.getElementById("startBtn").onclick = () => {
+    const val = document.getElementById("storeDropdown").value;
     if (!val) return;
 
     const [num, name] = val.split(" - ");
