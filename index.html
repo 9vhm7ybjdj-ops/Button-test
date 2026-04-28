@@ -1,105 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UHC Button Test</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UHC Testing</title>
+<link rel="stylesheet" href="style.css">
 
-  <link rel="stylesheet" href="style.css">
+<!-- PDF Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <!-- html2pdf + html2canvas -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 </head>
-
 <body>
 
 <!-- LOADING SCREEN -->
 <div id="loadingScreen">
-  <div id="loadingContent">
-
-    <!-- Pulsing Logo -->
-    <img id="loadingLogo" src="icon.png" alt="Logo">
-
-    <!-- Pulsing Title -->
-    <div id="loadingTitle">UHC Button Test</div>
-
-    <!-- Version Label -->
-    <div id="versionLabel">v1.4</div>
-
-    <div id="loadingBarOuter">
-      <div id="loadingBarInner"></div>
+    <div id="loadingBox">
+        <div id="loadingBarOuter">
+            <div id="loadingBarInner"></div>
+        </div>
+        <div id="loadingPercent">0%</div>
     </div>
-
-    <div id="loadingPercent">0%</div>
-  </div>
 </div>
 
-<div class="shell body">
-
-  <div class="top">
-    <div>
-      Store:
-      <select id="store">
+<!-- HEADER -->
+<div id="topBar">
+    <select id="store">
         <option value="">Select Store</option>
         <option value="0818 - Kuluin">0818 - Kuluin</option>
-        <option value="0892 - Nambour">0892 - Nambour</option>
-        <option value="0981 - Maroochydore">0981 - Maroochydore</option>
-        <option value="1614 - Sippy Downs">1614 - Sippy Downs</option>
-      </select>
-    </div>
-    <div id="mode">Testing Front Face (Left UHC)</div>
-  </div>
+        <option value="1234 - Example">1234 - Example</option>
+    </select>
+    <div id="mode">Loading...</div>
+</div>
 
-  <div id="unitContainer"></div>
+<!-- MAIN TEST AREA -->
+<div id="unitContainer"></div>
 
-  <!-- REPORT -->
-  <div id="report" class="report">
+<!-- REPORT PAGE -->
+<div id="report" class="report">
 
-    <div class="reportHeader">
-      <div class="reportTitle">UHC Button Test – Full Report</div>
-      <div class="reportMeta" id="reportStore"></div>
-      <div class="reportMeta" id="reportTime"></div>
-    </div>
+    <h2 id="reportStore"></h2>
+    <div id="reportTime"></div>
 
-    <div id="pdfHeader" class="pdfHeader">
-      <div class="pdfHeaderLeft">
-        <div class="pdfHeaderTitle" id="pdfStoreName">No Store Selected</div>
-        <div class="pdfHeaderSub" id="pdfTimestamp"></div>
-      </div>
-      <img class="pdfQR" id="pdfQR" src="">
-    </div>
+    <img id="pdfQR" />
 
     <div id="fullGridView"></div>
 
-    <div class="reportFooter">
-      <div class="totalFailures" id="totalFailures">Total Failures: 0</div>
-      <div class="legendRow">
-        <div class="legendItem">
-          <span class="statusDot dot-pass"></span>
-          <span class="statusText text-pass">PASS</span>
-        </div>
-        <div class="legendItem">
-          <span class="statusDot dot-fail"></span>
-          <span class="statusText text-fail">FAIL</span>
-        </div>
-        <div class="legendItem">
-          <span class="statusDot dot-un"></span>
-          <span class="statusText text-un">UNTESTED</span>
-        </div>
-        <div class="legendItem">
-          <span class="statusDot dot-skip"></span>
-          <span class="statusText text-skip">SKIPPED</span>
-        </div>
-      </div>
+    <div id="totalFailures"></div>
+
+    <!-- NEW BUTTONS -->
+    <div class="reportNav">
+        <button id="backToTest">Back</button>
+        <button id="newTest">New Test</button>
     </div>
 
-    <button id="pdfBtn" class="darkButton" style="display:none;">Download PDF</button>
-    <button id="sharePdfBtn" class="darkButton" style="display:none;">Share PDF</button>
-
-  </div>
+    <!-- PDF BUTTONS -->
+    <button id="pdfBtn" onclick="generatePDF()">Download PDF</button>
+    <button id="sharePdfBtn" onclick="sharePDF()">Share PDF</button>
 
 </div>
 
-<script src="script.js" defer></script>
+<script src="script.js"></script>
 </body>
 </html>
