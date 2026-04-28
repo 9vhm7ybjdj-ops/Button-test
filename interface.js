@@ -147,7 +147,6 @@ function renderScreen() {
         lastScreen: currentScreen
       }));
 
-      // Pass correct screen index to report
       window.location.href = `report.html?data=${data}&screen=${currentScreen}`;
     } else {
       currentScreen++;
