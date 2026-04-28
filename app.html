@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>UHC Test</title>
+<style>
+  html, body {
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  #app { padding: 10px; }
+
+  #storeWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px auto 10px;
+    max-width: 420px;
+  }
+  #storeWrap label {
+    font-size: 14px;
+    opacity: 0.8;
+  }
+  #store {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #444;
+    background: #111;
+    color: #fff;
+  }
+
+  .faceWrap {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+  }
+  .face {
+    background: #000;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 420px;
+  }
+  .face h3 {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 16px;
+    white-space: nowrap;
+  }
+
+  .row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+  }
+  .row.rowPass {
+    box-shadow: 0 0 20px #00ff00;
+    border-radius: 6px;
+  }
+  .row.rowFail {
+    box-shadow: 0 0 20px #ff0000;
+    border-radius: 6px;
+  }
+
+  .btn {
+    width: 80px;
+    height: 50px;
+    background: #111;
+    border: 2px solid #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+  }
+  .statusText {
+    font-size: 16px;
+    color: #fff;
+  }
+  .btn.pass {
+    background: #003300;
+    border-color: #00ff00;
+    box-shadow: 0 0 12px #00ff00;
+  }
+  .btn.fail {
+    background: #330000;
+    border-color: #ff0000;
+    box-shadow: 0 0 12px #ff0000;
+  }
+  .btn.un {
+    background: #000;
+    border: 2px solid #ffeb3b;
+    box-shadow: 0 0 12px #ffeb3b;
+    color: #ffeb3b;
+  }
+
+  .skipBox {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .navBtns {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  .navBtns button {
+    width: 48%;
+    padding: 12px;
+    font-size: 16px;
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 6px;
+  }
+
+  #buildTag {
+    text-align: center;
+    font-size: 11px;
+    opacity: 0.5;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="storeWrap">
+    <label for="store">Select Store</label>
+    <select id="store"></select>
+  </div>
+
+  <div id="unitContainer"></div>
+  <div id="buildTag">UHC Testing — Build 2.0</div>
+</div>
+
+<script>
+  // ---------- CONFIG ----------
+  const storeList = [
+    "0818 – Kuluin",
+    "0892 – Nambour",
+    "0981 – Nambour",
+    "0981 – Maroochydore",
+    "1614 – Sippy Downs"
+  ];
+
+  const unitNames = [
+    "Left UHC",
+    "Middle UHC",
+    "Right UHC"
+  ];
+
+  function makeFace() {
+    return Array.from({ length: 6 }, () => ["UN", "UN", "UN"]);
+  }
+
+  const units = [
+    { skip: false, front: makeFace(), back: makeFace() },
+    { skip: false, front: makeFace(), back: makeFace() },
+    { skip: false, front: makeFace(), back: makeFace() }
+  ];
+
+  function el(tag, cls, html) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  // ---------- STORE DROPDOWN ----------
+  const storeSelect = document.getElementById("store");
+  function populateStores() {
+    storeSelect.innerHTML = "";
+    const optDefault = el("option", "", "Select Store");
+    optDefault.value = "";
+    storeSelect.appendChild(optDefault);
+
+    storeList.forEach(name => {
+      const o = el("option", "", name);
+      o.value = name;
+      storeSelect.appendChild(o);
+    });
+
+    const saved = sessionStorage.getItem("uhc_store");
+    if (saved) storeSelect.value = saved;
+  }
+  populateStores();
+
+  storeSelect.addEventListener("change", () => {
+    sessionStorage.setItem("uhc_store", storeSelect.value || "");
+  });
+
+  // ---------- SCREEN STATE ----------
+  const params = new URLSearchParams(location.search);
+  const startScreen = parseInt(params.get("screen"));
+  let currentScreen = !isNaN(startScreen) ? startScreen : 0;
+
+  function getSelectedStore() {
+    return storeSelect.value || "No Store Selected";
+  }
+
+  // ---------- RENDER ----------
+  function renderScreen() {
+    const c = document.getElementById("unitContainer");
+    c.innerHTML = "";
+
+    const unitIndex = Math.floor(currentScreen / 2);
+    const sideKey = currentScreen % 2 === 0 ? "front" : "back";
+    const sideLabel = sideKey === "front" ? "Front Face" : "Back Face";
+    const unit = units[unitIndex];
+
+    const wrap = el("div", "faceWrap");
+    const face = el("div", "face");
+    face.appendChild(el("h3", "", `${unitNames[unitIndex]} — ${sideLabel}`));
+
+    if (unit.skip) {
+      const skipped = el("div", "", "SKIPPED");
+      skipped.style.textAlign = "center";
+      skipped.style.fontSize = "24px";
+      skipped.style.padding = "40px 0";
+      face.appendChild(skipped);
+    } else {
+      unit[sideKey].forEach((row, rIndex) => {
+        const rowDiv = el("div", "row");
+
+        if (row.some(v => v === "FAIL")) {
+          rowDiv.classList.add("rowFail");
+        } else if (row.every(v => v === "PASS")) {
+          rowDiv.classList.add("rowPass");
+        }
+
+        row.forEach((val, cIndex) => {
+          const btn = el("div", "btn");
+          const text = el("span", "statusText");
+
+          if (val === "PASS") {
+            btn.classList.add("pass");
+            text.textContent = "PASS";
+          } else if (val === "FAIL") {
+            btn.classList.add("fail");
+            text.textContent = "FAIL";
+          } else {
+            btn.classList.add("un");
+            text.textContent = "- - -";
+          }
+
+          btn.appendChild(text);
+
+          btn.onclick = () => {
+            if (unit.skip) return;
+            const current = units[unitIndex][sideKey][rIndex][cIndex];
+            const next =
+              current === "UN" ? "PASS" :
+              current === "PASS" ? "FAIL" :
+              "UN";
+            units[unitIndex][sideKey][rIndex][cIndex] = next;
+            renderScreen();
+          };
+
+          rowDiv.appendChild(btn);
+        });
+
+        face.appendChild(rowDiv);
+      });
+    }
+
+    const skipBox = el("div", "skipBox");
+    const skipCheck = document.createElement("input");
+    skipCheck.type = "checkbox";
+    skipCheck.checked = unit.skip;
+    skipCheck.onchange = () => {
+      unit.skip = skipCheck.checked;
+      if (unit.skip) {
+        unit.front = makeFace();
+        unit.back = makeFace();
+      }
+      renderScreen();
+    };
+    skipBox.appendChild(skipCheck);
+    skipBox.append(" Skip entire unit");
+    face.appendChild(skipBox);
+
+    const nav = el("div", "navBtns");
+    const backBtn = el("button", "", "Back");
+    backBtn.disabled = currentScreen === 0;
+    backBtn.onclick = () => {
+      if (currentScreen > 0) {
+        currentScreen--;
+        renderScreen();
+      }
+    };
+
+    const nextBtn = el("button", "", currentScreen === 5 ? "Finish" : "Next");
+    nextBtn.onclick = () => {
+      if (currentScreen === 5) {
+        const store = getSelectedStore();
+        const payload = {
+          store,
+          units,
+          lastScreen: currentScreen
+        };
+        const data = encodeURIComponent(JSON.stringify(payload));
+        const cb = Date.now();
+        window.location.href = `report.html?data=${data}&screen=${currentScreen}&cb=${cb}`;
+      } else {
+        currentScreen++;
+        renderScreen();
+      }
+    };
+
+    nav.append(backBtn, nextBtn);
+    face.appendChild(nav);
+
+    wrap.appendChild(face);
+    c.appendChild(wrap);
+  }
+
+  renderScreen();
+</script>
+
+</body>
+</html>
