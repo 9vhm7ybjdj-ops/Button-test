@@ -14,6 +14,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const interval = setInterval(() => {
     p += 2;
     if (p > 100) p = 100;
+
     bar.style.width = p + "%";
     percent.textContent = p + "%";
 
@@ -26,7 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           screen.remove();
 
-          // ⭐ Apply vh fix AFTER loading screen is gone
+          // Apply vh fix AFTER loading screen is gone
           updateVH();
 
         }, 800);
@@ -171,4 +172,64 @@ function renderScreen() {
   c.appendChild(wrap);
 }
 
-/* REPORT (CLASSIC STYLE, 6x3, ROW H
+/* REPORT (CLASSIC STYLE, 6x3, ROW HIGHLIGHT) */
+function buildReport() {
+  const full = document.getElementById("fullGridView");
+  full.innerHTML = "";
+
+  const storeName = getSelectedStore();
+  const timestamp = new Date().toLocaleString();
+  const qrURL = generateQR(window.location.href);
+
+  document.getElementById("pdfStoreName").textContent = storeName;
+  document.getElementById("pdfTimestamp").textContent = timestamp;
+  document.getElementById("pdfQR").src = qrURL;
+
+  document.getElementById("reportStore").textContent = storeName;
+  document.getElementById("reportTime").textContent = timestamp;
+
+  let totalFails = 0;
+
+  [1, 2, 3].forEach(u => {
+    const unit = units[u];
+
+    const row = el("div", "unitRow");
+
+    ["front", "back"].forEach(side => {
+      const face = el("div", "reportFace");
+      face.appendChild(el("div", "sectionHeader", `${unitNames[u]} — ${side === "front" ? "Front" : "Back"}`));
+
+      unit[side].forEach(r => {
+        const wrap = el("div", "gridRowWrapper");
+        const inner = el("div", "gridRowInner");
+
+        if (r.some(v => v === "FAIL")) {
+          inner.classList.add("rowFail");
+          totalFails++;
+        }
+
+        r.forEach(v => {
+          const cell = el("div", "cell", v);
+          inner.appendChild(cell);
+        });
+
+        wrap.appendChild(inner);
+        face.appendChild(wrap);
+      });
+
+      row.appendChild(face);
+    });
+
+    full.appendChild(row);
+  });
+
+  document.getElementById("totalFailures").textContent = `Total Failures: ${totalFails}`;
+
+  document.getElementById("pdfBtn").style.display = "block";
+  document.getElementById("sharePdfBtn").style.display = "block";
+}
+
+/* QR GENERATOR */
+function generateQR(url) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+}
