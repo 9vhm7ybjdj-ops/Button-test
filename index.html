@@ -2,55 +2,82 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Loading…</title>
-<link rel="stylesheet" href="style.css">
 
 <style>
-    body, html {
+    body {
         margin: 0;
-        padding: 0;
-        height: 100%;
         background: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
+        height: 100vh;
         flex-direction: column;
-        font-family: Arial, sans-serif;
-        color: #fff;
+        text-align: center;
     }
 
-    #loadingLogo {
-        width: 140px;
-        height: auto;
+    #logo {
+        font-size: 28px;
         margin-bottom: 20px;
     }
 
-    #loadingText {
-        font-size: 22px;
-        color: #ffeb3b;
-        margin-bottom: 8px;
+    #version {
+        font-size: 14px;
+        opacity: 0.6;
+        margin-bottom: 30px;
     }
 
-    #loadingVersion {
-        font-size: 14px;
-        color: #00ff00;
-        opacity: 0.7;
+    #barOuter {
+        width: 80%;
+        height: 14px;
+        border: 2px solid #00ff00;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 12px #00ff00;
+    }
+
+    #barInner {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #004d00, #00ff00);
+        box-shadow: 0 0 12px #00ff00;
+        transition: width 3s linear;
+    }
+
+    #loadingText {
+        margin-top: 12px;
+        font-size: 16px;
+        opacity: 0.8;
     }
 </style>
-
-<script>
-    setTimeout(() => {
-        window.location.href = "app.html";
-    }, 1000);
-</script>
 
 </head>
 <body>
 
-    <img id="loadingLogo" src="icon.png" alt="Logo">
-    <div id="loadingText">Loading…</div>
-    <div id="loadingVersion">V1.7</div>
+<div id="logo">UHC Testing</div>
+<div id="version">V1.8</div>
+
+<div id="barOuter">
+    <div id="barInner"></div>
+</div>
+
+<div id="loadingText">Loading…</div>
+
+<script>
+    // Start bar animation
+    setTimeout(() => {
+        document.getElementById("barInner").style.width = "100%";
+    }, 100);
+
+    // Redirect after animation completes
+    setTimeout(() => {
+        window.location.href = "app.html";
+    }, 3100);
+</script>
 
 </body>
 </html>
