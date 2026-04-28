@@ -45,7 +45,7 @@
         height: 100%;
         background: linear-gradient(90deg, #004d00, #00ff00);
         box-shadow: 0 0 12px #00ff00;
-        transition: width 3s linear;
+        transition: width 1.5s linear; /* UPDATED SPEED */
     }
 
     #loadingText {
@@ -68,16 +68,14 @@
 <div id="loadingText">Loading…</div>
 
 <script>
-    // Start bar animation AFTER DOM is ready
     window.onload = () => {
         setTimeout(() => {
             document.getElementById("barInner").style.width = "100%";
         }, 50);
 
-        // Redirect after animation completes
         setTimeout(() => {
             window.location.href = "app.html";
-        }, 3100);
+        }, 1600); // UPDATED REDIRECT
     };
 </script>
 
