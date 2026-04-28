@@ -3,6 +3,7 @@ function updateVH() {
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
 window.addEventListener('resize', updateVH);
+currentScreen = 0;
 
 /* LOADING BAR */
 window.addEventListener("DOMContentLoaded", () => {
