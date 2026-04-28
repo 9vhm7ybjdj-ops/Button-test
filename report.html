@@ -180,8 +180,11 @@
     table.appendChild(row);
 
     const isFail = String(item.status).toUpperCase().includes("FAIL");
-    const isFront = item.face.toLowerCase().startsWith("front");
-    const isBack = item.face.toLowerCase().startsWith("back");
+
+    // ⭐ Bulletproof face detection
+    const face = item.face.toLowerCase();
+    const isFront = face.includes("front");
+    const isBack = face.includes("back") || face.includes("rear");
 
     if (isFail && isFront) totalFrontFails++;
     if (isFail && isBack) totalBackFails++;
