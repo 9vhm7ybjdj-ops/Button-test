@@ -11,6 +11,7 @@ const parsed = JSON.parse(decodeURIComponent(raw));
 
 const storeName = parsed.store;
 const units = parsed.units;
+const lastScreen = parsed.lastScreen ?? 0;
 
 document.getElementById("reportStore").textContent = storeName;
 document.getElementById("reportTime").textContent = new Date().toLocaleString();
@@ -62,87 +63,12 @@ const unitNames = {
 document.getElementById("totalFailures").textContent =
   `Total Failures: ${totalFails}`;
 
+// BACK → return to last unit/face
 document.getElementById("backToTest").onclick = () => {
-  window.location.href = "index.html";
+  window.location.href = `app.html?screen=${lastScreen}`;
 };
 
+// NEW TEST → restart
 document.getElementById("newTest").onclick = () => {
-  window.location.href = "index.html";
-};
-
-document.getElementById("shareAppBtn").onclick = () => {
-  const appURL = "https://m7ybjdj-ops.github.io/";
-  if (navigator.share) {
-    navigator.share({
-      title: "UHC Button Test App",
-      text: "Open the UHC Button Test App.",
-      url: appURL
-    });
-  } else {
-    window.open(appURL, "_blank");
-  }
-};
-
-document.getElementById("pdfBtn").onclick = async () => {
-  const report = document.getElementById("report");
-
-  await new Promise(r => requestAnimationFrame(r));
-  await new Promise(r => requestAnimationFrame(r));
-  await new Promise(r => setTimeout(r, 150));
-
-  window.scrollTo(0, document.body.scrollHeight);
-  await new Promise(r => setTimeout(r, 100));
-  window.scrollTo(0, 0);
-
-  const canvas = await html2canvas(report, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#000"
-  });
-
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jspdf.jsPDF("p", "mm", "a4");
-
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const imgWidth = pageWidth;
-  const imgHeight = canvas.height * (imgWidth / canvas.width);
-
-  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-  pdf.save("UHC-Report.pdf");
-};
-
-document.getElementById("sharePdfBtn").onclick = async () => {
-  const report = document.getElementById("report");
-
-  await new Promise(r => requestAnimationFrame(r));
-  await new Promise(r => requestAnimationFrame(r));
-  await new Promise(r => setTimeout(r, 150));
-
-  window.scrollTo(0, document.body.scrollHeight);
-  await new Promise(r => setTimeout(r, 100));
-  window.scrollTo(0, 0);
-
-  const canvas = await html2canvas(report, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: "#000"
-  });
-
-  const imgData = canvas.toDataURL("image/png");
-  const pdf = new jspdf.jsPDF("p", "mm", "a4");
-
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const imgWidth = pageWidth;
-  const imgHeight = canvas.height * (imgWidth / canvas.width);
-
-  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-
-  const blob = pdf.output("blob");
-
-  if (navigator.share) {
-    const file = new File([blob], "UHC-Report.pdf", { type: "application/pdf" });
-    navigator.share({ files: [file] });
-  } else {
-    alert("Sharing not supported");
-  }
+  window.location.href = "app.html";
 };
