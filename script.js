@@ -1,14 +1,16 @@
-// iOS 100vh fix
+/* ------------------------------
+   iOS 100vh FIX
+------------------------------ */
 function updateVH() {
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
-
-// ⭐ Run immediately BEFORE anything renders
 updateVH();
 window.onload = updateVH;
-window.addEventListener('resize', updateVH);
+window.addEventListener("resize", updateVH);
 
-/* LOADING BAR */
+/* ------------------------------
+   LOADING SCREEN
+------------------------------ */
 window.addEventListener("DOMContentLoaded", () => {
   const bar = document.getElementById("loadingBarInner");
   const percent = document.getElementById("loadingPercent");
@@ -30,8 +32,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
           screen.remove();
-          updateVH(); // ⭐ Ensure correct height after loading screen disappears
-          renderScreen(); // ⭐ Force first render
+          updateVH();
+          renderScreen();
         }, 800);
 
       }, 300);
@@ -39,7 +41,9 @@ window.addEventListener("DOMContentLoaded", () => {
   }, 100);
 });
 
-/* HELPERS */
+/* ------------------------------
+   HELPERS
+------------------------------ */
 function el(tag, cls, html) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -63,20 +67,19 @@ const units = {
   3: { skip: false, front: makeFace(), back: makeFace() }
 };
 
-// ⭐ Force start at screen 0
 let currentScreen = 0;
 
 function getSelectedStore() {
   return document.getElementById("store").value || "No Store Selected";
 }
 
-/* TESTING SCREENS */
+/* ------------------------------
+   MAIN TESTING SCREENS
+------------------------------ */
 function renderScreen() {
   const c = document.getElementById("unitContainer");
   const r = document.getElementById("report");
   const m = document.getElementById("mode");
-
-  if (!c) return; // ⭐ Safety check
 
   c.innerHTML = "";
   r.style.display = "none";
@@ -106,29 +109,23 @@ function renderScreen() {
   } else {
     unit[f].forEach((row, rIndex) => {
       const rowDiv = el("div", "row");
-      const hasFail = row.some(v => v === "FAIL");
-      if (hasFail) rowDiv.classList.add("rowFail");
+      if (row.some(v => v === "FAIL")) rowDiv.classList.add("rowFail");
 
       row.forEach((val, cIndex) => {
         const btn = el("div", "btn");
-        const dot = el("span", "statusDot");
         const text = el("span", "statusText");
 
         if (val === "PASS") {
-          dot.classList.add("dot-pass");
-          text.classList.add("text-pass");
+          btn.classList.add("pass");
           text.textContent = "PASS";
         } else if (val === "FAIL") {
-          dot.classList.add("dot-fail");
-          text.classList.add("text-fail");
+          btn.classList.add("fail");
           text.textContent = "FAIL";
         } else {
-          dot.classList.add("dot-un");
-          text.classList.add("text-un");
-          text.textContent = "UNTESTED";
+          btn.classList.add("un");
+          text.textContent = "- - -";
         }
 
-        btn.appendChild(dot);
         btn.appendChild(text);
 
         btn.onclick = () => {
@@ -177,7 +174,9 @@ function renderScreen() {
   c.appendChild(wrap);
 }
 
-/* REPORT */
+/* ------------------------------
+   REPORT GENERATION
+------------------------------ */
 function buildReport() {
   const full = document.getElementById("fullGridView");
   full.innerHTML = "";
@@ -197,7 +196,6 @@ function buildReport() {
 
   [1, 2, 3].forEach(u => {
     const unit = units[u];
-
     const row = el("div", "unitRow");
 
     ["front", "back"].forEach(side => {
@@ -214,7 +212,7 @@ function buildReport() {
         }
 
         r.forEach(v => {
-          const cell = el("div", "cell", v);
+          const cell = el("div", "cell", v === "UN" ? "- - -" : v);
           inner.appendChild(cell);
         });
 
@@ -234,7 +232,96 @@ function buildReport() {
   document.getElementById("sharePdfBtn").style.display = "block";
 }
 
-/* QR GENERATOR */
+/* ------------------------------
+   QR CODE
+------------------------------ */
 function generateQR(url) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+}
+
+/* ------------------------------
+   REPORT PAGE BUTTONS
+------------------------------ */
+document.getElementById("backToTest").onclick = () => {
+  currentScreen = 5;
+  renderScreen();
+};
+
+document.getElementById("newTest").onclick = () => {
+  currentScreen = 0;
+
+  [1,2,3].forEach(u => {
+    units[u].skip = false;
+    units[u].front = makeFace();
+    units[u].back = makeFace();
+  });
+
+  renderScreen();
+};
+
+/* ------------------------------
+   PDF GENERATION (AUTO-DETECT)
+------------------------------ */
+async function generatePDF() {
+  const report = document.getElementById("report");
+
+  report.style.display = "block";
+  await new Promise(r => setTimeout(r, 200));
+
+  if (typeof html2canvas === "undefined" || typeof jspdf === "undefined") {
+    alert("PDF engine not loaded");
+    return;
+  }
+
+  const canvas = await html2canvas(report, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#000"
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const imgWidth = pageWidth;
+  const imgHeight = canvas.height * (imgWidth / canvas.width);
+
+  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+  pdf.save("UHC-Report.pdf");
+}
+
+async function sharePDF() {
+  const report = document.getElementById("report");
+
+  report.style.display = "block";
+  await new Promise(r => setTimeout(r, 200));
+
+  if (typeof html2canvas === "undefined" || typeof jspdf === "undefined") {
+    alert("PDF engine not loaded");
+    return;
+  }
+
+  const canvas = await html2canvas(report, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#000"
+  });
+
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jspdf.jsPDF("p", "mm", "a4");
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const imgWidth = pageWidth;
+  const imgHeight = canvas.height * (imgWidth / canvas.width);
+
+  pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+  const blob = pdf.output("blob");
+
+  if (navigator.share) {
+    const file = new File([blob], "UHC-Report.pdf", { type: "application/pdf" });
+    navigator.share({ files: [file] });
+  } else {
+    alert("Sharing not supported");
+  }
 }
