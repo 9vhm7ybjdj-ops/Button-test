@@ -4,66 +4,90 @@
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Loading…</title>
+<title>UHC Store Select</title>
+
 <style>
-  html, body {
-    margin: 0;
-    background: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    height: 100%;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    user-select: none;
-  }
   body {
+    margin: 0;
+    padding: 0;
+    background: #111;
+    font-family: Arial, sans-serif;
+    color: #fff;
     display: flex;
     justify-content: center;
-    align-items: center;
+    padding-top: 40px;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
     flex-direction: column;
-    text-align: center;
+    gap: 20px;
+    align-items: center;
   }
-  #logo { font-size: 28px; margin-bottom: 20px; }
-  #version { font-size: 14px; opacity: 0.6; margin-bottom: 30px; }
-  #barOuter {
-    width: 80%;
-    height: 14px;
-    border: 2px solid #00ff00;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 12px #00ff00;
+
+  .header {
+    font-size: 22px;
+    font-weight: bold;
   }
-  #barInner {
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(90deg, #004d00, #00ff00);
-    box-shadow: 0 0 12px #00ff00;
-    transition: width 1.5s linear;
+
+  .sub {
+    opacity: 0.8;
+    margin-bottom: 10px;
   }
-  #loadingText { margin-top: 12px; font-size: 16px; opacity: 0.8; }
+
+  select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background: #222;
+    color: #fff;
+    font-size: 16px;
+  }
+
+  button {
+    padding: 12px 20px;
+    background: #2b6cb0;
+    border: 1px solid #777;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  button:active {
+    transform: scale(0.98);
+  }
 </style>
 </head>
+
 <body>
+<div id="app">
+  <div class="header">UHC Test</div>
+  <div class="sub">Select store to begin</div>
 
-<div id="logo">UHC Testing</div>
-<div id="version">Build 2.0</div>
+  <select id="storeSelect">
+    <option value="">Select Store</option>
+    <option value="Kuluin|0818">Kuluin – 0818</option>
+    <option value="Nambour|0892">Nambour – 0892</option>
+    <option value="Maroochydore|0981">Maroochydore – 0981</option>
+    <option value="Sippy Downs|1614">Sippy Downs – 1614</option>
+  </select>
 
-<div id="barOuter">
-  <div id="barInner"></div>
+  <button id="startBtn">Start</button>
 </div>
 
-<div id="loadingText">Loading…</div>
-
 <script>
-  window.onload = () => {
-    setTimeout(() => {
-      document.getElementById("barInner").style.width = "100%";
-    }, 50);
+  document.getElementById("startBtn").onclick = () => {
+    const val = document.getElementById("storeSelect").value;
+    if (!val) return;
 
-    setTimeout(() => {
-      const cacheBust = Date.now();
-      window.location.href = "app.html?cb=" + cacheBust;
-    }, 1600);
+    const [store, num] = val.split("|");
+
+    // Redirect to app.html with URL parameters
+    window.location.href = `app.html?store=${encodeURIComponent(store)}&num=${encodeURIComponent(num)}`;
   };
 </script>
 
