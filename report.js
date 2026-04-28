@@ -5,6 +5,7 @@ function el(tag, cls, html) {
   return e;
 }
 
+// Read data from URL
 const params = new URLSearchParams(location.search);
 const raw = params.get("data");
 const parsed = JSON.parse(decodeURIComponent(raw));
@@ -13,6 +14,7 @@ const storeName = parsed.store;
 const units = parsed.units;
 const lastScreen = parsed.lastScreen ?? 0;
 
+// Insert store + time + title
 document.getElementById("reportStore").textContent = storeName;
 document.getElementById("reportTime").textContent = new Date().toLocaleString();
 document.getElementById("reportTitle").textContent =
@@ -27,15 +29,32 @@ const unitNames = {
   3: "Right UHC"
 };
 
+// Render each unit
 [1,2,3].forEach(u => {
   const unit = units[u];
   const row = el("div", "unitRow");
 
   ["front", "back"].forEach(side => {
     const face = el("div", "reportFace");
+
+    // Face header
     face.appendChild(el("div", "sectionHeader",
       `${unitNames[u]} — ${side === "front" ? "Front" : "Back"}`));
 
+    // ⭐ If unit is skipped → show SKIPPED panel
+    if (unit.skip) {
+      const skippedBox = el("div", "", "SKIPPED");
+      skippedBox.style.fontSize = "28px";
+      skippedBox.style.textAlign = "center";
+      skippedBox.style.padding = "40px 0";
+      skippedBox.style.color = "#ffeb3b";
+      skippedBox.style.textShadow = "0 0 12px #ffeb3b";
+      face.appendChild(skippedBox);
+      row.appendChild(face);
+      return;
+    }
+
+    // ⭐ Otherwise render normal grid
     unit[side].forEach(r => {
       const wrap = el("div", "gridRowWrapper");
       const inner = el("div", "gridRowInner");
@@ -60,6 +79,7 @@ const unitNames = {
   full.appendChild(row);
 });
 
+// Insert total failures
 document.getElementById("totalFailures").textContent =
   `Total Failures: ${totalFails}`;
 
