@@ -5,31 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UHC Report</title>
 <link rel="stylesheet" href="style.css">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script src="report.js" defer></script>
 </head>
 
 <body>
 
-<div id="report" class="report">
+<div class="report">
 
-    <h1 id="reportTitle"></h1>
-    <h2 id="reportStore"></h2>
-    <div id="reportTime"></div>
+    <!-- TITLE -->
+    <div id="reportTitle"></div>
 
+    <!-- STORE + TIME -->
+    <div id="reportStore" style="margin-top:10px; font-size:20px;"></div>
+    <div id="reportTime" style="margin-bottom:20px; opacity:0.8;"></div>
+
+    <!-- TOTAL FAILURES -->
+    <div id="totalFailures"
+         style="font-size:22px; margin-bottom:20px; color:#ffeb3b; text-shadow:0 0 10px #ffeb3b;">
+    </div>
+
+    <!-- FULL GRID -->
     <div id="fullGridView"></div>
 
-    <div id="totalFailures"></div>
-
+    <!-- NAV BUTTONS -->
     <div class="reportNav">
         <button id="backToTest">Back</button>
         <button id="newTest">New Test</button>
     </div>
 
-    <button id="shareAppBtn">Share App</button>
+    <!-- PDF + SHARE -->
     <button id="pdfBtn">Download PDF</button>
     <button id="sharePdfBtn">Share PDF</button>
 
