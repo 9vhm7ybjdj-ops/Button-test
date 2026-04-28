@@ -7,34 +7,79 @@
 <title>UHC Report</title>
 
 <style>
-  body {
+  html, body {
     margin: 0;
-    background: #000;
-    color: #7CFC00;
+    padding: 0;
+    background: #111;
+    color: #fff;
     font-family: Arial, sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #app {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
     padding: 20px;
+    box-sizing: border-box;
   }
 
   h1 {
     text-align: center;
-    margin-bottom: 20px;
-    text-shadow: 0 0 6px #00ff00;
+    margin-bottom: 10px;
   }
 
-  .summary-card {
-    border: 2px solid #00ff00;
-    padding: 15px;
-    margin-bottom: 20px;
+  h2 {
+    text-align: center;
+    margin-top: 0;
+    opacity: 0.8;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+    font-size: 18px;
+  }
+
+  th, td {
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    text-align: left;
+  }
+
+  th {
+    background: #222;
+  }
+
+  tr:nth-child(even) {
+    background: #1a1a1a;
+  }
+
+  /* Print Button */
+  #printBtn {
+    padding: 12px 24px;
+    font-size: 18px;
     border-radius: 8px;
+    background: #111;
+    color: #7CFC00;
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
     box-shadow: 0 0 12px #00ff00;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .failText {
-    color: #ff4444;
-    text-shadow: 0 0 6px #ff0000;
+  #printBtn:active {
+    transform: scale(0.97);
   }
 
-  #summaryTotals {
+  /* Totals block */
+  #totalsBlock {
     margin-top: 30px;
     text-align: center;
     font-size: 22px;
@@ -42,88 +87,94 @@
     text-shadow: 0 0 6px #ff0000;
   }
 
-  .btn-row {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 40px;
-  }
+  /* Print Layout */
+  @media print {
+    #printBtn {
+      display: none;
+    }
 
-  .glowButton {
-    padding: 12px 24px;
-    font-size: 18px;
-    border-radius: 6px;
-    background: #111;
-    color: #7CFC00;
-    border: 2px solid #00ff00;
-    text-shadow: 0 0 6px #00ff00;
-    box-shadow: 0 0 12px #00ff00;
-    cursor: pointer;
-  }
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
 
-  .glowButton:active {
-    transform: scale(0.97);
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #app {
+      padding: 20px;
+    }
   }
 </style>
 </head>
 
 <body>
+<div id="app">
 
-<h1>UHC TEST REPORT</h1>
+  <button id="printBtn">Print Report</button>
 
-<div id="summaryContainer"></div>
+  <h1>UHC Test Report</h1>
+  <h2 id="storeHeader"></h2>
 
-<div id="summaryTotals"></div>
+  <table id="reportTable">
+    <tr>
+      <th>Unit</th>
+      <th>Face</th>
+      <th>Status</th>
+    </tr>
+  </table>
 
-<div class="btn-row">
-  <button class="glowButton" onclick="window.location.href='index.html'">Back</button>
-  <button class="glowButton" onclick="window.location.href='app.html'">New Test</button>
+  <!-- ⭐ NEW TOTALS BLOCK -->
+  <div id="totalsBlock"></div>
+
 </div>
 
 <script>
-  // Read URL params
-  const urlParams = new URLSearchParams(window.location.search);
-  const storeName = urlParams.get("store") || "Unknown Store";
-  const storeNum  = urlParams.get("num")   || "0000";
+  // Load stored data
+  const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
+  const storeName = sessionStorage.getItem("storeName") || "";
+  const storeNumber = sessionStorage.getItem("storeNumber") || "";
 
-  // Read stored summary data
-  const summaryData = JSON.parse(localStorage.getItem("uhcSummary")) || {};
+  // Set store header
+  document.getElementById("storeHeader").textContent =
+    `${storeName} — ${storeNumber}`;
 
-  const container = document.getElementById("summaryContainer");
+  // Populate table
+  const table = document.getElementById("reportTable");
 
   let totalFrontFails = 0;
   let totalBackFails = 0;
 
-  // Build summary cards
-  for (let unit = 1; unit <= 3; unit++) {
-    const data = summaryData[unit];
-    if (!data) continue;
+  summary.forEach(item => {
+    const row = document.createElement("tr");
 
-    totalFrontFails += data.frontFails;
-    totalBackFails += data.backFails;
-
-    const card = document.createElement("div");
-    card.className = "summary-card";
-
-    card.innerHTML = `
-      <h2>Unit ${unit}</h2>
-      <p><strong>Store:</strong> ${storeNum} - ${storeName}</p>
-      <p><strong>Front Failed Rows:</strong> 
-         <span class="failText">${data.frontFails}</span></p>
-      <p><strong>Back Failed Rows:</strong> 
-         <span class="failText">${data.backFails}</span></p>
-      <p><strong>Front Fail List:</strong> ${data.frontList.join(", ") || "None"}</p>
-      <p><strong>Back Fail List:</strong> ${data.backList.join(", ") || "None"}</p>
+    row.innerHTML = `
+      <td>Unit ${item.unit}</td>
+      <td>${item.face.charAt(0).toUpperCase() + item.face.slice(1)}</td>
+      <td>${item.status}</td>
     `;
 
-    container.appendChild(card);
-  }
+    table.appendChild(row);
 
-  // Insert TOTALS at bottom
-  document.getElementById("summaryTotals").innerHTML = `
+    // Count totals
+    if (item.status === "FAIL") {
+      if (item.face === "front") totalFrontFails++;
+      if (item.face === "back") totalBackFails++;
+    }
+  });
+
+  // Insert totals
+  document.getElementById("totalsBlock").innerHTML = `
     TOTAL FRONT FAILED ROWS: ${totalFrontFails}<br>
     TOTAL BACK FAILED ROWS: ${totalBackFails}
   `;
+
+  // Print button
+  document.getElementById("printBtn").onclick = () => {
+    window.print();
+  };
 </script>
 
 </body>
