@@ -1,3 +1,8 @@
+// Read ?screen= from URL to resume last unit/face
+const params = new URLSearchParams(location.search);
+const startScreen = parseInt(params.get("screen"));
+let currentScreen = !isNaN(startScreen) ? startScreen : 0;
+
 function el(tag, cls, html) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
@@ -20,8 +25,6 @@ const units = {
   2: { skip: false, front: makeFace(), back: makeFace() },
   3: { skip: false, front: makeFace(), back: makeFace() }
 };
-
-let currentScreen = 0;
 
 function getSelectedStore() {
   return document.getElementById("store").value || "No Store Selected";
@@ -109,7 +112,11 @@ function renderScreen() {
   nextBtn.onclick = () => {
     if (currentScreen === 5) {
       const store = getSelectedStore();
-      const data = encodeURIComponent(JSON.stringify({ store, units }));
+      const data = encodeURIComponent(JSON.stringify({
+        store,
+        units,
+        lastScreen: currentScreen
+      }));
       window.location.href = `report.html?data=${data}`;
       return;
     }
