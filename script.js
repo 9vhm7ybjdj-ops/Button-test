@@ -2,8 +2,11 @@
 function updateVH() {
   document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
 }
+
+// ⭐ Run immediately BEFORE anything renders
+updateVH();
+window.onload = updateVH;
 window.addEventListener('resize', updateVH);
-currentScreen = 0;
 
 /* LOADING BAR */
 window.addEventListener("DOMContentLoaded", () => {
@@ -27,10 +30,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
         setTimeout(() => {
           screen.remove();
-
-          // Apply vh fix AFTER loading screen is gone
-          updateVH();
-
+          updateVH(); // ⭐ Ensure correct height after loading screen disappears
+          renderScreen(); // ⭐ Force first render
         }, 800);
 
       }, 300);
@@ -62,6 +63,7 @@ const units = {
   3: { skip: false, front: makeFace(), back: makeFace() }
 };
 
+// ⭐ Force start at screen 0
 let currentScreen = 0;
 
 function getSelectedStore() {
@@ -73,6 +75,8 @@ function renderScreen() {
   const c = document.getElementById("unitContainer");
   const r = document.getElementById("report");
   const m = document.getElementById("mode");
+
+  if (!c) return; // ⭐ Safety check
 
   c.innerHTML = "";
   r.style.display = "none";
@@ -173,7 +177,7 @@ function renderScreen() {
   c.appendChild(wrap);
 }
 
-/* REPORT (CLASSIC STYLE, 6x3, ROW HIGHLIGHT) */
+/* REPORT */
 function buildReport() {
   const full = document.getElementById("fullGridView");
   full.innerHTML = "";
