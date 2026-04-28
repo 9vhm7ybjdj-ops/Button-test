@@ -68,15 +68,17 @@
 <div id="loadingText">Loading…</div>
 
 <script>
-    // Start bar animation
-    setTimeout(() => {
-        document.getElementById("barInner").style.width = "100%";
-    }, 100);
+    // Start bar animation AFTER DOM is ready
+    window.onload = () => {
+        setTimeout(() => {
+            document.getElementById("barInner").style.width = "100%";
+        }, 50);
 
-    // Redirect after animation completes
-    setTimeout(() => {
-        window.location.href = "app.html";
-    }, 3100);
+        // Redirect after animation completes
+        setTimeout(() => {
+            window.location.href = "app.html";
+        }, 3100);
+    };
 </script>
 
 </body>
