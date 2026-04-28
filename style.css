@@ -2,14 +2,12 @@
    INTERFACE (app.html)
    =========================== */
 
-/* Face wrapper */
 .faceWrap {
     display: flex;
     justify-content: center;
     padding: 20px;
 }
 
-/* Face container */
 .face {
     background: #000;
     padding: 20px;
@@ -19,7 +17,6 @@
     max-width: 420px;
 }
 
-/* Header */
 .face h3 {
     text-align: center;
     font-size: 20px;
@@ -47,7 +44,6 @@
     border-radius: 6px;
 }
 
-/* TEXT INSIDE BUTTON */
 .statusText {
     font-size: 16px;
     color: #fff;
@@ -67,19 +63,17 @@
     box-shadow: 0 0 12px #ff0000;
 }
 
-/* UNTESTED */
+/* UN */
 .btn.un {
     background: #222;
     border-color: #555;
 }
 
-/* Skip box */
 .skipBox {
     margin-top: 20px;
     text-align: center;
 }
 
-/* Navigation buttons */
 .navBtns {
     display: flex;
     justify-content: space-between;
@@ -97,7 +91,7 @@
 }
 
 /* ===========================
-   REPORT PAGE (report.html)
+   REPORT PAGE
    =========================== */
 
 .sectionHeader {
@@ -107,27 +101,23 @@
     margin-bottom: 8px;
 }
 
-/* PASS row highlight */
 .gridRowInner.rowPass {
     justify-content: center !important;
     box-shadow: 0 0 20px #00ff00;
     border-radius: 6px;
 }
 
-/* FAIL row highlight */
 .gridRowInner.rowFail {
     justify-content: center !important;
     box-shadow: 0 0 20px #ff0000;
     border-radius: 6px;
 }
 
-/* Grid row container */
 .gridRowInner {
     display: flex;
     gap: 6px;
 }
 
-/* Cells */
 .cell {
     padding: 6px 10px;
     background: #111;
@@ -136,7 +126,6 @@
     font-size: 14px;
 }
 
-/* Report face */
 .reportFace {
     background: #000;
     padding: 10px;
@@ -145,7 +134,7 @@
 }
 
 /* ===========================
-   LOADING SCREEN (index.html)
+   LOADING SCREEN
    =========================== */
 
 #barInner {
