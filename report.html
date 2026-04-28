@@ -73,7 +73,7 @@
     text-shadow: 0 0 6px #ff0000;
   }
 
-  #printBtn {
+  .actionBtn {
     padding: 12px 24px;
     font-size: 18px;
     border-radius: 8px;
@@ -83,33 +83,24 @@
     text-shadow: 0 0 6px #00ff00;
     box-shadow: 0 0 12px #00ff00;
     cursor: pointer;
-    margin-top: 30px;
+    margin-top: 20px;
     display: block;
     margin-left: auto;
     margin-right: auto;
   }
 
-  #printBtn:active {
+  .actionBtn:active {
     transform: scale(0.97);
   }
 
   @media print {
-    #printBtn {
+    .actionBtn {
       display: none;
     }
 
     @page {
       size: A4 landscape;
       margin: 0;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-    }
-
-    #app {
-      padding: 20px;
     }
   }
 </style>
@@ -132,7 +123,12 @@
 
   <div id="totalsBlock"></div>
 
-  <button id="printBtn">Print Report</button>
+  <!-- ⭐ BACK + NEW TEST ABOVE PRINT -->
+  <button id="backBtn" class="actionBtn">Back</button>
+  <button id="newTestBtn" class="actionBtn">New Test</button>
+
+  <!-- ⭐ PRINT BUTTON LAST -->
+  <button id="printBtn" class="actionBtn">Print Report</button>
 
 </div>
 
@@ -141,6 +137,8 @@
   const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
   const storeName = sessionStorage.getItem("storeName") || "";
   const storeNumber = sessionStorage.getItem("storeNumber") || "";
+  const lastUnit = sessionStorage.getItem("lastUnit") || 1;
+  const lastFace = sessionStorage.getItem("lastFace") || "front";
 
   // Auto-generate timestamp
   const now = new Date();
@@ -157,11 +155,11 @@
   document.getElementById("storeHeader").textContent =
     `${storeName} — ${storeNumber}`;
 
-  // Insert timestamp under header
+  // Insert timestamp
   document.getElementById("timestamp").textContent =
     `Completed: ${timestamp}`;
 
-  // Populate table and total fails
+  // Populate table + totals
   const table = document.getElementById("reportTable");
 
   let totalFrontFails = 0;
@@ -181,17 +179,34 @@
 
     table.appendChild(row);
 
-    const statusUpper = String(item.status).toUpperCase();
-    const faceLower = String(item.face).toLowerCase();
-
-    const isFail = statusUpper.includes("FAIL");
-    const isFront = faceLower.startsWith("front");
-    const isBack = faceLower.startsWith("back");
+    const isFail = String(item.status).toUpperCase().includes("FAIL");
+    const isFront = item.face.toLowerCase().startsWith("front");
+    const isBack = item.face.toLowerCase().startsWith("back");
 
     if (isFail && isFront) totalFrontFails++;
     if (isFail && isBack) totalBackFails++;
   });
 
-  // Totals block
   document.getElementById("totalsBlock").innerHTML = `
-    TOTAL
+    TOTAL FRONT FAILED ROWS: ${totalFrontFails}<br>
+    TOTAL BACK FAILED ROWS: ${totalBackFails}
+  `;
+
+  // Print
+  document.getElementById("printBtn").onclick = () => window.print();
+
+  // Back button → return to last unit/face
+  document.getElementById("backBtn").onclick = () => {
+    window.location.href =
+      `app.html?resume=1&unit=${lastUnit}&face=${lastFace}`;
+  };
+
+  // New Test button → reset + go to store select
+  document.getElementById("newTestBtn").onclick = () => {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  };
+</script>
+
+</body>
+</html>
