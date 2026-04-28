@@ -71,7 +71,6 @@
     gap: 10px;
   }
 
-  /* Stainless steel panel */
   .uhc-panel {
     width: 340px;
     padding: 18px;
@@ -84,7 +83,6 @@
     box-sizing: border-box;
   }
 
-  /* Screws */
   .uhc-panel::before,
   .uhc-panel::after {
     content: "";
@@ -99,7 +97,6 @@
   .uhc-panel::before { top: 8px; left: 10px; }
   .uhc-panel::after  { top: 8px; right: 10px; }
 
-  /* Top bar (FRONT) */
   .uhc-top-bar {
     display: flex;
     align-items: center;
@@ -108,7 +105,6 @@
     margin-bottom: 16px;
   }
 
-  /* Top bar (BACK) — empty stainless */
   .uhc-top-bar-empty {
     height: 40px;
     margin-bottom: 16px;
@@ -164,7 +160,6 @@
     align-items: center;
   }
 
-  /* Tray rows */
   .uhc-rows {
     display: flex;
     flex-direction: column;
@@ -273,7 +268,6 @@
     transform: scale(0.98);
   }
 
-  /* Report */
   .report-list {
     width: 100%;
     display: flex;
@@ -313,14 +307,12 @@
 <body>
 <div id="app">
 
-  <!-- TEST SCREEN -->
   <div id="testScreen" class="screen active">
     <div class="header-row">
       <div class="store-header" id="storeHeader"></div>
       <div class="unit-header" id="unitHeader"></div>
     </div>
 
-    <!-- FRONT WRAPPER -->
     <div class="uhc-wrapper" id="frontWrapper">
       <div class="uhc-panel" id="frontPanel">
         <div class="uhc-top-bar">
@@ -361,14 +353,12 @@
       </label>
     </div>
 
-    <!-- BACK WRAPPER -->
     <div class="uhc-wrapper" id="backWrapper">
       <div class="uhc-panel" id="backPanel">
         <div class="uhc-top-bar-empty"></div>
         <div class="uhc-rows" id="backRows"></div>
       </div>
 
-      <!-- Spacer to prevent layout jump -->
       <div class="touchscreen-spacer"></div>
     </div>
 
@@ -377,7 +367,6 @@
     </div>
   </div>
 
-  <!-- REPORT SCREEN -->
   <div id="reportScreen" class="screen">
     <div class="header-row">
       <div class="store-header" id="reportStoreHeader"></div>
@@ -485,7 +474,6 @@
       container.appendChild(rowEl);
     });
   }
-
   function isFaceComplete(unitIndex, face) {
     if (units[unitIndex].touchscreen) return true;
     const grid = units[unitIndex][face];
@@ -553,7 +541,6 @@
     reportStoreHeader.textContent = `${storeName} — ${storeNumber}`;
     reportList.innerHTML = '';
 
-  
     for (let u = 0; u < TOTAL_UNITS; u++) {
       ['front', 'back'].forEach(face => {
         const item = createEl('div', 'report-item');
@@ -592,6 +579,26 @@
       });
     }
   }
+
+  // Touchscreen skip handler
+  touchscreenToggle.onchange = () => {
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+
+    if (step.face !== 'front') return;
+
+    if (touchscreenToggle.checked) {
+      units[unitIndex].touchscreen = true;
+      advanceStep();
+    } else {
+      units[unitIndex].touchscreen = false;
+    }
+  };
+
+  // Manual Next button
+  nextBtn.onclick = () => {
+    advanceStep();
+  };
 
   // Parse URL parameters
   function getParams() {
