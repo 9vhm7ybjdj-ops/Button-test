@@ -105,15 +105,16 @@ document.getElementById("shareAppBtn").onclick = () => {
 };
 
 async function sharePDF() {
-  const report = document.querySelector(".report");
+  const report = document.getElementById("pdfWrapper");
 
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => requestAnimationFrame(resolve));
+  await new Promise(resolve => requestAnimationFrame(resolve));
 
   const opt = {
     margin: 0,
     filename: `UHC-Report-${storeName}.pdf`,
     image: { type: "jpeg", quality: 1 },
-    html2canvas: { scale: 3, useCORS: true, backgroundColor: "#000" },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: "#000" },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
   };
 
