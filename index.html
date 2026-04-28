@@ -48,15 +48,14 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 140px; /* ← moves the bar UP into the correct gap */
+    bottom: 140px; /* Adjusted to sit in the correct gap */
     width: 65%;
     height: 8px;
     background: #222;
     border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 0 10px #00ff00;
-}
-
+  }
 
   .loading-fill {
     width: 0%;
@@ -94,6 +93,35 @@
       <div class="loading-fill"></div>
     </div>
   </div>
+
+<script>
+  /* Low‑pitch boot hum (no audio file needed) */
+  function playBootHum() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";          // smooth hum
+    osc.frequency.value = 110;  // low pitch (A2)
+    gain.gain.value = 0.25;     // volume
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.45); // short, deep hum
+  }
+
+  // Play hum on load (allowed because user tapped the icon)
+  window.addEventListener("load", () => {
+    playBootHum();
+  });
+
+  // Redirect after loading bar completes
+  setTimeout(() => {
+    window.location.href = "app.html";
+  }, 3000);
+</script>
 
 </body>
 </html>
