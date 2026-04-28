@@ -1,4 +1,14 @@
 /* ===========================
+   GLOBAL TOUCH / ZOOM CONTROL
+   =========================== */
+
+html, body {
+    touch-action: manipulation !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+}
+
+/* ===========================
    INTERFACE (app.html)
    =========================== */
 
