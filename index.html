@@ -13,8 +13,12 @@
     height: 100vh;
     width: 100vw;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
+  /* Fullscreen loading screen */
   #loadingScreen {
     position: fixed;
     top: 0;
@@ -56,7 +60,7 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: 100px; /* lowered into correct gap */
+    bottom: 110px;
     width: 65%;
     height: 8px;
     background: #222;
@@ -85,11 +89,48 @@
     from { width: 0%; }
     to   { width: 100%; }
   }
+
+  /* Store selection screen */
+  #storeSelectScreen {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 9999;
+  }
+
+  #storeSelectScreen input {
+    width: 80%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  #startTestBtn {
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 6px;
+    border: none;
+    background: #00ff00;
+    color: #000;
+    cursor: pointer;
+  }
 </style>
 </head>
 
 <body>
 
+<!-- Loading Screen -->
 <div id="loadingScreen">
   <div class="badge-wrapper">
     <img src="IMG_4088.png" class="badge-img">
@@ -100,30 +141,36 @@
   </div>
 </div>
 
+<!-- Store Selection Screen -->
+<div id="storeSelectScreen">
+  <h2>Select Store</h2>
+
+  <input id="storeNameInput" type="text" placeholder="Store Name">
+  <input id="storeNumberInput" type="text" placeholder="Store Number">
+
+  <button id="startTestBtn">Start Test</button>
+</div>
+
 <script>
-  function playBootHum() {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = "sine";
-    osc.frequency.value = 110;
-    gain.gain.value = 0.25;
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 0.45);
-  }
-
-  window.addEventListener("load", () => {
-    playBootHum();
-  });
-
+  // After loading bar completes, show store selection
   setTimeout(() => {
-    window.location.href = "app.html";
+    document.getElementById("loadingScreen").style.display = "none";
+    document.getElementById("storeSelectScreen").style.display = "flex";
   }, 3000);
+
+  // Start Test button → redirect with parameters
+  document.getElementById("startTestBtn").onclick = () => {
+    const store = document.getElementById("storeNameInput").value.trim();
+    const num   = document.getElementById("storeNumberInput").value.trim();
+
+    if (!store || !num) {
+      alert("Please enter both store name and store number");
+      return;
+    }
+
+    window.location.href =
+      `app.html?store=${encodeURIComponent(store)}&num=${encodeURIComponent(num)}`;
+  };
 </script>
 
 </body>
