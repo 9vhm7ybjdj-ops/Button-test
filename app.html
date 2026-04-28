@@ -45,42 +45,6 @@
     display: flex;
   }
 
-  .field-row {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .field-row label {
-    font-size: 14px;
-  }
-
-  .field-row select,
-  .field-row input {
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #555;
-    background: #222;
-    color: #fff;
-    font-size: 14px;
-  }
-
-  .primary-btn {
-    margin-top: 10px;
-    padding: 10px 18px;
-    border-radius: 6px;
-    border: 1px solid #888;
-    background: #2b6cb0;
-    color: #fff;
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  .primary-btn:active {
-    transform: scale(0.98);
-  }
-
   .header-row {
     width: 100%;
     display: flex;
@@ -349,34 +313,8 @@
 <body>
 <div id="app">
 
-  <!-- START SCREEN -->
-  <div id="startScreen" class="screen active">
-    <div class="header-row">
-      <div class="store-header">UHC Test</div>
-      <div class="unit-header">Select store to begin</div>
-    </div>
-
-    <div class="field-row">
-      <label for="storeSelect">Store</label>
-      <select id="storeSelect">
-        <option value="">Select Store</option>
-        <option value="0818">Kuluin – 0818</option>
-        <option value="0892">Nambour – 0892</option>
-        <option value="0981">Maroochydore – 0981</option>
-        <option value="1614">Sippy Downs – 1614</option>
-      </select>
-    </div>
-
-    <div class="field-row">
-      <label for="storeNumber">Store Number</label>
-      <input id="storeNumber" type="text" readonly>
-    </div>
-
-    <button class="primary-btn" id="startBtn">Start</button>
-  </div>
-
   <!-- TEST SCREEN -->
-  <div id="testScreen" class="screen">
+  <div id="testScreen" class="screen active">
     <div class="header-row">
       <div class="store-header" id="storeHeader"></div>
       <div class="unit-header" id="unitHeader"></div>
@@ -454,13 +392,8 @@
 <script>
   const TOTAL_UNITS = 3;
 
-  const startScreen   = document.getElementById('startScreen');
   const testScreen    = document.getElementById('testScreen');
   const reportScreen  = document.getElementById('reportScreen');
-
-  const storeSelect   = document.getElementById('storeSelect');
-  const storeNumberInput = document.getElementById('storeNumber');
-  const startBtn         = document.getElementById('startBtn');
 
   const storeHeader = document.getElementById('storeHeader');
   const unitHeader  = document.getElementById('unitHeader');
@@ -565,4 +498,114 @@
   }
 
   function checkAutoProgress() {
-    const step = steps[current
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+    const face = step.face;
+
+    if (units[unitIndex].touchscreen || isFaceComplete(unitIndex, face)) {
+      advanceStep();
+    }
+  }
+
+  function advanceStep() {
+    currentStepIndex++;
+    if (currentStepIndex >= steps.length) {
+      showReport();
+    } else {
+      loadStep();
+    }
+  }
+
+  function renderCurrentFace() {
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+    const face = step.face;
+
+    unitHeader.textContent =
+      `Unit ${step.unit} of ${TOTAL_UNITS} — ${face === 'front' ? 'Front' : 'Back'}`;
+
+    if (face === 'front') {
+      frontWrapper.style.display = 'flex';
+      backWrapper.style.display  = 'none';
+      touchscreenRow.style.display = 'flex';
+      touchscreenToggle.checked = units[unitIndex].touchscreen;
+      renderPanel(frontRows, units[unitIndex].front, unitIndex, 'front');
+    } else {
+      if (units[unitIndex].touchscreen) {
+        advanceStep();
+        return;
+      }
+      frontWrapper.style.display = 'none';
+      backWrapper.style.display  = 'flex';
+      touchscreenRow.style.display = 'none';
+      renderPanel(backRows, units[unitIndex].back, unitIndex, 'back');
+    }
+  }
+
+  function loadStep() {
+    renderCurrentFace();
+  }
+
+  function showReport() {
+    testScreen.classList.remove('active');
+    reportScreen.classList.add('active');
+
+    reportStoreHeader.textContent = `${storeName} — ${storeNumber}`;
+    reportList.innerHTML = '';
+
+  
+    for (let u = 0; u < TOTAL_UNITS; u++) {
+      ['front', 'back'].forEach(face => {
+        const item = createEl('div', 'report-item');
+        const label = createEl('div', 'report-label',
+          `Unit ${u + 1} — ${face === 'front' ? 'Front' : 'Back'}`);
+
+        let statusText = '';
+        let statusClass = '';
+
+        if (units[u].touchscreen) {
+          statusText = 'Skipped (Touchscreen)';
+          statusClass = 'status-skip';
+        } else {
+          const grid = units[u][face];
+          let failedRows = 0;
+
+          for (let r = 0; r < grid.length; r++) {
+            if (grid[r].some(v => v === 'FAIL')) {
+              failedRows++;
+            }
+          }
+
+          if (failedRows > 0) {
+            statusText = `${failedRows} failed rows`;
+            statusClass = 'status-fail';
+          } else {
+            statusText = `0 failed rows`;
+            statusClass = 'status-pass';
+          }
+        }
+
+        const status = createEl('div', statusClass, statusText);
+        item.appendChild(label);
+        item.appendChild(status);
+        reportList.appendChild(item);
+      });
+    }
+  }
+
+  // Parse URL parameters
+  function getParams() {
+    const params = new URLSearchParams(window.location.search);
+    storeName = params.get('store') || 'Store';
+    storeNumber = params.get('num') || '0000';
+  }
+
+  // Init
+  getParams();
+  storeHeader.textContent = `${storeName} — ${storeNumber}`;
+  initUnits();
+  loadStep();
+</script>
+
+</body>
+</html>
