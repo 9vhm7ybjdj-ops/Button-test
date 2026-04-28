@@ -6,7 +6,7 @@ function el(tag, cls, html) {
   return e;
 }
 
-// Correct 6×3 face generator
+// CORRECT 6×3 FACE GENERATOR
 function makeFace() {
   return Array.from({ length: 6 }, () => ["UN", "UN", "UN"]);
 }
