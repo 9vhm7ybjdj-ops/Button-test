@@ -241,10 +241,11 @@
     transform: scale(1.4);
   }
 
+  /* Spacer under touchscreen row, used when showing back face */
   .touchscreen-spacer {
     height: 32px;
     margin-top: 10px;
-    visibility: hidden;
+    display: none;
   }
 
   .nav-row {
@@ -317,6 +318,9 @@
         <input type="checkbox" id="touchscreenToggle">
         Touchscreen
       </label>
+
+      <!-- Spacer to keep back-face layout aligned -->
+      <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
     <!-- BACK PANEL -->
@@ -325,8 +329,6 @@
         <div class="uhc-top-bar-empty"></div>
         <div class="uhc-rows" id="backRows"></div>
       </div>
-
-      <div class="touchscreen-spacer"></div>
     </div>
 
     <!-- NAVIGATION -->
@@ -337,7 +339,6 @@
   </div>
 </div>
 
-<!-- SCRIPT STARTS IN PART 3 -->
 <script>
   const TOTAL_UNITS = 3;
 
@@ -352,6 +353,7 @@
   const backRows          = document.getElementById('backRows');
   const touchscreenRow    = document.getElementById('touchscreenRow');
   const touchscreenToggle = document.getElementById('touchscreenToggle');
+  const backSpacer        = document.getElementById('backSpacer');
 
   const nextBtn = document.getElementById('nextBtn');
   const backBtn = document.getElementById('backBtn');
@@ -367,11 +369,10 @@
 
   let currentStepIndex = 0;
 
-  // ⭐ Combo Sound Function
+  // Combo Sound
   function playComboSound() {
     const a = new AudioContext();
 
-    // Subtle Tick
     const o1 = a.createOscillator();
     const g1 = a.createGain();
     o1.type = 'triangle';
@@ -381,7 +382,6 @@
     o1.connect(g1); g1.connect(a.destination);
     o1.start(); o1.stop(a.currentTime + 0.03);
 
-    // Deep Thump
     const o2 = a.createOscillator();
     const g2 = a.createGain();
     o2.type = 'sine';
@@ -504,6 +504,7 @@
       frontWrapper.style.display = 'flex';
       backWrapper.style.display  = 'none';
       touchscreenRow.style.display = 'flex';
+      backSpacer.style.display = 'none';
       touchscreenToggle.checked = units[unitIndex].touchscreen;
       renderPanel(frontRows, units[unitIndex].front, unitIndex, 'front');
     } else {
@@ -514,6 +515,7 @@
       frontWrapper.style.display = 'none';
       backWrapper.style.display  = 'flex';
       touchscreenRow.style.display = 'none';
+      backSpacer.style.display = 'block';
       renderPanel(backRows, units[unitIndex].back, unitIndex, 'back');
     }
   }
@@ -550,9 +552,15 @@
       });
     }
 
+    // Save last unit/face so Back from report returns to the last screen
+    const lastIndex = Math.min(currentStepIndex - 1, steps.length - 1);
+    const lastStep = steps[lastIndex] || steps[steps.length - 1];
+
     sessionStorage.setItem("uhcSummary", JSON.stringify(summary));
     sessionStorage.setItem("storeName", storeName);
     sessionStorage.setItem("storeNumber", storeNumber);
+    sessionStorage.setItem("lastUnit", String(lastStep.unit));
+    sessionStorage.setItem("lastFace", lastStep.face);
 
     window.location.href = "report.html";
   }
