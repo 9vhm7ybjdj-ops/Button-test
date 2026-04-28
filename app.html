@@ -250,7 +250,7 @@
   .nav-row {
     margin-top: 10px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     width: 100%;
   }
 
@@ -266,40 +266,6 @@
 
   .nav-row button:active {
     transform: scale(0.98);
-  }
-
-  .report-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 10px;
-  }
-
-  .report-item {
-    padding: 8px 10px;
-    border-radius: 6px;
-    background: #1b1b1b;
-    border: 1px solid #444;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .report-label {
-    opacity: 0.85;
-  }
-
-  .status-fail {
-    color: #ff5555;
-  }
-
-  .status-pass {
-    color: #7CFC00;
-  }
-
-  .status-skip {
-    color: #ffeb3b;
   }
 </style>
 </head>
@@ -363,26 +329,13 @@
     </div>
 
     <div class="nav-row">
+      <button id="backBtn">Back</button>
       <button id="nextBtn">Next</button>
     </div>
   </div>
-
-  <div id="reportScreen" class="screen">
-    <div class="header-row">
-      <div class="store-header" id="reportStoreHeader"></div>
-      <div class="unit-header">Summary</div>
-    </div>
-
-    <div class="report-list" id="reportList"></div>
-  </div>
-
-</div>
-
-<script>
   const TOTAL_UNITS = 3;
 
   const testScreen    = document.getElementById('testScreen');
-  const reportScreen  = document.getElementById('reportScreen');
 
   const storeHeader = document.getElementById('storeHeader');
   const unitHeader  = document.getElementById('unitHeader');
@@ -393,10 +346,9 @@
   const backRows          = document.getElementById('backRows');
   const touchscreenRow    = document.getElementById('touchscreenRow');
   const touchscreenToggle = document.getElementById('touchscreenToggle');
-  const nextBtn           = document.getElementById('nextBtn');
 
-  const reportStoreHeader = document.getElementById('reportStoreHeader');
-  const reportList        = document.getElementById('reportList');
+  const nextBtn = document.getElementById('nextBtn');
+  const backBtn = document.getElementById('backBtn');
 
   let storeName = '';
   let storeNumber = '';
@@ -474,6 +426,7 @@
       container.appendChild(rowEl);
     });
   }
+
   function isFaceComplete(unitIndex, face) {
     if (units[unitIndex].touchscreen) return true;
     const grid = units[unitIndex][face];
@@ -534,50 +487,41 @@
     renderCurrentFace();
   }
 
+  // ⭐ NEW — Redirect to report.html with summary-only data
   function showReport() {
-    testScreen.classList.remove('active');
-    reportScreen.classList.add('active');
-
-    reportStoreHeader.textContent = `${storeName} — ${storeNumber}`;
-    reportList.innerHTML = '';
+    const summary = [];
 
     for (let u = 0; u < TOTAL_UNITS; u++) {
       ['front', 'back'].forEach(face => {
-        const item = createEl('div', 'report-item');
-        const label = createEl('div', 'report-label',
-          `Unit ${u + 1} — ${face === 'front' ? 'Front' : 'Back'}`);
-
         let statusText = '';
-        let statusClass = '';
+        let failedRows = 0;
 
         if (units[u].touchscreen) {
           statusText = 'Skipped (Touchscreen)';
-          statusClass = 'status-skip';
         } else {
           const grid = units[u][face];
-          let failedRows = 0;
-
           for (let r = 0; r < grid.length; r++) {
-            if (grid[r].some(v => v === 'FAIL')) {
-              failedRows++;
-            }
+            if (grid[r].some(v => v === 'FAIL')) failedRows++;
           }
-
-          if (failedRows > 0) {
-            statusText = `${failedRows} failed rows`;
-            statusClass = 'status-fail';
-          } else {
-            statusText = `0 failed rows`;
-            statusClass = 'status-pass';
-          }
+          statusText = failedRows > 0
+            ? `${failedRows} failed rows`
+            : `0 failed rows`;
         }
 
-        const status = createEl('div', statusClass, statusText);
-        item.appendChild(label);
-        item.appendChild(status);
-        reportList.appendChild(item);
+        summary.push({
+          unit: u + 1,
+          face,
+          status: statusText
+        });
       });
     }
+
+    sessionStorage.setItem("uhcSummary", JSON.stringify(summary));
+    sessionStorage.setItem("storeName", storeName);
+    sessionStorage.setItem("storeNumber", storeNumber);
+    sessionStorage.setItem("timestamp", new Date().toLocaleString());
+
+    window.location.href = "report.html";
   }
 
   // Touchscreen skip handler
@@ -598,6 +542,14 @@
   // Manual Next button
   nextBtn.onclick = () => {
     advanceStep();
+  };
+
+  // Manual Back button
+  backBtn.onclick = () => {
+    if (currentStepIndex > 0) {
+      currentStepIndex--;
+      loadStep();
+    }
   };
 
   // Parse URL parameters
