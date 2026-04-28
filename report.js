@@ -15,7 +15,6 @@ const units = parsed.units;
 const lastScreen = parseInt(params.get("screen")) || 0;
 
 // Insert store + time + title
-document.getElementById("reportStore").textContent = storeName;
 document.getElementById("reportTime").textContent = new Date().toLocaleString();
 document.getElementById("reportTitle").textContent =
   `UHC Button Test – ${storeName}`;
@@ -110,22 +109,39 @@ document.getElementById("shareAppBtn").onclick = () => {
   img.style.display = "block";
 };
 
-// PDF GENERATOR
-function generatePDF() {
+// ⭐ FIXED SHARE PDF — waits for full render, then shares
+async function sharePDF() {
   const report = document.querySelector(".report");
 
+  // Wait for Safari/iOS to finish painting the DOM
+  await new Promise(resolve => setTimeout(resolve, 500));
+
   const opt = {
-    margin:       0,
-    filename:     `UHC-Report-${storeName}.pdf`,
-    image:        { type: 'jpeg', quality: 1 },
-    html2canvas:  { scale: 3, useCORS: true, backgroundColor: "#000" },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    margin: 0,
+    filename: `UHC-Report-${storeName}.pdf`,
+    image: { type: "jpeg", quality: 1 },
+    html2canvas: { scale: 3, useCORS: true, backgroundColor: "#000" },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
   };
 
-  setTimeout(() => {
-    html2pdf().set(opt).from(report).save();
-  }, 300);
+  // Generate PDF as Blob
+  const pdfBlob = await html2pdf().set(opt).from(report).outputPdf("blob");
+
+  const file = new File(
+    [pdfBlob],
+    `UHC-Report-${storeName}.pdf`,
+    { type: "application/pdf" }
+  );
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    await navigator.share({
+      files: [file],
+      title: "UHC Report",
+      text: "UHC Button Test Report"
+    });
+  } else {
+    alert("Sharing not supported on this device.");
+  }
 }
 
-document.getElementById("pdfBtn").onclick = generatePDF;
-document.getElementById("sharePdfBtn").onclick = generatePDF;
+document.getElementById("sharePdfBtn").onclick = sharePDF;
