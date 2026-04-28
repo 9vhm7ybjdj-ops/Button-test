@@ -298,3 +298,15 @@ body {
   text-align: center;
   box-shadow: 0 0 10px #000;
 }
+/* LCD GREEN VERSION LABEL */
+#versionLabel {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #00ff55;
+  font-weight: bold;
+  text-align: center;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px #00ff55;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
