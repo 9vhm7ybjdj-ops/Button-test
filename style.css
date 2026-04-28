@@ -58,49 +58,21 @@ button {
 .fail { background: #f00; }
 .skip { background: #ff0; }
 
-/* V1.1 LOADING SCREEN */
+/* V1.0 BLUE LOADING BAR */
 #loadingScreen {
     position: fixed;
     inset: 0;
     background: #000;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    opacity: 1;
-    transition: opacity 0.6s ease-out;
     z-index: 9999;
-}
-
-#loadingLogo {
-    width: 180px;
-    opacity: 0;
-    animation: fadeIn 0.5s forwards, pulse 1.2s ease-in-out infinite 0.5s;
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); filter: drop-shadow(0 0 4px #0f0); }
-    50% { transform: scale(1.05); filter: drop-shadow(0 0 14px #0f0); }
-    100% { transform: scale(1); filter: drop-shadow(0 0 4px #0f0); }
-}
-
-#loadingBarContainer {
-    width: 70%;
-    height: 12px;
-    background: #222;
-    border-radius: 6px;
-    margin-top: 25px;
-    overflow: hidden;
 }
 
 #loadingBar {
     width: 0%;
-    height: 100%;
-    background: linear-gradient(90deg, #0f0, #8fff8f);
-    box-shadow: 0 0 12px #0f0;
-    transition: width 3s linear;
+    height: 12px;
+    background: #00aaff;
+    box-shadow: 0 0 12px #00aaff;
+    transition: width 2.5s linear;
 }
