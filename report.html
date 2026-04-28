@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UHC Report</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  .header {
+    text-align: center;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #333;
+  }
+
+  .header .title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .header .sub {
+    font-size: 14px;
+    color: #ccc;
+  }
+
+  .report-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .report-item {
+    padding: 10px;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+
+  .status-pass { color: #7CFC00; }
+  .status-fail { color: #ff5555; }
+  .status-skip { color: #ffeb3b; }
+
+  .nav-row {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .nav-row button {
+    padding: 12px 20px;
+    background: #333;
+    border: 1px solid #777;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  @media print {
+    .nav-row { display: none }
+    body {
+      background: #000 !important;
+      color: #fff !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    .report-item {
+      background: #111 !important;
+      border-color: #444 !important;
+      page-break-inside: avoid;
+    }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="title">UHC Test Summary</div>
+  <div class="sub" id="storeLine"></div>
+  <div class="sub" id="timestampLine"></div>
+</div>
+
+<div id="reportList" class="report-list"></div>
+
+<div class="nav-row">
+  <button onclick="goBack()">Back to Store Select</button>
+</div>
+
+<script>
+  const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
+  const storeName = sessionStorage.getItem("storeName") || "Store";
+  const storeNumber = sessionStorage.getItem("storeNumber") || "0000";
+  const timestamp = sessionStorage.getItem("timestamp") || "";
+
+  document.getElementById("storeLine").textContent =
+    `${storeName} — ${storeNumber}`;
+
+  document.getElementById("timestampLine").textContent = timestamp;
+
+  const list = document.getElementById("reportList");
+
+  summary.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "report-item";
+
+    const label = `Unit ${item.unit} — ${item.face === 'front' ? 'Front' : 'Back'}`;
+
+    let statusClass =
+      item.status.includes("failed") ? "status-fail" :
+      item.status.includes("Skipped") ? "status-skip" :
+      "status-pass";
+
+    div.innerHTML = `
+      <div>${label}</div>
+      <div class="${statusClass}">${item.status}</div>
+    `;
+
+    list.appendChild(div);
+  });
+
+  function goBack() {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  }
+
+  window.onload = () => {
+    setTimeout(() => window.print(), 300);
+  };
+</script>
+
+</body>
+</html>
