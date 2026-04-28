@@ -272,13 +272,13 @@
 
 <body>
 <div id="app">
-
   <div id="testScreen" class="screen active">
     <div class="header-row">
       <div class="store-header" id="storeHeader"></div>
       <div class="unit-header" id="unitHeader"></div>
     </div>
 
+    <!-- FRONT PANEL -->
     <div class="uhc-wrapper" id="frontWrapper">
       <div class="uhc-panel" id="frontPanel">
         <div class="uhc-top-bar">
@@ -319,6 +319,7 @@
       </label>
     </div>
 
+    <!-- BACK PANEL -->
     <div class="uhc-wrapper" id="backWrapper">
       <div class="uhc-panel" id="backPanel">
         <div class="uhc-top-bar-empty"></div>
@@ -328,6 +329,7 @@
       <div class="touchscreen-spacer"></div>
     </div>
 
+    <!-- NAVIGATION -->
     <div class="nav-row">
       <button id="backBtn">Back</button>
       <button id="nextBtn">Next</button>
@@ -335,6 +337,7 @@
   </div>
 </div>
 
+<!-- SCRIPT STARTS IN PART 3 -->
 <script>
   const TOTAL_UNITS = 3;
 
@@ -363,6 +366,32 @@
   for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'back' });
 
   let currentStepIndex = 0;
+
+  // ⭐ Combo Sound Function
+  function playComboSound() {
+    const a = new AudioContext();
+
+    // Subtle Tick
+    const o1 = a.createOscillator();
+    const g1 = a.createGain();
+    o1.type = 'triangle';
+    o1.frequency.value = 3200;
+    g1.gain.setValueAtTime(0.08, a.currentTime);
+    g1.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + 0.03);
+    o1.connect(g1); g1.connect(a.destination);
+    o1.start(); o1.stop(a.currentTime + 0.03);
+
+    // Deep Thump
+    const o2 = a.createOscillator();
+    const g2 = a.createGain();
+    o2.type = 'sine';
+    o2.frequency.setValueAtTime(120, a.currentTime);
+    o2.frequency.exponentialRampToValueAtTime(60, a.currentTime + 0.12);
+    g2.gain.setValueAtTime(0.25, a.currentTime);
+    g2.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + 0.12);
+    o2.connect(g2); g2.connect(a.destination);
+    o2.start(); o2.stop(a.currentTime + 0.12);
+  }
 
   function initUnits() {
     for (let i = 0; i < TOTAL_UNITS; i++) {
@@ -403,11 +432,14 @@
         else led.classList.add('un');
 
         led.onclick = () => {
+          playComboSound();
+
           const current = units[unitIndex][face][rIndex][cIndex];
           const next =
             current === 'UN'   ? 'PASS' :
             current === 'PASS' ? 'FAIL' :
             'UN';
+
           units[unitIndex][face][rIndex][cIndex] = next;
           renderCurrentFace();
           checkAutoProgress();
@@ -521,28 +553,11 @@
     sessionStorage.setItem("uhcSummary", JSON.stringify(summary));
     sessionStorage.setItem("storeName", storeName);
     sessionStorage.setItem("storeNumber", storeNumber);
-    sessionStorage.setItem("timestamp", new Date().toLocaleString());
 
     window.location.href = "report.html";
   }
 
-  touchscreenToggle.onchange = () => {
-    const step = steps[currentStepIndex];
-    const unitIndex = step.unit - 1;
-
-    if (step.face !== 'front') return;
-
-    if (touchscreenToggle.checked) {
-      units[unitIndex].touchscreen = true;
-      advanceStep();
-    } else {
-      units[unitIndex].touchscreen = false;
-    }
-  };
-
-  nextBtn.onclick = () => {
-    advanceStep();
-  };
+  nextBtn.onclick = () => advanceStep();
 
   backBtn.onclick = () => {
     if (currentStepIndex > 0) {
@@ -551,14 +566,21 @@
     }
   };
 
-  function getParams() {
+  touchscreenToggle.onchange = () => {
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+    units[unitIndex].touchscreen = touchscreenToggle.checked;
+    renderCurrentFace();
+  };
+
+  function parseParams() {
     const params = new URLSearchParams(window.location.search);
-    storeName = params.get('store') || 'Store';
-    storeNumber = params.get('num') || '0000';
+    storeName   = params.get("store") || "";
+    storeNumber = params.get("num")   || "";
+    storeHeader.textContent = `${storeName} — ${storeNumber}`;
   }
 
-  getParams();
-  storeHeader.textContent = `${storeName} — ${storeNumber}`;
+  parseParams();
   initUnits();
   loadStep();
 </script>
