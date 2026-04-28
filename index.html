@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>UHC Store Select</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>UHC Test Loader</title>
 
 <style>
   body {
@@ -15,16 +14,89 @@
     color: #fff;
     display: flex;
     justify-content: center;
-    padding-top: 40px;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
   }
 
-  #app {
+  /* LOADING SCREEN */
+  #loader {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 420px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    justify-content: center;
     align-items: center;
+    background: radial-gradient(circle at center, #444 0%, #111 100%);
+    transition: opacity 1s ease;
+  }
+
+  .logo {
+    width: 300px;
+    height: 160px;
+    background: linear-gradient(145deg, #d7d9dc, #a5a7aa);
+    border-radius: 12px;
+    box-shadow: 0 0 0 2px #777, 0 12px 20px rgba(0,0,0,0.6);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .logo::before, .logo::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #666;
+    background: radial-gradient(circle at 30% 30%, #f5f5f5, #999);
+    box-shadow: 0 0 4px rgba(0,0,0,0.6);
+  }
+  .logo::before { top: 10px; left: 12px; }
+  .logo::after { top: 10px; right: 12px; }
+
+  .logo h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: bold;
+    color: #e0e0e0;
+    text-shadow: 0 0 10px #fff, 0 0 20px #aaa;
+  }
+
+  .logo h2 {
+    margin: 4px 0 0 0;
+    font-size: 18px;
+    color: #ffeb3b;
+  }
+
+  .bar {
+    width: 220px;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+
+  .bar-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #00ffcc, #00aaff);
+    border-radius: 4px;
+    transition: width 1.5s ease;
+  }
+
+  /* STORE SELECT SCREEN */
+  #app {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
   }
 
   .header {
@@ -64,6 +136,17 @@
 </head>
 
 <body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="logo">
+    <h1>UHC TEST</h1>
+    <h2>v1.0</h2>
+  </div>
+  <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+</div>
+
+<!-- STORE SELECT -->
 <div id="app">
   <div class="header">UHC Test</div>
   <div class="sub">Select store to begin</div>
@@ -80,13 +163,29 @@
 </div>
 
 <script>
-  document.getElementById("startBtn").onclick = () => {
-    const val = document.getElementById("storeSelect").value;
+  const loader = document.getElementById('loader');
+  const barFill = document.getElementById('barFill');
+  const app = document.getElementById('app');
+
+  // Animate loading bar
+  setTimeout(() => {
+    barFill.style.width = '100%';
+  }, 300);
+
+  // Fade out loader and show app
+  setTimeout(() => {
+    loader.style.opacity = '0';
+    setTimeout(() => {
+      loader.style.display = 'none';
+      app.style.display = 'flex';
+    }, 1000);
+  }, 1800);
+
+  // Redirect to app.html
+  document.getElementById('startBtn').onclick = () => {
+    const val = document.getElementById('storeSelect').value;
     if (!val) return;
-
-    const [store, num] = val.split("|");
-
-    // Redirect to app.html with URL parameters
+    const [store, num] = val.split('|');
     window.location.href = `app.html?store=${encodeURIComponent(store)}&num=${encodeURIComponent(num)}`;
   };
 </script>
