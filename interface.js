@@ -1,3 +1,10 @@
+// LOADING SCREEN FADE OUT
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    document.getElementById("loadingScreen").classList.add("fadeOut");
+  }, 400);
+});
+
 function el(tag, cls, html) {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
