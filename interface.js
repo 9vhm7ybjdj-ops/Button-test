@@ -32,15 +32,11 @@ function getSelectedStore() {
 
 function renderScreen() {
   const c = document.getElementById("unitContainer");
-  const m = document.getElementById("mode");
-
   c.innerHTML = "";
 
   const u = Math.floor(currentScreen / 2) + 1;
   const f = currentScreen % 2 === 0 ? "front" : "back";
   const l = f === "front" ? "Front Face" : "Back Face";
-
-  m.textContent = `Testing ${l} (${unitNames[u]})`;
 
   const unit = units[u];
   const wrap = el("div", "faceWrap");
