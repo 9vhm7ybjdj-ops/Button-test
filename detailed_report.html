@@ -15,6 +15,10 @@
     font-family: Arial, sans-serif;
     -webkit-user-select: none;
     user-select: none;
+    background-image:
+      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
   h1, h2 {
@@ -22,59 +26,104 @@
     margin-bottom: 10px;
   }
 
-  .section {
-    background: #222;
+  .summaryBox {
+    background: #000;
+    border: 2px solid #00ff00;
     padding: 16px;
     border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 10px rgba(0,255,0,0.2);
+    margin-bottom: 30px;
+    box-shadow: 0 0 12px #00ff00;
   }
 
-  .unit-block {
-    margin-bottom: 20px;
-    padding: 14px;
-    background: #1a1a1a;
-    border-radius: 8px;
-    box-shadow: inset 0 0 8px rgba(0,255,0,0.15);
+  .summaryRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 16px;
   }
 
-  .unit-title {
-    font-size: 18px;
-    margin-bottom: 8px;
+  .summaryLabel {
     color: #7CFC00;
   }
 
-  .row-block {
-    margin-bottom: 10px;
-    padding: 10px;
-    background: #000;
-    border-radius: 6px;
-  }
-
-  .row-title {
-    font-size: 14px;
-    margin-bottom: 6px;
-  }
-
-  .led-line {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 4px;
-  }
-
-  .led-label {
-    width: 60px;
-  }
-
-  .led-value {
+  .summaryValue {
     font-weight: bold;
   }
 
-  /* BUTTONS */
+  .uhcContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .uhcBox {
+    background: #000;
+    border: 2px solid #00ff00;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 0 12px #00ff00;
+  }
+
+  .uhcTitle {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #7CFC00;
+    text-align: center;
+  }
+
+  .faceRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .faceCol {
+    flex: 1;
+    background: #111;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px dashed #ffff55;
+  }
+
+  .faceHeader {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #ffff55;
+    text-align: center;
+  }
+
+  .rowBlock {
+    background: #000;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px dashed #ffff55;
+  }
+
+  .rowTitle {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #7CFC00;
+  }
+
+  .ledLine {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .ledLabel {
+    color: #ffff55;
+  }
+
+  .ledValue {
+    font-weight: bold;
+  }
+
   .reportActions {
     display: flex;
     gap: 14px;
-    margin-top: 30px;
+    margin-top: 40px;
   }
 
   .reportActions button {
@@ -100,13 +149,8 @@
       display: none;
     }
     body {
-      background: #fff;
-      color: #000;
-    }
-    .section, .unit-block, .row-block {
-      box-shadow: none;
-      background: #fff;
-      color: #000;
+      background: #000;
+      color: #fff;
     }
   }
 </style>
@@ -118,7 +162,9 @@
 <h2 id="storeInfo"></h2>
 <h2 id="dateInfo"></h2>
 
-<div id="reportContainer"></div>
+<div class="summaryBox" id="summaryBox"></div>
+
+<div class="uhcContainer" id="uhcContainer"></div>
 
 <div class="reportActions">
   <button id="downloadPdfBtn">Download PDF</button>
@@ -133,73 +179,117 @@
 
   document.getElementById("storeInfo").textContent =
     `${storeName} — ${storeNumber}`;
-
   document.getElementById("dateInfo").textContent = dateString;
 
-  const container = document.getElementById("reportContainer");
+  const summaryBox = document.getElementById("summaryBox");
+  const uhcContainer = document.getElementById("uhcContainer");
 
-  fullData.forEach((unit, index) => {
-    const unitDiv = document.createElement("div");
-    unitDiv.className = "unit-block";
+  const totalUnits = fullData.length;
+  const totalFaces = totalUnits * 2;
+  let skipped = 0;
+  let failedRows = 0;
 
-    unitDiv.innerHTML = `<div class="unit-title">Unit ${index + 1}</div>`;
+  fullData.forEach(unit => {
+    if (unit.touchscreen) skipped++;
 
-    // FRONT
-    const frontDiv = document.createElement("div");
-    frontDiv.className = "section";
-    frontDiv.innerHTML = `<h3>Front</h3>`;
-    unit.front.forEach((row, rIndex) => {
-      const rowDiv = document.createElement("div");
-      rowDiv.className = "row-block";
-      rowDiv.innerHTML = `<div class="row-title">Row ${rIndex + 1}</div>`;
-
-      row.forEach((val, cIndex) => {
-        const line = document.createElement("div");
-        line.className = "led-line";
-        line.innerHTML = `
-          <div class="led-label">LED ${cIndex + 1}</div>
-          <div class="led-value">${val}</div>
-        `;
-        rowDiv.appendChild(line);
-      });
-
-      frontDiv.appendChild(rowDiv);
+    unit.front.forEach(row => {
+      if (row.includes("FAIL")) failedRows++;
     });
-
-    // BACK
-    const backDiv = document.createElement("div");
-    backDiv.className = "section";
-    backDiv.innerHTML = `<h3>Back</h3>`;
-    unit.back.forEach((row, rIndex) => {
-      const rowDiv = document.createElement("div");
-      rowDiv.className = "row-block";
-      rowDiv.innerHTML = `<div class="row-title">Row ${rIndex + 1}</div>`;
-
-      row.forEach((val, cIndex) => {
-        const line = document.createElement("div");
-        line.className = "led-line";
-        line.innerHTML = `
-          <div class="led-label">LED ${cIndex + 1}</div>
-          <div class="led-value">${val}</div>
-        `;
-        rowDiv.appendChild(line);
-      });
-
-      backDiv.appendChild(rowDiv);
+    unit.back.forEach(row => {
+      if (row.includes("FAIL")) failedRows++;
     });
-
-    unitDiv.appendChild(frontDiv);
-    unitDiv.appendChild(backDiv);
-    container.appendChild(unitDiv);
   });
 
-  /* BUTTON LOGIC */
+  const status = failedRows === 0 ? "PASS" : "FAIL";
+
+  summaryBox.innerHTML = `
+    <div class="summaryRow">
+      <div class="summaryLabel">Total UHCs:</div>
+      <div class="summaryValue">${totalUnits}</div>
+    </div>
+    <div class="summaryRow">
+      <div class="summaryLabel">Total Faces:</div>
+      <div class="summaryValue">${totalFaces}</div>
+    </div>
+    <div class="summaryRow">
+      <div class="summaryLabel">Touchscreen Skipped:</div>
+      <div class="summaryValue">${skipped}</div>
+    </div>
+    <div class="summaryRow">
+      <div class="summaryLabel">Failed Rows:</div>
+      <div class="summaryValue">${failedRows}</div>
+    </div>
+    <div class="summaryRow">
+      <div class="summaryLabel">Status:</div>
+      <div class="summaryValue" style="color:${status === "PASS" ? "#00ff00" : "#ff0000"}">${status}</div>
+    </div>
+  `;
+
+  fullData.forEach((unit, index) => {
+    const box = document.createElement("div");
+    box.className = "uhcBox";
+
+    box.innerHTML = `<div class="uhcTitle">Unit ${index + 1}</div>`;
+
+    const faceRow = document.createElement("div");
+    faceRow.className = "faceRow";
+
+    const frontCol = document.createElement("div");
+    frontCol.className = "faceCol";
+    frontCol.innerHTML = `<div class="faceHeader">Front</div>`;
+
+    unit.front.forEach((row, rIndex) => {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "rowBlock";
+      rowDiv.innerHTML = `<div class="rowTitle">Row ${rIndex + 1}</div>`;
+
+      row.forEach((val, cIndex) => {
+        const line = document.createElement("div");
+        line.className = "ledLine";
+        line.innerHTML = `
+          <div class="ledLabel">LED ${cIndex + 1}</div>
+          <div class="ledValue">${val}</div>
+        `;
+        rowDiv.appendChild(line);
+      });
+
+      frontCol.appendChild(rowDiv);
+    });
+
+    const backCol = document.createElement("div");
+    backCol.className = "faceCol";
+    backCol.innerHTML = `<div class="faceHeader">Back</div>`;
+
+    unit.back.forEach((row, rIndex) => {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "rowBlock";
+      rowDiv.innerHTML = `<div class="rowTitle">Row ${rIndex + 1}</div>`;
+
+      row.forEach((val, cIndex) => {
+        const line = document.createElement("div");
+        line.className = "ledLine";
+        line.innerHTML = `
+          <div class="ledLabel">LED ${cIndex + 1}</div>
+          <div class="ledValue">${val}</div>
+        `;
+        rowDiv.appendChild(line);
+      });
+
+      backCol.appendChild(rowDiv);
+    });
+
+    faceRow.appendChild(frontCol);
+    faceRow.appendChild(backCol);
+    box.appendChild(faceRow);
+    uhcContainer.appendChild(box);
+  });
+
   document.getElementById("downloadPdfBtn").onclick = () => {
-    window.print(); // iOS Safari → Save as PDF
+    window.print();
   };
 
   document.getElementById("newTestBtn").onclick = () => {
-    window.location.href = "index.html"; // Change if your start page is different
+    window.location.href = "index.html";
   };
 </script>
 
