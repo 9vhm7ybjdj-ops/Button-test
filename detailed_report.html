@@ -110,4 +110,152 @@
   }
 
   .cell-pass {
-    color
+    color: #9eff9e;
+    text-shadow: 0 0 6px #00ff00;
+  }
+
+  .cell-fail {
+    color: #ffb0b0;
+    text-shadow: 0 0 6px #ff0000;
+  }
+
+  .cell-un {
+    color: #ffeb3b;
+    text-shadow: 0 0 6px #ffeb3b;
+  }
+
+  .face-summary {
+    margin-top: 6px;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .face-status-ok {
+    color: #9eff9e;
+  }
+
+  .face-status-issues {
+    color: #ffb0b0;
+  }
+
+  .face-status-skip {
+    color: #ffeb3b;
+  }
+</style>
+</head>
+
+<body>
+<div id="reportApp">
+  <div class="report-header">
+    <div class="store-line" id="storeLine"></div>
+    <div class="meta-line" id="metaLine"></div>
+  </div>
+
+  <div class="overall-summary" id="overallSummary"></div>
+
+  <div id="unitsContainer"></div>
+</div>
+
+<script>
+  const UHC_NAMES = ["Left UHC", "Middle UHC", "Right UHC"];
+
+  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData"));
+  const storeName = sessionStorage.getItem("storeName");
+  const storeNumber = sessionStorage.getItem("storeNumber");
+  const dateString = sessionStorage.getItem("dateString");
+
+  document.getElementById("storeLine").textContent =
+    `${storeName} — ${storeNumber}`;
+  document.getElementById("metaLine").textContent =
+    `Detailed UHC Test Report — ${dateString}`;
+
+  function createEl(tag, cls, text) {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
+  function renderFace(unit, face, label) {
+    const block = createEl("div", "face-block");
+    block.appendChild(createEl("div", "face-title", label));
+
+    if (unit.touchscreen) {
+      block.appendChild(createEl("div", "face-summary face-status-skip",
+        "Skipped (Touchscreen enabled)"));
+      return { el: block, failed: 0, skipped: true };
+    }
+
+    const rows = unit[face];
+    let failedRows = 0;
+
+    rows.forEach((row, rIndex) => {
+      block.appendChild(createEl("div", "row-title", `Row ${rIndex + 1}`));
+
+      const rowCells = createEl("div", "row-cells");
+      let rowFail = false;
+
+      row.forEach(state => {
+        let cls = "cell";
+        let text = state;
+
+        if (state === "PASS") cls += " cell-pass";
+        else if (state === "FAIL") { cls += " cell-fail"; rowFail = true; }
+        else { cls += " cell-un"; text = "- - -"; }
+
+        rowCells.appendChild(createEl("div", cls, text));
+      });
+
+      if (rowFail) failedRows++;
+      block.appendChild(rowCells);
+    });
+
+    block.appendChild(
+      createEl(
+        "div",
+        "face-summary " + (failedRows > 0 ? "face-status-issues" : "face-status-ok"),
+        failedRows > 0 ? `${failedRows} failed row(s)` : "0 failed rows"
+      )
+    );
+
+    return { el: block, failed: failedRows, skipped: false };
+  }
+
+  function renderReport() {
+    const unitsContainer = document.getElementById("unitsContainer");
+    let totalFailed = 0;
+    let totalSkipped = 0;
+
+    fullData.forEach((u, idx) => {
+      const unitBlock = createEl("div", "unit-block");
+      unitBlock.appendChild(createEl("div", "unit-title", UHC_NAMES[idx]));
+
+      const facesRow = createEl("div", "faces-row");
+
+      const front = renderFace(u, "front", "Front");
+      const back  = renderFace(u, "back",  "Back");
+
+      facesRow.appendChild(front.el);
+      facesRow.appendChild(back.el);
+
+      unitBlock.appendChild(facesRow);
+      unitsContainer.appendChild(unitBlock);
+
+      totalFailed += front.failed + back.failed;
+      totalSkipped += (front.skipped ? 1 : 0) + (back.skipped ? 1 : 0);
+    });
+
+    document.getElementById("overallSummary").innerHTML = `
+      <div><strong>Total UHCs:</strong> 3</div>
+      <div><strong>Total Faces:</strong> 6</div>
+      <div><strong>Total Faces Skipped:</strong> ${totalSkipped}</div>
+      <div><strong>Total Failed Rows:</strong> ${totalFailed}</div>
+      <div><strong>Overall Status:</strong> ${totalFailed > 0 ? "Issues Found" : "All Clear"}</div>
+    `;
+  }
+
+  renderReport();
+</script>
+
+</body>
+</html>
