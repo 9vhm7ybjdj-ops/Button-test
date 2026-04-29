@@ -334,7 +334,7 @@ function colorForFails(fails) {
   return "none";
 }
 
-/* Build bar with X overlay */
+/* Build bar with subtle 3D white X and no box expansion */
 function buildBar(filled, color) {
   const emoji = {
     green:"🟩", yellow:"🟨", orange:"🟧", red:"🟥", none:"⬛"
@@ -352,20 +352,32 @@ function buildBar(filled, color) {
   for (let i = 1; i <= 6; i++) {
     if (i <= filled) {
       bar += `
-        <span style="position:relative; display:inline-block; width:1em; text-shadow:${glow}">
-          ${emoji}
+        <span style="
+          position:relative;
+          display:inline-flex;
+          width:1em;
+          height:1em;
+          align-items:center;
+          justify-content:center;
+          text-shadow:${glow};
+        ">
+          <span style="font-size:1em; line-height:1em;">${emoji}</span>
           <span style="
             position:absolute;
-            top:0;
-            left:0;
             width:100%;
             height:100%;
             display:flex;
             align-items:center;
             justify-content:center;
             font-size:0.65em;
-            color:#000;
-            font-weight:bold;
+            font-weight:900;
+            color:#fff;
+            text-shadow:
+              0 1px 0 #ccc,
+              0 -1px 0 #ccc,
+              1px 0 0 #ccc,
+              -1px 0 0 #ccc,
+              0 0 3px rgba(0,0,0,0.6);
           ">X</span>
         </span>`;
     } else {
