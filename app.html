@@ -127,8 +127,6 @@
 
   .invisible { visibility: hidden; }
 
-  .back-bottom-spacer { height: 32px; }
-
   .uhc-slots { display: flex; gap: 6px; }
 
   .uhc-slot {
@@ -271,9 +269,9 @@
 
   .touchscreen-label input { transform: scale(1.4); }
 
-  /* FIXED: match touchscreen row height */
+  /* Spacer will be dynamically synced */
   .touchscreen-spacer {
-    height: 52px;
+    height: 0px;
     margin-top: 10px;
   }
 
@@ -397,7 +395,7 @@
         <div class="uhc-rows" id="backRows"></div>
       </div>
 
-      <!-- FIXED: matches touchscreen row height -->
+      <!-- Dynamic spacer (height set by JS) -->
       <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
@@ -551,6 +549,12 @@
       container.appendChild(rowEl);
     });
   }
+  /* DYNAMIC SPACER SYNC — prevents nav-row drift */
+  function syncSpacerHeight() {
+    const h = touchscreenRow.offsetHeight;
+    backSpacer.style.height = h + "px";
+  }
+
   function renderCurrentFace() {
 
     /* AUTO‑SKIP FORWARD over skipped BACK faces */
@@ -591,6 +595,9 @@
     backBtn.style.visibility = currentStepIndex === 0 ? 'hidden' : 'visible';
     nextBtn.style.display = currentStepIndex === steps.length - 1 ? 'none' : 'inline-block';
     finishBtn.style.display = currentStepIndex === steps.length - 1 ? 'inline-block' : 'none';
+
+    /* LOCK NAV ROW — dynamic spacer sync */
+    syncSpacerHeight();
   }
 
   /* TOUCHSCREEN SKIP LOGIC */
@@ -643,7 +650,7 @@
     if (currentStepIndex > 0) {
       currentStepIndex--;
 
-      /* NEW: AUTO‑SKIP BACKWARD over skipped BACK faces */
+      /* AUTO‑SKIP BACKWARD over skipped BACK faces */
       while (currentStepIndex >= 0) {
         const s = steps[currentStepIndex];
         const ui = s.unit - 1;
