@@ -274,7 +274,6 @@
   .touchscreen-spacer {
     height: 32px;
     margin-top: 10px;
-    display: none;
   }
 
   .nav-row {
@@ -319,7 +318,6 @@
       <div class="uhc-name-header" id="uhcNameHeader"></div>
       <div class="unit-header" id="unitHeader"></div>
     </div>
-
     <!-- FRONT PANEL -->
     <div class="uhc-wrapper" id="frontWrapper">
       <div class="uhc-panel" id="frontPanel">
@@ -360,8 +358,6 @@
         <input type="checkbox" id="touchscreenToggle">
         Touchscreen
       </label>
-
-      <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
     <!-- BACK PANEL -->
@@ -398,10 +394,9 @@
         </div>
 
         <div class="uhc-rows" id="backRows"></div>
-
       </div>
 
-      <div class="back-bottom-spacer"></div>
+      <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
     <!-- NAVIGATION -->
@@ -439,7 +434,7 @@
 
   const units = [];
 
-  /* CORRECT ORDER: ALL FRONTS → THEN ALL BACKS */
+  /* Correct order: ALL FRONTS → THEN ALL BACKS */
   const steps = [];
   for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'front' });
   for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'back' });
@@ -489,7 +484,6 @@
     return e;
   }
 
-  /* NEW: cycle entire row state */
   function cycleRow(unitIndex, face, rIndex) {
     const states = ['UN', 'PASS', 'FAIL'];
     const current = units[unitIndex][face][rIndex][0];
@@ -505,25 +499,30 @@
       const rowEl = createEl('div', 'uhc-row');
       const inner = createEl('div', 'uhc-row-inner');
 
-      const labels = ["PASS", "FAIL", "---"];
-      /* LED + LABEL + LED + LABEL + LED + LABEL */
+      /* LED + dynamic label triplets */
       for (let c = 0; c < 3; c++) {
-        const led = createEl('div', 'uhc-led ' + row[c].toLowerCase());
+        const state = row[c];
+
+        const led = createEl('div', 'uhc-led ' + state.toLowerCase());
         led.onclick = () => {
           const order = ['UN', 'PASS', 'FAIL'];
-          const next = order[(order.indexOf(row[c]) + 1) % 3];
+          const next = order[(order.indexOf(state) + 1) % 3];
           units[unitIndex][face][rIndex][c] = next;
           playComboSound();
           renderCurrentFace();
         };
 
-        const label = createEl('div', 'uhc-label', labels[c]);
+        const labelText =
+          state === 'PASS' ? 'PASS' :
+          state === 'FAIL' ? 'FAIL' :
+          '---';
+
+        const label = createEl('div', 'uhc-label', labelText);
 
         inner.appendChild(led);
         inner.appendChild(label);
       }
 
-      /* NEW 4TH BUTTON — row cycle + sound */
       const btn = createEl('div', 'uhc-row-btn');
       btn.innerHTML = `
         <svg viewBox="0 0 24 24">
@@ -538,7 +537,6 @@
 
       inner.appendChild(btn);
 
-      /* Row glow logic */
       if (row.every(v => v === 'PASS')) rowEl.classList.add('passRow');
       else if (row.every(v => v === 'FAIL')) rowEl.classList.add('failRow');
 
@@ -546,42 +544,74 @@
       container.appendChild(rowEl);
     });
   }
-
   function renderCurrentFace() {
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
     const face = step.face;
 
-    /* HEADER TEXT */
     storeHeader.textContent = `${storeName} — ${storeNumber}`;
     const uhcNames = ["Left UHC", "Middle UHC", "Right UHC"];
     uhcNameHeader.textContent = uhcNames[unitIndex];
     unitHeader.textContent =
       `Unit ${step.unit} of ${TOTAL_UNITS} — ${face.charAt(0).toUpperCase() + face.slice(1)}`;
 
-    /* PANEL VISIBILITY */
     frontWrapper.style.display = face === 'front' ? 'flex' : 'none';
     backWrapper.style.display = face === 'back' ? 'flex' : 'none';
 
-    /* TOUCHSCREEN */
     touchscreenToggle.checked = units[unitIndex].touchscreen;
     touchscreenRow.style.display = face === 'front' ? 'flex' : 'none';
-    backSpacer.style.display = face === 'front' ? 'block' : 'none';
+    backSpacer.style.display = face === 'back' ? 'block' : 'none';
 
-    /* RENDER ROWS */
     if (face === 'front') {
       renderPanel(frontRows, units[unitIndex].front, unitIndex, 'front');
     } else {
       renderPanel(backRows, units[unitIndex].back, unitIndex, 'back');
     }
 
-    /* NAV BUTTONS */
     backBtn.style.visibility = currentStepIndex === 0 ? 'hidden' : 'visible';
     nextBtn.style.display = currentStepIndex === steps.length - 1 ? 'none' : 'inline-block';
     finishBtn.style.display = currentStepIndex === steps.length - 1 ? 'inline-block' : 'none';
   }
 
-  /* NAVIGATION */
+  /* TOUCHSCREEN SKIP LOGIC
+     - Skip FRONT → skip matching BACK
+     - Skip BACK → skip only BACK
+     - Flow remains: all fronts → all backs
+  */
+  touchscreenToggle.onchange = () => {
+    const checked = touchscreenToggle.checked;
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+    const face = step.face;
+
+    units[unitIndex].touchscreen = checked;
+
+    if (!checked) return;
+
+    playComboSound();
+
+    if (face === 'front') {
+      // Skip FRONT + matching BACK
+      units[unitIndex].front = Array.from({ length: 6 }, () => Array(3).fill('UN'));
+      units[unitIndex].back  = Array.from({ length: 6 }, () => Array(3).fill('UN'));
+
+      // Move to next FRONT (normal flow)
+      currentStepIndex++;
+      renderCurrentFace();
+      return;
+    }
+
+    if (face === 'back') {
+      // Skip ONLY this BACK
+      units[unitIndex].back = Array.from({ length: 6 }, () => Array(3).fill('UN'));
+
+      // Move to next BACK (normal flow)
+      currentStepIndex++;
+      renderCurrentFace();
+      return;
+    }
+  };
+
   nextBtn.onclick = () => {
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
@@ -600,21 +630,18 @@
     }
   };
 
-  /* FIXED: Finish now goes to report_select.html */
   finishBtn.onclick = () => {
     const payload = encodeURIComponent(JSON.stringify(units));
     window.location.href =
       `report_select.html?data=${payload}&store=${storeName}&num=${storeNumber}`;
   };
 
-  /* URL PARSING */
   function parseURL() {
     const params = new URLSearchParams(window.location.search);
     storeName = params.get('store') || 'Store';
     storeNumber = params.get('num') || '';
   }
 
-  /* INIT */
   parseURL();
   initUnits();
   renderCurrentFace();
