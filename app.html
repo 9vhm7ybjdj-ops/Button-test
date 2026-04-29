@@ -370,7 +370,7 @@
             <div class="uhc-slot"></div>
           </div>
 
-          <div class="uhc-top-indicators invisible">
+        <div class="uhc-top-indicators invisible">
             <div class="uhc-top-led"></div>
             <div class="uhc-top-led"></div>
             <div class="uhc-top-led"></div>
@@ -472,7 +472,8 @@
         back: Array.from({ length: 6 }, () =>
           Array.from({ length: 3 }, () => 'UN')
         ),
-        touchscreen: false
+        touchscreen: false,
+        skipped: false   // REQUIRED for auto-skip + reporting
       });
     }
   }
@@ -545,6 +546,19 @@
     });
   }
   function renderCurrentFace() {
+
+    /* AUTO‑SKIP BACK FACES FOR SKIPPED UNITS */
+    while (currentStepIndex < steps.length) {
+      const s = steps[currentStepIndex];
+      const ui = s.unit - 1;
+
+      if (s.face === 'back' && units[ui].skipped) {
+        currentStepIndex++;
+        continue;
+      }
+      break;
+    }
+
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
     const face = step.face;
@@ -573,11 +587,7 @@
     finishBtn.style.display = currentStepIndex === steps.length - 1 ? 'inline-block' : 'none';
   }
 
-  /* TOUCHSCREEN SKIP LOGIC
-     - Skip FRONT → skip matching BACK
-     - Skip BACK → skip only BACK
-     - Flow remains: all fronts → all backs
-  */
+  /* TOUCHSCREEN SKIP LOGIC */
   touchscreenToggle.onchange = () => {
     const checked = touchscreenToggle.checked;
     const step = steps[currentStepIndex];
@@ -591,21 +601,23 @@
     playComboSound();
 
     if (face === 'front') {
-      // Skip FRONT + matching BACK
+      /* Skip FRONT + BACK */
       units[unitIndex].front = Array.from({ length: 6 }, () => Array(3).fill('UN'));
       units[unitIndex].back  = Array.from({ length: 6 }, () => Array(3).fill('UN'));
 
-      // Move to next FRONT (normal flow)
+      /* Mark unit skipped AND touchscreen for reporting */
+      units[unitIndex].skipped = true;
+      units[unitIndex].touchscreen = true;
+
       currentStepIndex++;
       renderCurrentFace();
       return;
     }
 
     if (face === 'back') {
-      // Skip ONLY this BACK
+      /* Skip ONLY this back */
       units[unitIndex].back = Array.from({ length: 6 }, () => Array(3).fill('UN'));
 
-      // Move to next BACK (normal flow)
       currentStepIndex++;
       renderCurrentFace();
       return;
@@ -630,10 +642,14 @@
     }
   };
 
+  /* FINALIZE TEST → SEND DATA TO REPORTS */
   finishBtn.onclick = () => {
-    const payload = encodeURIComponent(JSON.stringify(units));
-    window.location.href =
-      `report_select.html?data=${payload}&store=${storeName}&num=${storeNumber}`;
+    sessionStorage.setItem("uhcFullData", JSON.stringify(units));
+    sessionStorage.setItem("storeName", storeName);
+    sessionStorage.setItem("storeNumber", storeNumber);
+    sessionStorage.setItem("dateString", new Date().toLocaleString());
+
+    window.location.href = "report_select.html";
   };
 
   function parseURL() {
