@@ -7,7 +7,6 @@
 <title>UHC Multi-Unit Test</title>
 
 <style>
-  /* GLOBAL DIAGNOSTIC GRID BACKGROUND */
   html, body {
     margin: 0;
     padding: 0;
@@ -17,7 +16,6 @@
     touch-action: manipulation;
     -webkit-user-select: none;
     user-select: none;
-
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
@@ -77,7 +75,6 @@
     gap: 10px;
   }
 
-  /* PANEL FRAME */
   .uhc-panel {
     width: 340px;
     padding: 18px;
@@ -90,7 +87,6 @@
     box-sizing: border-box;
   }
 
-  /* SCREWS */
   .uhc-panel::before,
   .uhc-panel::after {
     content: "";
@@ -105,7 +101,6 @@
   .uhc-panel::before { top: 8px; left: 10px; }
   .uhc-panel::after  { top: 8px; right: 10px; }
 
-  /* FRONT TOP BAR */
   .uhc-top-bar {
     display: flex;
     align-items: center;
@@ -115,7 +110,6 @@
     margin-bottom: 16px;
   }
 
-  /* BACK TOP BAR */
   .back-top-bar {
     height: 40px;
     margin-bottom: 16px;
@@ -123,18 +117,11 @@
     align-items: center;
   }
 
-  .invisible {
-    visibility: hidden;
-  }
+  .invisible { visibility: hidden; }
 
-  .back-bottom-spacer {
-    height: 32px;
-  }
+  .back-bottom-spacer { height: 32px; }
 
-  .uhc-slots {
-    display: flex;
-    gap: 6px;
-  }
+  .uhc-slots { display: flex; gap: 6px; }
 
   .uhc-slot {
     width: 36px;
@@ -158,9 +145,7 @@
     box-shadow: 0 0 4px #0a0;
   }
 
-  .uhc-top-spacer {
-    flex: 1;
-  }
+  .uhc-top-spacer { flex: 1; }
 
   .uhc-keypad {
     display: grid;
@@ -258,9 +243,7 @@
     font-size: 16px;
   }
 
-  .touchscreen-label input {
-    transform: scale(1.4);
-  }
+  .touchscreen-label input { transform: scale(1.4); }
 
   .touchscreen-spacer {
     height: 32px;
@@ -285,16 +268,13 @@
     cursor: pointer;
   }
 
-  .nav-row button:active {
-    transform: scale(0.98);
-  }
+  .nav-row button:active { transform: scale(0.98); }
 
-  /* FINISH BUTTON */
   #finishBtn {
     display: none;
     width: 100%;
     padding: 12px;
-    margin-top: 20px;
+    margin-top: 10px;
     border-radius: 8px;
     background: #222;
     border: 1px solid #44ff44;
@@ -314,30 +294,121 @@
       <div class="store-header" id="storeHeader"></div>
       <div class="unit-header" id="unitHeader"></div>
     </div>
+
+    <!-- FRONT PANEL -->
+    <div class="uhc-wrapper" id="frontWrapper">
+      <div class="uhc-panel" id="frontPanel">
+
+        <div class="uhc-top-bar">
+          <div class="uhc-slots">
+            <div class="uhc-slot"></div>
+            <div class="uhc-slot"></div>
+          </div>
+
+          <div class="uhc-top-indicators">
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+          </div>
+
+          <div class="uhc-top-spacer"></div>
+
+          <div class="uhc-keypad">
+            <div class="uhc-key">1</div>
+            <div class="uhc-key">2</div>
+            <div class="uhc-key">3</div>
+            <div class="uhc-key">4</div>
+            <div class="uhc-key">5</div>
+            <div class="uhc-key">6</div>
+            <div class="uhc-key">7</div>
+            <div class="uhc-key">8</div>
+            <div class="uhc-key">9</div>
+          </div>
+        </div>
+
+        <div class="uhc-rows" id="frontRows"></div>
+      </div>
+
+      <label class="touchscreen-label" id="touchscreenRow">
+        <input type="checkbox" id="touchscreenToggle">
+        Touchscreen
+      </label>
+
+      <div class="touchscreen-spacer" id="backSpacer"></div>
+    </div>
+
+    <!-- BACK PANEL -->
+    <div class="uhc-wrapper" id="backWrapper">
+      <div class="uhc-panel" id="backPanel">
+
+        <div class="uhc-top-bar back-top-bar">
+          <div class="uhc-slots invisible">
+            <div class="uhc-slot"></div>
+            <div class="uhc-slot"></div>
+          </div>
+
+          <div class="uhc-top-indicators invisible">
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+            <div class="uhc-top-led"></div>
+          </div>
+
+          <div class="uhc-top-spacer"></div>
+
+          <div class="uhc-keypad invisible">
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+            <div class="uhc-key"></div>
+          </div>
+        </div>
+
+        <div class="uhc-rows" id="backRows"></div>
+
+      </div>
+
+      <div class="back-bottom-spacer"></div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="nav-row">
+      <button id="backBtn">Back</button>
+      <button id="nextBtn">Next</button>
+    </div>
+
+    <!-- FINISH BUTTON (hidden until last face) -->
+    <div id="finishBtn">Finish</div>
+
+  </div>
+</div>
+
 <script>
   const TOTAL_UNITS = 3;
 
-  const testScreen    = document.getElementById('testScreen');
-
+  const testScreen = document.getElementById('testScreen');
   const storeHeader = document.getElementById('storeHeader');
-  const unitHeader  = document.getElementById('unitHeader');
+  const unitHeader = document.getElementById('unitHeader');
 
-  const frontWrapper      = document.getElementById('frontWrapper');
-  const backWrapper       = document.getElementById('backWrapper');
-  const frontRows         = document.getElementById('frontRows');
-  const backRows          = document.getElementById('backRows');
-  const touchscreenRow    = document.getElementById('touchscreenRow');
+  const frontWrapper = document.getElementById('frontWrapper');
+  const backWrapper = document.getElementById('backWrapper');
+  const frontRows = document.getElementById('frontRows');
+  const backRows = document.getElementById('backRows');
+  const touchscreenRow = document.getElementById('touchscreenRow');
   const touchscreenToggle = document.getElementById('touchscreenToggle');
-  const backSpacer        = document.getElementById('backSpacer');
+  const backSpacer = document.getElementById('backSpacer');
 
   const nextBtn = document.getElementById('nextBtn');
   const backBtn = document.getElementById('backBtn');
-
-  /* NEW: Finish button */
-  const finishBtn = document.createElement("div");
-  finishBtn.id = "finishBtn";
-  finishBtn.textContent = "Finish";
-  document.getElementById("app").appendChild(finishBtn);
+  const finishBtn = document.getElementById('finishBtn');
 
   let storeName = '';
   let storeNumber = '';
@@ -350,10 +421,8 @@
 
   let currentStepIndex = 0;
 
-  /* SOUND */
   function playComboSound() {
     const a = new AudioContext();
-
     const o1 = a.createOscillator();
     const g1 = a.createGain();
     o1.type = 'triangle';
@@ -394,7 +463,6 @@
     if (html !== undefined) e.innerHTML = html;
     return e;
   }
-
   function renderPanel(container, data, unitIndex, face) {
     container.innerHTML = '';
 
@@ -466,6 +534,7 @@
 
   function advanceStep() {
     currentStepIndex++;
+
     if (currentStepIndex >= steps.length) {
       showFinishButton();
     } else {
@@ -483,7 +552,7 @@
 
     if (face === 'front') {
       frontWrapper.style.display = 'flex';
-      backWrapper.style.display  = 'none';
+      backWrapper.style.display = 'none';
       touchscreenRow.style.display = 'flex';
       backSpacer.style.display = 'none';
       touchscreenToggle.checked = units[unitIndex].touchscreen;
@@ -494,7 +563,7 @@
         return;
       }
       frontWrapper.style.display = 'none';
-      backWrapper.style.display  = 'flex';
+      backWrapper.style.display = 'flex';
       touchscreenRow.style.display = 'none';
       backSpacer.style.display = 'block';
       renderPanel(backRows, units[unitIndex].back, unitIndex, 'back');
@@ -505,14 +574,12 @@
     renderCurrentFace();
   }
 
-  /* NEW: Show Finish button instead of auto-redirect */
+  /* NEXT → FINISH SWAP (Option D) */
   function showFinishButton() {
     nextBtn.style.display = "none";
-    backBtn.style.display = "none";
     finishBtn.style.display = "block";
   }
 
-  /* NEW: Finish button → save + redirect */
   finishBtn.onclick = () => {
     sessionStorage.setItem("uhcFullData", JSON.stringify(units));
     sessionStorage.setItem("uhcSummary", JSON.stringify(units));
@@ -541,8 +608,8 @@
 
   function parseParams() {
     const params = new URLSearchParams(window.location.search);
-    storeName   = params.get("store") || "";
-    storeNumber = params.get("num")   || "";
+    storeName = params.get("store") || "";
+    storeNumber = params.get("num") || "";
     storeHeader.textContent = `${storeName} — ${storeNumber}`;
   }
 
