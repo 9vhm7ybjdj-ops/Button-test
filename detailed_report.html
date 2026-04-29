@@ -4,259 +4,204 @@
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Detailed UHC Report</title>
+<title>UHC Detailed Report</title>
 
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #111;
-    font-family: Arial, sans-serif;
-    color: #fff;
-
-    background-image:
-      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
   body {
-    display: flex;
-    justify-content: center;
-    padding: 20px 10px 40px;
+    margin: 0;
+    padding: 20px;
+    background: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
-  #reportApp {
-    width: 100%;
-    max-width: 520px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .report-header {
+  h1, h2 {
     text-align: center;
-  }
-
-  .store-line {
-    font-size: 18px;
-    font-weight: bold;
-  }
-
-  .meta-line {
-    font-size: 13px;
-    opacity: 0.8;
-  }
-
-  .overall-summary {
-    background: rgba(0,0,0,0.7);
-    border-radius: 10px;
-    padding: 10px 12px;
-    border: 1px solid #444;
-    font-size: 13px;
-  }
-
-  .unit-block {
-    background: rgba(0,0,0,0.75);
-    border-radius: 12px;
-    border: 1px solid #555;
-    padding: 12px;
-  }
-
-  .unit-title {
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
     margin-bottom: 10px;
   }
 
-  .faces-row {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
+  .section {
+    background: #222;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 10px rgba(0,255,0,0.2);
   }
 
-  .face-block {
-    flex: 1;
-    min-width: 0;
-    background: rgba(10,10,10,0.9);
+  .unit-block {
+    margin-bottom: 20px;
+    padding: 14px;
+    background: #1a1a1a;
     border-radius: 8px;
-    border: 1px solid #333;
-    padding: 8px;
+    box-shadow: inset 0 0 8px rgba(0,255,0,0.15);
   }
 
-  .face-title {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 6px;
+  .unit-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #7CFC00;
+  }
+
+  .row-block {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #000;
+    border-radius: 6px;
   }
 
   .row-title {
-    font-size: 11px;
-    font-weight: bold;
-    margin-top: 4px;
+    font-size: 14px;
+    margin-bottom: 6px;
   }
 
-  .row-cells {
+  .led-line {
     display: flex;
-    gap: 10px;
-    font-size: 12px;
+    gap: 12px;
+    margin-bottom: 4px;
   }
 
-  .cell {
-    min-width: 40px;
+  .led-label {
+    width: 60px;
   }
 
-  .cell-pass {
-    color: #9eff9e;
+  .led-value {
+    font-weight: bold;
+  }
+
+  /* BUTTONS */
+  .reportActions {
+    display: flex;
+    gap: 14px;
+    margin-top: 30px;
+  }
+
+  .reportActions button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    background: #111;
+    color: #7CFC00;
+    border: 2px solid #00ff00;
     text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 14px #00ff00;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
   }
 
-  .cell-fail {
-    color: #ffb0b0;
-    text-shadow: 0 0 6px #ff0000;
+  .reportActions button:active {
+    transform: scale(0.97);
   }
 
-  .cell-un {
-    color: #ffeb3b;
-    text-shadow: 0 0 6px #ffeb3b;
-  }
-
-  .face-summary {
-    margin-top: 6px;
-    text-align: center;
-    font-size: 12px;
-  }
-
-  .face-status-ok {
-    color: #9eff9e;
-  }
-
-  .face-status-issues {
-    color: #ffb0b0;
-  }
-
-  .face-status-skip {
-    color: #ffeb3b;
+  @media print {
+    .reportActions {
+      display: none;
+    }
+    body {
+      background: #fff;
+      color: #000;
+    }
+    .section, .unit-block, .row-block {
+      box-shadow: none;
+      background: #fff;
+      color: #000;
+    }
   }
 </style>
 </head>
 
 <body>
-<div id="reportApp">
-  <div class="report-header">
-    <div class="store-line" id="storeLine"></div>
-    <div class="meta-line" id="metaLine"></div>
-  </div>
 
-  <div class="overall-summary" id="overallSummary"></div>
+<h1>UHC Detailed Report</h1>
+<h2 id="storeInfo"></h2>
+<h2 id="dateInfo"></h2>
 
-  <div id="unitsContainer"></div>
+<div id="reportContainer"></div>
+
+<div class="reportActions">
+  <button id="downloadPdfBtn">Download PDF</button>
+  <button id="newTestBtn">New Test</button>
 </div>
 
 <script>
-  const UHC_NAMES = ["Left UHC", "Middle UHC", "Right UHC"];
+  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData") || "[]");
+  const storeName = sessionStorage.getItem("storeName") || "";
+  const storeNumber = sessionStorage.getItem("storeNumber") || "";
+  const dateString = sessionStorage.getItem("dateString") || "";
 
-  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData"));
-  const storeName = sessionStorage.getItem("storeName");
-  const storeNumber = sessionStorage.getItem("storeNumber");
-  const dateString = sessionStorage.getItem("dateString");
-
-  document.getElementById("storeLine").textContent =
+  document.getElementById("storeInfo").textContent =
     `${storeName} — ${storeNumber}`;
-  document.getElementById("metaLine").textContent =
-    `Detailed UHC Test Report — ${dateString}`;
 
-  function createEl(tag, cls, text) {
-    const el = document.createElement(tag);
-    if (cls) el.className = cls;
-    if (text !== undefined) el.textContent = text;
-    return el;
-  }
+  document.getElementById("dateInfo").textContent = dateString;
 
-  function renderFace(unit, face, label) {
-    const block = createEl("div", "face-block");
-    block.appendChild(createEl("div", "face-title", label));
+  const container = document.getElementById("reportContainer");
 
-    if (unit.touchscreen) {
-      block.appendChild(createEl("div", "face-summary face-status-skip",
-        "Skipped (Touchscreen enabled)"));
-      return { el: block, failed: 0, skipped: true };
-    }
+  fullData.forEach((unit, index) => {
+    const unitDiv = document.createElement("div");
+    unitDiv.className = "unit-block";
 
-    const rows = unit[face];
-    let failedRows = 0;
+    unitDiv.innerHTML = `<div class="unit-title">Unit ${index + 1}</div>`;
 
-    rows.forEach((row, rIndex) => {
-      block.appendChild(createEl("div", "row-title", `Row ${rIndex + 1}`));
+    // FRONT
+    const frontDiv = document.createElement("div");
+    frontDiv.className = "section";
+    frontDiv.innerHTML = `<h3>Front</h3>`;
+    unit.front.forEach((row, rIndex) => {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "row-block";
+      rowDiv.innerHTML = `<div class="row-title">Row ${rIndex + 1}</div>`;
 
-      const rowCells = createEl("div", "row-cells");
-      let rowFail = false;
-
-      row.forEach(state => {
-        let cls = "cell";
-        let text = state;
-
-        if (state === "PASS") cls += " cell-pass";
-        else if (state === "FAIL") { cls += " cell-fail"; rowFail = true; }
-        else { cls += " cell-un"; text = "- - -"; }
-
-        rowCells.appendChild(createEl("div", cls, text));
+      row.forEach((val, cIndex) => {
+        const line = document.createElement("div");
+        line.className = "led-line";
+        line.innerHTML = `
+          <div class="led-label">LED ${cIndex + 1}</div>
+          <div class="led-value">${val}</div>
+        `;
+        rowDiv.appendChild(line);
       });
 
-      if (rowFail) failedRows++;
-      block.appendChild(rowCells);
+      frontDiv.appendChild(rowDiv);
     });
 
-    block.appendChild(
-      createEl(
-        "div",
-        "face-summary " + (failedRows > 0 ? "face-status-issues" : "face-status-ok"),
-        failedRows > 0 ? `${failedRows} failed row(s)` : "0 failed rows"
-      )
-    );
+    // BACK
+    const backDiv = document.createElement("div");
+    backDiv.className = "section";
+    backDiv.innerHTML = `<h3>Back</h3>`;
+    unit.back.forEach((row, rIndex) => {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "row-block";
+      rowDiv.innerHTML = `<div class="row-title">Row ${rIndex + 1}</div>`;
 
-    return { el: block, failed: failedRows, skipped: false };
-  }
+      row.forEach((val, cIndex) => {
+        const line = document.createElement("div");
+        line.className = "led-line";
+        line.innerHTML = `
+          <div class="led-label">LED ${cIndex + 1}</div>
+          <div class="led-value">${val}</div>
+        `;
+        rowDiv.appendChild(line);
+      });
 
-  function renderReport() {
-    const unitsContainer = document.getElementById("unitsContainer");
-    let totalFailed = 0;
-    let totalSkipped = 0;
-
-    fullData.forEach((u, idx) => {
-      const unitBlock = createEl("div", "unit-block");
-      unitBlock.appendChild(createEl("div", "unit-title", UHC_NAMES[idx]));
-
-      const facesRow = createEl("div", "faces-row");
-
-      const front = renderFace(u, "front", "Front");
-      const back  = renderFace(u, "back",  "Back");
-
-      facesRow.appendChild(front.el);
-      facesRow.appendChild(back.el);
-
-      unitBlock.appendChild(facesRow);
-      unitsContainer.appendChild(unitBlock);
-
-      totalFailed += front.failed + back.failed;
-      totalSkipped += (front.skipped ? 1 : 0) + (back.skipped ? 1 : 0);
+      backDiv.appendChild(rowDiv);
     });
 
-    document.getElementById("overallSummary").innerHTML = `
-      <div><strong>Total UHCs:</strong> 3</div>
-      <div><strong>Total Faces:</strong> 6</div>
-      <div><strong>Total Faces Skipped:</strong> ${totalSkipped}</div>
-      <div><strong>Total Failed Rows:</strong> ${totalFailed}</div>
-      <div><strong>Overall Status:</strong> ${totalFailed > 0 ? "Issues Found" : "All Clear"}</div>
-    `;
-  }
+    unitDiv.appendChild(frontDiv);
+    unitDiv.appendChild(backDiv);
+    container.appendChild(unitDiv);
+  });
 
-  renderReport();
+  /* BUTTON LOGIC */
+  document.getElementById("downloadPdfBtn").onclick = () => {
+    window.print(); // iOS Safari → Save as PDF
+  };
+
+  document.getElementById("newTestBtn").onclick = () => {
+    window.location.href = "index.html"; // Change if your start page is different
+  };
 </script>
 
 </body>
 </html>
-
