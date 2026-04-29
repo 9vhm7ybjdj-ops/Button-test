@@ -41,6 +41,7 @@ h1 {
   margin-top: 10px;
   margin-bottom: 6px;
   text-align: center;
+  line-height: 1.25;
 }
 
 #storeLine {
@@ -183,12 +184,16 @@ input[type="range"] {
 
 <div id="captureArea">
 
-<h1>UHC Button Test Graphical Report</h1>
+<h1>
+  UHC Button Test<br>
+  Graphical Report
+</h1>
+
 <div id="storeLine"></div>
 <div id="timeLine"></div>
 
 <div class="total-panel">
-  <div class="total-title">TOTAL ACROSS ALL UHCs</div>
+  <div class="total-title">All UHC Total</div>
 
   <div class="bar-row">
     <div class="bar-label">Front</div>
@@ -388,7 +393,7 @@ function updateAll() {
   document.getElementById("t_b_bar").innerHTML = buildBar(Math.min(totalBack, 6), backColor);
 
   document.getElementById("t_summary").textContent =
-    `Total: ${totalFails} failed rows → $${totalCost.toLocaleString()}`;
+    `${totalFails} rows = $${totalCost.toLocaleString()}`;
 }
 
 document.querySelectorAll("input").forEach(i => i.addEventListener("input", updateAll));
@@ -400,51 +405,31 @@ document.getElementById("backBtn").onclick = () => {
   window.location.href = "report_select.html";
 };
 
-/* Share PNG — FIXED VERSION */
+/* Share PNG — unchanged logic */
 document.getElementById("shareBtn").onclick = async () => {
   const element = document.getElementById("captureArea");
 
-  // Force proper text rendering before capture
-  element.style.transform = "translateZ(0)";
-  element.style.fontSmoothing = "antialiased";
-  element.style.webkitFontSmoothing = "antialiased";
-
-  // Allow browser to settle layout
   await new Promise(r => setTimeout(r, 200));
 
-  // High-resolution capture
   const canvas = await html2canvas(element, {
-    scale: 3,
+    scale: 2,
     useCORS: true,
     backgroundColor: "#0b0b0d",
     logging: false
   });
 
-  // Downsample for crisp text
-  const resizedCanvas = document.createElement("canvas");
-  const ctx = resizedCanvas.getContext("2d");
-  resizedCanvas.width = canvas.width / 2;
-  resizedCanvas.height = canvas.height / 2;
-  ctx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
-
-  resizedCanvas.toBlob(async (blob) => {
+  canvas.toBlob(async (blob) => {
     const file = new File([blob], "UHC_Report.png", { type: "image/png" });
 
-    // Native share if supported
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: "UHC Graphical Report",
-          text: "Diagnostic summary"
-        });
-      } catch (err) {
-        console.log("Share cancelled or failed:", err);
-      }
+      await navigator.share({
+        files: [file],
+        title: "UHC Graphical Report",
+        text: "Diagnostic summary"
+      });
     } else {
-      // Fallback: download
       const link = document.createElement("a");
-      link.href = resizedCanvas.toDataURL("image/png");
+      link.href = canvas.toDataURL("image/png");
       link.download = "UHC_Report.png";
       link.click();
     }
