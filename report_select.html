@@ -14,6 +14,11 @@
     color: #fff;
     font-family: Arial, sans-serif;
 
+    /* Prevent horizontal scroll on iPhone */
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+
     /* Diagnostic grid background */
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
@@ -21,11 +26,20 @@
     background-size: 40px 40px;
   }
 
+  /* ⭐ Vertically centered container */
   #app {
     width: 100%;
     max-width: 420px;
     margin: 0 auto;
-    padding: 30px;
+    padding: 0 16px;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* ⭐ vertical centering */
+    align-items: center;       /* ⭐ horizontal centering */
+
+    min-height: 100vh;         /* ⭐ full screen height */
     text-align: center;
   }
 
@@ -77,12 +91,12 @@
 </div>
 
 <script>
-  /* ⭐ Hide Back button if a report has already been opened */
+  /* Hide Back button if a report has already been opened */
   if (sessionStorage.getItem("reportOpened") === "1") {
     document.getElementById("backBtn").style.display = "none";
   }
 
-  /* ⭐ Mark that a report has been opened BEFORE leaving */
+  /* Mark that a report has been opened BEFORE leaving */
   document.getElementById("summaryBtn").onclick = () => {
     sessionStorage.setItem("reportOpened", "1");
     window.location.href = "report.html";
@@ -93,7 +107,7 @@
     window.location.href = "detailed_report.html";
   };
 
-  /* ⭐ Back → ALWAYS return to last unit tested (when visible) */
+  /* Back → ALWAYS return to last unit tested (when visible) */
   document.getElementById("backBtn").onclick = () => {
     const lastUnit = sessionStorage.getItem("lastUnit");
     const lastFace = sessionStorage.getItem("lastFace");
