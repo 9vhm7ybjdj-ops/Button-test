@@ -188,6 +188,9 @@
     window.location.href =
       `app.html?store=${encodeURIComponent(storeName)}&num=${storeNumber}`;
   };
+  if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
 
 </body>
