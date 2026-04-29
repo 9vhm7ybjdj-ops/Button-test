@@ -14,6 +14,7 @@
     color: #fff;
     font-family: Arial, sans-serif;
 
+    /* Diagnostic grid background */
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
@@ -33,21 +34,21 @@
     font-size: 22px;
   }
 
-  /* ⭐ COMPACT BUTTONS */
+  /* ⭐ EXACT SAME BUTTON SIZE AS OTHER PAGES */
   .btn {
     display: block;
-    width: 100%;
-    padding: 8px 10px;
-    margin: 10px 0;
-    font-size: 14px;
-    border-radius: 6px;
+    width: 180px;              /* identical width */
+    padding: 8px 12px;         /* identical padding */
+    margin: 12px auto;         /* centered */
+    font-size: 16px;           /* same font size */
+    border-radius: 8px;
 
     background: #111;
     color: #7CFC00;
 
-    border: 1px solid #00ff00;
-    text-shadow: 0 0 3px #00ff00;
-    box-shadow: 0 0 6px #00ff00;
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 12px #00ff00;
 
     cursor: pointer;
   }
@@ -77,16 +78,23 @@
 
 <script>
   document.getElementById("summaryBtn").onclick = () => {
-    window.location.href = "report.html";   // ✔ fixed link
+    window.location.href = "report.html";   // ✔ correct link
   };
 
   document.getElementById("detailedBtn").onclick = () => {
     window.location.href = "detailed_report.html";
   };
 
-  // ✔ Back to last unit tested
+  /* ⭐ Back to last unit tested */
   document.getElementById("backBtn").onclick = () => {
-    window.history.back();
+    const lastUnit = sessionStorage.getItem("lastUnit");
+    const lastFace = sessionStorage.getItem("lastFace");
+
+    if (lastUnit && lastFace) {
+      window.location.href = `app.html?unit=${lastUnit}&face=${lastFace}`;
+    } else {
+      window.history.back();  // fallback
+    }
   };
 </script>
 
