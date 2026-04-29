@@ -14,19 +14,16 @@
     color: #fff;
     font-family: Arial, sans-serif;
 
-    /* Prevent horizontal scroll on iPhone */
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
 
-    /* Diagnostic grid background */
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
-  /* ⭐ Vertically centered container */
   #app {
     width: 100%;
     max-width: 420px;
@@ -36,10 +33,10 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: center;   /* ⭐ vertical centering */
-    align-items: center;       /* ⭐ horizontal centering */
+    justify-content: center;
+    align-items: center;
 
-    min-height: 100vh;         /* ⭐ full screen height */
+    min-height: 100vh;
     text-align: center;
   }
 
@@ -48,7 +45,6 @@
     font-size: 22px;
   }
 
-  /* ⭐ EXACT SAME BUTTON SIZE AS OTHER PAGES */
   .btn {
     display: block;
     width: 180px;
@@ -86,28 +82,32 @@
 
   <button id="summaryBtn" class="btn">Summary Report</button>
   <button id="detailedBtn" class="btn">Detailed Report</button>
-  <button id="backBtn" class="btn">Back</button>
+  <button id="backBtn" class="btn">New Test</button>
 
 </div>
 
 <script>
-  /* Hide Back button if a report has already been opened */
-  if (sessionStorage.getItem("reportOpened") === "1") {
-    document.getElementById("backBtn").style.display = "none";
+  /* Restore lastUnit/lastFace if passed via URL */
+  const params = new URLSearchParams(window.location.search);
+  const unitFromURL = params.get("unit");
+  const faceFromURL = params.get("face");
+
+  if (unitFromURL && faceFromURL) {
+    sessionStorage.setItem("lastUnit", unitFromURL);
+    sessionStorage.setItem("lastFace", faceFromURL);
   }
 
-  /* Mark that a report has been opened BEFORE leaving */
+  /* Summary → report.html */
   document.getElementById("summaryBtn").onclick = () => {
-    sessionStorage.setItem("reportOpened", "1");
     window.location.href = "report.html";
   };
 
+  /* Detailed → detailed_report.html */
   document.getElementById("detailedBtn").onclick = () => {
-    sessionStorage.setItem("reportOpened", "1");
     window.location.href = "detailed_report.html";
   };
 
-  /* Back → ALWAYS return to last unit tested (when visible) */
+  /* New Test → same behaviour as old Back button */
   document.getElementById("backBtn").onclick = () => {
     const lastUnit = sessionStorage.getItem("lastUnit");
     const lastFace = sessionStorage.getItem("lastFace");
@@ -115,7 +115,7 @@
     if (lastUnit && lastFace) {
       window.location.href = `app.html?unit=${lastUnit}&face=${lastFace}`;
     } else {
-      window.location.href = "index.html";  // fallback
+      window.location.href = "index.html";
     }
   };
 </script>
