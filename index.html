@@ -92,6 +92,12 @@
     gap: 16px;
   }
 
+  label {
+    font-size: 14px;
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+
   select, button {
     width: 100%;
     padding: 12px;
@@ -131,17 +137,14 @@
 <!-- START SCREEN -->
 <div id="startScreen">
   <div class="startBox">
-    <select id="storeSelect">
-      <option value="">Select Store</option>
-      <option value="Store 101">Store 101</option>
-      <option value="Store 202">Store 202</option>
-      <option value="Store 303">Store 303</option>
-    </select>
 
-    <select id="unitSelect">
-      <option value="3">3 Units</option>
-      <option value="4">4 Units</option>
-      <option value="5">5 Units</option>
+    <label for="storeSelect">Store</label>
+    <select id="storeSelect">
+      <option value="">Select Store…</option>
+      <option value="Kuluin — 0818">Kuluin — 0818</option>
+      <option value="Nambour — 0892">Nambour — 0892</option>
+      <option value="Maroochydore — 0981">Maroochydore — 0981</option>
+      <option value="Sippy Downs — 1614">Sippy Downs — 1614</option>
     </select>
 
     <button id="startBtn">Start Test</button>
@@ -170,14 +173,17 @@
   // Start button
   document.getElementById("startBtn").onclick = () => {
     const store = document.getElementById("storeSelect").value;
-    const units = document.getElementById("unitSelect").value;
 
     if (!store) {
       alert("Please select a store");
       return;
     }
 
-    window.location.href = `app.html?store=${encodeURIComponent(store)}&num=${units}`;
+    // Split into name + number
+    const [storeName, storeNumber] = store.split(" — ");
+
+    window.location.href =
+      `app.html?store=${encodeURIComponent(storeName)}&num=${storeNumber}`;
   };
 </script>
 
