@@ -6,12 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-  /* iPhone scaling system */
-  :root {
-    --base-height: 820; /* Baseline for iPhone */
-    --scale: calc(100vh / var(--base-height));
-  }
-
+  /* GLOBAL SHRINK: 15% smaller */
   html, body {
     margin: 0;
     padding: 0;
@@ -21,135 +16,130 @@
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-size: 34px 34px; /* 15% smaller */
+    color: #f5f5f7;
+    font-family: system-ui, -apple-system, sans-serif;
+    overflow: hidden;
   }
 
   body {
-    transform: scale(var(--scale));
-    transform-origin: top center;
-    height: calc(var(--base-height) * 1px);
-    overflow: hidden;
-
-    color: #f5f5f7;
-    font-family: system-ui, -apple-system, sans-serif;
-
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
   h1 {
-    font-size: 1.2rem;
+    font-size: 1.02rem; /* 15% smaller */
     text-transform: uppercase;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     text-align: center;
   }
 
-  /* Panels */
+  /* PANELS */
   .panel, .total-panel {
     background: linear-gradient(145deg, #2a2c31 0%, #1a1b1f 40%, #0f1013 100%);
     border: 1px solid #3a3c42;
-    padding: 12px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 420px;
+    padding: 10px; /* 15% smaller */
+    border-radius: 8px; /* 15% smaller */
+    width: 85%; /* 15% smaller */
+    max-width: 360px; /* 15% smaller */
     text-align: center;
-    margin: 10px 0;
-    box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+    margin: 8px 0; /* 15% smaller */
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
   }
 
   .total-panel {
     background: linear-gradient(160deg, #3a3c42 0%, #1f2024 50%, #121316 100%);
     border: 1px solid #4a4c52;
-    box-shadow: inset 0 0 12px rgba(0,0,0,0.7);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
   }
 
   .panel-title, .total-title {
-    font-size: 1rem;
+    font-size: 0.85rem; /* 15% smaller */
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     color: #d7d7d9;
   }
 
   .sub-label {
-    font-size: 0.8rem;
+    font-size: 0.68rem; /* 15% smaller */
     color: #c0c2c7;
-    margin-top: 4px;
+    margin-top: 3px;
   }
 
   .bar {
-    font-size: 1.4rem;
-    letter-spacing: 2px;
-    margin-top: 4px;
+    font-size: 1.19rem; /* 15% smaller */
+    letter-spacing: 1.7px; /* 15% smaller */
+    margin-top: 3px;
     user-select: none;
   }
 
   .legend {
-    margin: 10px 0;
-    font-size: 0.8rem;
+    margin: 8px 0;
+    font-size: 0.68rem; /* 15% smaller */
     color: #a0a4b0;
     display: flex;
     justify-content: center;
-    gap: 14px;
-    width: 90%;
-    max-width: 420px;
+    gap: 12px; /* 15% smaller */
+    width: 85%;
+    max-width: 360px;
   }
 
-  /* Sliders at bottom */
+  /* SLIDERS */
   .input-block {
     background: #15161a;
     border: 1px solid #262833;
-    padding: 12px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 420px;
+    padding: 10px; /* 15% smaller */
+    border-radius: 8px; /* 15% smaller */
+    width: 85%;
+    max-width: 360px;
     margin-top: auto;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .input-title {
-    font-size: 1rem;
+    font-size: 0.85rem; /* 15% smaller */
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     text-align: center;
   }
 
   label {
-    font-size: 0.8rem;
+    font-size: 0.68rem; /* 15% smaller */
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     color: #a0a4b0;
   }
 
   input[type="range"] {
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   .slider-value {
-    font-size: 0.8rem;
+    font-size: 0.68rem; /* 15% smaller */
     color: #c0c2c7;
     text-align: right;
-    margin-top: -6px;
-    margin-bottom: 8px;
+    margin-top: -5px;
+    margin-bottom: 6px;
   }
 
-  /* BACK BUTTON (bottom) */
+  /* BUTTONS */
   .btn {
     display: block;
-    width: 140px;
-    padding: 8px 12px;
-    margin: 12px auto;
-    font-size: 16px;
-    border-radius: 8px;
+    width: 120px; /* 15% smaller */
+    padding: 7px 10px; /* 15% smaller */
+    margin: 10px auto;
+    font-size: 14px; /* 15% smaller */
+    border-radius: 7px; /* 15% smaller */
 
     background: #111;
     color: #7CFC00;
 
     border: 2px solid #00ff00;
-    text-shadow: 0 0 6px #00ff00;
-    box-shadow: 0 0 12px #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+    box-shadow: 0 0 10px #00ff00;
 
     cursor: pointer;
   }
@@ -177,7 +167,7 @@
   <div id="t_summary" class="total-summary"></div>
 </div>
 
-<!-- LEGEND UNDER GRAND TOTAL -->
+<!-- LEGEND -->
 <div class="legend">
   <span>🟩 1 fail</span>
   <span>🟨 2 fails</span>
@@ -218,7 +208,7 @@
   <div id="r_b_bar" class="bar"></div>
 </div>
 
-<!-- COST SLIDERS AT BOTTOM -->
+<!-- SLIDERS -->
 <div class="input-block">
   <div class="input-title">Cost Settings</div>
 
@@ -231,8 +221,14 @@
   <div class="slider-value">Unit Cost: $<span id="cost_unit_val">8500</span></div>
 </div>
 
-<!-- BACK BUTTON AT BOTTOM -->
+<!-- SHARE BUTTON -->
+<button id="shareBtn" class="btn">Share as PNG</button>
+
+<!-- BACK BUTTON -->
 <button id="backBtn" class="btn">Back</button>
+
+<!-- html2canvas -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
 function colorForFails(fails) {
@@ -253,10 +249,10 @@ function buildBar(filled, color) {
   }[color];
 
   const glow = {
-    green:  "0 0 6px #00ff80",
-    yellow: "0 0 6px #ffe066",
-    orange: "0 0 6px #ff9933",
-    red:    "0 0 6px #ff3333",
+    green:  "0 0 5px #00ff80",
+    yellow: "0 0 5px #ffe066",
+    orange: "0 0 5px #ff9933",
+    red:    "0 0 5px #ff3333",
     none:   "none"
   }[color];
 
@@ -323,12 +319,43 @@ document.querySelectorAll("input").forEach(i =>
 
 updateAll();
 
-/* BACK BUTTON → report_select.html */
+/* BACK BUTTON */
 document.getElementById("backBtn").onclick = () => {
   window.location.href = "report_select.html";
 };
 
-/* Your app will call this to update bars */
+/* SHARE BUTTON */
+document.getElementById("shareBtn").onclick = async () => {
+  const element = document.body;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true
+  });
+
+  canvas.toBlob(async (blob) => {
+    const file = new File([blob], "uhc_report.png", { type: "image/png" });
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "UHC Graphical Report",
+          text: "Diagnostic summary"
+        });
+      } catch (err) {
+        console.log("Share cancelled", err);
+      }
+    } else {
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "uhc_report.png";
+      link.click();
+    }
+  });
+};
+
+/* Update from app */
 window.updateFromApp = function(data) {
   window.l_f = data.leftFront;
   window.l_b = data.leftBack;
