@@ -4,73 +4,140 @@
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Select Report Type</title>
+<title>Select Report</title>
 
 <style>
   html, body {
     margin: 0;
     padding: 0;
     background: #111;
-    color: #fff;
     font-family: Arial, sans-serif;
-
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-
-    background-image:
-      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+    color: #fff;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    display: flex;
+    justify-content: center;
   }
 
   #app {
     width: 100%;
     max-width: 420px;
-    margin: 0 auto;
-    padding: 0 16px;
-    box-sizing: border-box;
-
+    padding: 20px 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-
-    min-height: 100vh;
-    text-align: center;
+    gap: 24px;
   }
 
-  h1 {
-    margin-bottom: 20px;
-    font-size: 22px;
+  .header {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
   }
 
   .btn {
-    display: block;
-    width: 180px;
-    padding: 8px 12px;
-    margin: 12px auto;
-    font-size: 16px;
+    padding: 12px 24px;
     border-radius: 8px;
-
     background: #111;
     color: #7CFC00;
-
     border: 2px solid #00ff00;
     text-shadow: 0 0 6px #00ff00;
-    box-shadow: 0 0 12px #00ff00;
-
+    box-shadow: 0 0 14px #00ff00;
+    font-size: 18px;
     cursor: pointer;
+    width: 260px;
+    text-align: center;
+    margin-bottom: 10px;
   }
 
   .btn:active {
     transform: scale(0.97);
   }
 
-  @media print {
-    .btn {
-      display: none;
-    }
+  /* RED destructive button */
+  .red-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    background: #220000;
+    color: #ff4d4d;
+    border: 2px solid #ff0000;
+    text-shadow: 0 0 6px #ff0000;
+    box-shadow: 0 0 14px #ff0000;
+    font-size: 18px;
+    cursor: pointer;
+    width: 260px;
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .red-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* Modal overlay */
+  #confirmOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+
+  /* Modal box */
+  #confirmBox {
+    width: 300px;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, #d7d9dc, #a5a7aa);
+    box-shadow:
+      0 0 0 2px #777,
+      0 12px 20px rgba(0,0,0,0.6);
+    text-align: center;
+    color: #111;
+    font-size: 16px;
+  }
+
+  #confirmButtons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .confirm-cancel {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #333;
+    color: #fff;
+    border: 2px solid #555;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .confirm-cancel:active {
+    transform: scale(0.97);
+  }
+
+  .confirm-yes {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #220000;
+    color: #ff4d4d;
+    border: 2px solid #ff0000;
+    text-shadow: 0 0 6px #ff0000;
+    box-shadow: 0 0 14px #ff0000;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .confirm-yes:active {
+    transform: scale(0.97);
   }
 </style>
 </head>
@@ -78,55 +145,53 @@
 <body>
 <div id="app">
 
-  <h1>Select Report Type</h1>
+  <div class="header">Select Report</div>
 
-  <button id="summaryBtn" class="btn">Summary Report</button>
-  <button id="detailedBtn" class="btn">Detailed Report</button>
+  <button class="btn" onclick="goSummary()">Summary Report</button>
+  <button class="btn" onclick="goGraphical()">Graphical Report</button>
 
-  <!-- NEW BUTTON -->
-  <button id="graphicalBtn" class="btn">Graphical Report</button>
-
-  <button id="backBtn" class="btn">New Test</button>
+  <!-- RED destructive button -->
+  <button class="red-btn" onclick="openConfirm()">New Test</button>
 
 </div>
 
-<script>
-  /* Restore lastUnit/lastFace if passed via URL */
-  const params = new URLSearchParams(window.location.search);
-  const unitFromURL = params.get("unit");
-  const faceFromURL = params.get("face");
+<!-- Custom Confirmation Modal -->
+<div id="confirmOverlay">
+  <div id="confirmBox">
+    <div>Are you sure you want to clear all data and start a new test</div>
 
-  if (unitFromURL && faceFromURL) {
-    sessionStorage.setItem("lastUnit", unitFromURL);
-    sessionStorage.setItem("lastFace", faceFromURL);
+    <div id="confirmButtons">
+      <button class="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="confirm-yes" onclick="confirmNewTest()">Yes, Start New Test</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function goSummary() {
+    window.location.href = "summary_report.html";
   }
 
-  /* Summary → report.html */
-  document.getElementById("summaryBtn").onclick = () => {
-    window.location.href = "report.html";
-  };
-
-  /* Detailed → detailed_report.html */
-  document.getElementById("detailedBtn").onclick = () => {
-    window.location.href = "detailed_report.html";
-  };
-
-  /* NEW: Graphical → graphical_report.html */
-  document.getElementById("graphicalBtn").onclick = () => {
+  function goGraphical() {
     window.location.href = "graphical_report.html";
-  };
+  }
 
-  /* New Test → same behaviour as old Back button */
-  document.getElementById("backBtn").onclick = () => {
-    const lastUnit = sessionStorage.getItem("lastUnit");
-    const lastFace = sessionStorage.getItem("lastFace");
+  function openConfirm() {
+    document.getElementById("confirmOverlay").style.display = "flex";
+  }
 
-    if (lastUnit && lastFace) {
-      window.location.href = `app.html?unit=${lastUnit}&face=${lastFace}`;
-    } else {
-      window.location.href = "index.html";
-    }
-  };
+  function closeConfirm() {
+    document.getElementById("confirmOverlay").style.display = "none";
+  }
+
+  function confirmNewTest() {
+    sessionStorage.removeItem("uhcFullData");
+    sessionStorage.removeItem("storeName");
+    sessionStorage.removeItem("storeNumber");
+    sessionStorage.removeItem("dateString");
+
+    window.location.href = "index.html";
+  }
 </script>
 
 </body>
