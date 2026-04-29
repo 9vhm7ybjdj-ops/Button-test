@@ -400,34 +400,55 @@ document.getElementById("backBtn").onclick = () => {
   window.location.href = "report_select.html";
 };
 
-/* Share PNG */
+/* Share PNG — FIXED VERSION */
 document.getElementById("shareBtn").onclick = async () => {
   const element = document.getElementById("captureArea");
 
+  // Force proper text rendering before capture
+  element.style.transform = "translateZ(0)";
+  element.style.fontSmoothing = "antialiased";
+  element.style.webkitFontSmoothing = "antialiased";
+
+  // Allow browser to settle layout
+  await new Promise(r => setTimeout(r, 200));
+
+  // High-resolution capture
   const canvas = await html2canvas(element, {
-    scale: 2,
+    scale: 3,
     useCORS: true,
-    backgroundColor: "#0b0b0d"
+    backgroundColor: "#0b0b0d",
+    logging: false
   });
 
-  canvas.toBlob(async (blob) => {
-    const file = new File([blob], "uhc_report.png", { type: "image/png" });
+  // Downsample for crisp text
+  const resizedCanvas = document.createElement("canvas");
+  const ctx = resizedCanvas.getContext("2d");
+  resizedCanvas.width = canvas.width / 2;
+  resizedCanvas.height = canvas.height / 2;
+  ctx.drawImage(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height);
 
-    if (navigator.share) {
+  resizedCanvas.toBlob(async (blob) => {
+    const file = new File([blob], "UHC_Report.png", { type: "image/png" });
+
+    // Native share if supported
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
           title: "UHC Graphical Report",
           text: "Diagnostic summary"
         });
-      } catch (err) {}
+      } catch (err) {
+        console.log("Share cancelled or failed:", err);
+      }
     } else {
+      // Fallback: download
       const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "uhc_report.png";
+      link.href = resizedCanvas.toDataURL("image/png");
+      link.download = "UHC_Report.png";
       link.click();
     }
-  });
+  }, "image/png");
 };
 
 }); // END DOMContentLoaded
