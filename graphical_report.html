@@ -252,6 +252,8 @@ input[type="range"] {
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+
 /* Store + timestamp */
 document.getElementById("storeLine").textContent =
   sessionStorage.getItem("storeName") || "Store";
@@ -402,6 +404,8 @@ document.getElementById("shareBtn").onclick = async () => {
     }
   });
 };
+
+}); // END DOMContentLoaded
 </script>
 
 </body>
