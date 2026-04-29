@@ -270,18 +270,17 @@
 
   .nav-row button:active { transform: scale(0.98); }
 
+  /* PATCHED FINISH BUTTON */
   #finishBtn {
     display: none;
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 8px;
-    background: #222;
-    border: 1px solid #44ff44;
-    text-align: center;
-    font-size: 16px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #777;
+    background: #333;
+    color: #fff;
+    font-size: 14px;
     cursor: pointer;
-    text-shadow: 0 0 6px #00ff00;
+    text-align: center;
   }
 </style>
 </head>
@@ -379,14 +378,12 @@
       <div class="back-bottom-spacer"></div>
     </div>
 
-    <!-- NAVIGATION -->
+    <!-- NAVIGATION (PATCHED) -->
     <div class="nav-row">
       <button id="backBtn">Back</button>
       <button id="nextBtn">Next</button>
+      <button id="finishBtn">Finish</button>
     </div>
-
-    <!-- FINISH BUTTON (hidden until last face) -->
-    <div id="finishBtn">Finish</div>
 
   </div>
 </div>
