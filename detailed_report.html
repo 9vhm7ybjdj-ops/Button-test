@@ -4,265 +4,309 @@
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>UHC Report</title>
+<title>Detailed UHC Report</title>
 
 <style>
   html, body {
     margin: 0;
     padding: 0;
     background: #111;
-    color: #fff;
     font-family: Arial, sans-serif;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    color: #fff;
+
+    background-image:
+      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
-  #app {
+  body {
+    display: flex;
+    justify-content: center;
+    padding: 20px 10px 40px;
+  }
+
+  #reportApp {
     width: 100%;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-    box-sizing: border-box;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
-  h1 {
+  .report-header {
     text-align: center;
-    margin-bottom: 10px;
   }
 
-  h2 {
-    text-align: center;
-    margin-top: 0;
+  .store-line {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .meta-line {
+    font-size: 13px;
     opacity: 0.8;
   }
 
-  .timestamp {
-    text-align: center;
-    margin-top: 5px;
-    margin-bottom: 20px;
-    opacity: 0.7;
-    font-size: 16px;
+  .overall-summary {
+    background: rgba(0,0,0,0.7);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #444;
+    font-size: 13px;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 30px;
-    font-size: 18px;
-  }
-
-  th, td {
+  .unit-block {
+    background: rgba(0,0,0,0.75);
+    border-radius: 12px;
+    border: 1px solid #555;
     padding: 12px;
-    border-bottom: 1px solid #444;
-    text-align: left;
   }
 
-  th {
-    background: #222;
-  }
-
-  tr:nth-child(even) {
-    background: #1a1a1a;
-  }
-
-  /* ⭐ Auto‑Fail Highlighting */
-  .statusFail {
-    color: #ff4444;
-    text-shadow: 0 0 6px #ff0000;
+  .unit-title {
+    text-align: center;
+    font-size: 16px;
     font-weight: bold;
+    margin-bottom: 10px;
   }
 
-  .statusPass {
-    color: #7CFC00;
+  .faces-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .face-block {
+    flex: 1;
+    min-width: 0;
+    background: rgba(10,10,10,0.9);
+    border-radius: 8px;
+    border: 1px solid #333;
+    padding: 8px;
+  }
+
+  .face-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+
+  .row-title {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+
+  .row-cells {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .cell {
+    min-width: 40px;
+  }
+
+  .cell-pass {
+    color: #9eff9e;
     text-shadow: 0 0 6px #00ff00;
   }
 
-  .statusSkip {
-    color: #ffcc00;
-    text-shadow: 0 0 6px #ffcc00;
-    font-weight: bold;
-  }
-
-  #totalsBlock {
-    margin-top: 30px;
-    text-align: center;
-    font-size: 22px;
-    color: #ff4444;
+  .cell-fail {
+    color: #ffb0b0;
     text-shadow: 0 0 6px #ff0000;
   }
 
-  .actionBtn {
-    padding: 12px 24px;
-    font-size: 18px;
+  .cell-un {
+    color: #ffeb3b;
+    text-shadow: 0 0 6px #ffeb3b;
+  }
+
+  .face-summary {
+    margin-top: 6px;
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .face-status-ok {
+    color: #9eff9e;
+  }
+
+  .face-status-issues {
+    color: #ffb0b0;
+  }
+
+  .face-status-skip {
+    color: #ffeb3b;
+  }
+
+  /* ⭐ GREEN GLOW BUTTONS */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .glow-btn {
+    flex: 1;
+    padding: 14px;
     border-radius: 8px;
     background: #111;
     color: #7CFC00;
     border: 2px solid #00ff00;
     text-shadow: 0 0 6px #00ff00;
-    box-shadow: 0 0 12px #00ff00;
+    box-shadow: 0 0 14px #00ff00;
+    font-size: 16px;
     cursor: pointer;
+    transition: transform 0.1s ease;
   }
 
-  .actionBtn:active {
+  .glow-btn:active {
     transform: scale(0.97);
   }
 
-  .actionRow {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 25px;
-  }
-
-  .smallBtn {
-    width: 180px;
-  }
-
   @media print {
-    .actionRow {
+    .action-buttons {
       display: none;
-    }
-
-    @page {
-      size: A4 landscape;
-      margin: 0;
     }
   }
 </style>
 </head>
 
 <body>
-<div id="app">
+<div id="reportApp">
+  <div class="report-header">
+    <div class="store-line" id="storeLine"></div>
+    <div class="meta-line" id="metaLine"></div>
+  </div>
 
-  <h1>UHC Test Report</h1>
-  <h2 id="storeHeader"></h2>
-  <div id="timestamp" class="timestamp"></div>
+  <div class="overall-summary" id="overallSummary"></div>
 
-  <table id="reportTable">
-    <tr>
-      <th>Unit</th>
-      <th>Face</th>
-      <th>Status</th>
-    </tr>
-  </table>
+  <div id="unitsContainer"></div>
 
-  <div id="totalsBlock"></div>
-
-  <div class="actionRow">
-    <button id="newTestBtn" class="actionBtn smallBtn">New Test</button>
-    <button id="printBtn" class="actionBtn smallBtn">Print Report</button>
+  <!-- ⭐ BUTTONS ADDED HERE -->
+  <div class="action-buttons">
+    <button id="backBtn" class="glow-btn">Back</button>
+    <button id="newTestBtn" class="glow-btn">New Test</button>
+    <button id="pdfBtn" class="glow-btn">Export PDF</button>
   </div>
 
 </div>
 
 <script>
-  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData") || "[]");
-  const storeName = sessionStorage.getItem("storeName") || "";
-  const storeNumber = sessionStorage.getItem("storeNumber") || "";
+  const UHC_NAMES = ["Left UHC", "Middle UHC", "Right UHC"];
 
-  const now = new Date();
-  const timestamp = now.toLocaleString("en-AU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false
-  });
+  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData"));
+  const storeName = sessionStorage.getItem("storeName");
+  const storeNumber = sessionStorage.getItem("storeNumber");
+  const dateString = sessionStorage.getItem("dateString");
 
-  document.getElementById("storeHeader").textContent =
+  document.getElementById("storeLine").textContent =
     `${storeName} — ${storeNumber}`;
+  document.getElementById("metaLine").textContent =
+    `Detailed UHC Test Report — ${dateString}`;
 
-  document.getElementById("timestamp").textContent =
-    `Completed: ${timestamp}`;
+  function createEl(tag, cls, text) {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
 
-  const table = document.getElementById("reportTable");
+  function renderFace(unit, face, label) {
+    const block = createEl("div", "face-block");
+    block.appendChild(createEl("div", "face-title", label));
 
-  let totalFrontFailedRows = 0;
-  let totalBackFailedRows = 0;
-
-  // ⭐ Build summary directly from fullData
-  const summary = [];
-
-  fullData.forEach((unit, index) => {
-
-    // FRONT
     if (unit.touchscreen) {
-      summary.push({
-        unit: index + 1,
-        face: "front",
-        status: "Skipped (Touchscreen)"
-      });
-    } else {
-      const failedFront = unit.front.filter(
-        row => row.includes("FAIL")
-      ).length;
-
-      summary.push({
-        unit: index + 1,
-        face: "front",
-        status: `${failedFront} failed rows`
-      });
-
-      totalFrontFailedRows += failedFront;
+      block.appendChild(createEl("div", "face-summary face-status-skip",
+        "Skipped (Touchscreen enabled)"));
+      return { el: block, failed: 0, skipped: true };
     }
 
-    // BACK
-    if (unit.touchscreen) {
-      summary.push({
-        unit: index + 1,
-        face: "back",
-        status: "Skipped (Touchscreen)"
+    const rows = unit[face];
+    let failedRows = 0;
+
+    rows.forEach((row, rIndex) => {
+      block.appendChild(createEl("div", "row-title", `Row ${rIndex + 1}`));
+
+      const rowCells = createEl("div", "row-cells");
+      let rowFail = false;
+
+      row.forEach(state => {
+        let cls = "cell";
+        let text = state;
+
+        if (state === "PASS") cls += " cell-pass";
+        else if (state === "FAIL") { cls += " cell-fail"; rowFail = true; }
+        else { cls += " cell-un"; text = "- - -"; }
+
+        rowCells.appendChild(createEl("div", cls, text));
       });
-    } else {
-      const failedBack = unit.back.filter(
-        row => row.includes("FAIL")
-      ).length;
 
-      summary.push({
-        unit: index + 1,
-        face: "back",
-        status: `${failedBack} failed rows`
-      });
+      if (rowFail) failedRows++;
+      block.appendChild(rowCells);
+    });
 
-      totalBackFailedRows += failedBack;
-    }
-  });
+    block.appendChild(
+      createEl(
+        "div",
+        "face-summary " + (failedRows > 0 ? "face-status-issues" : "face-status-ok"),
+        failedRows > 0 ? `${failedRows} failed row(s)` : "0 failed rows"
+      )
+    );
 
-  // ⭐ Render summary rows with highlighting
-  summary.forEach(item => {
-    const row = document.createElement("tr");
+    return { el: block, failed: failedRows, skipped: false };
+  }
 
-    let statusClass = "";
+  function renderReport() {
+    const unitsContainer = document.getElementById("unitsContainer");
+    let totalFailed = 0;
+    let totalSkipped = 0;
 
-    if (item.status.includes("failed")) {
-      statusClass = "statusFail";
-    } else if (item.status.includes("Skipped")) {
-      statusClass = "statusSkip";
-    } else {
-      statusClass = "statusPass";
-    }
+    fullData.forEach((u, idx) => {
+      const unitBlock = createEl("div", "unit-block");
+      unitBlock.appendChild(createEl("div", "unit-title", UHC_NAMES[idx]));
 
-    row.innerHTML = `
-      <td>Unit ${item.unit}</td>
-      <td>${item.face.charAt(0).toUpperCase() + item.face.slice(1)}</td>
-      <td class="${statusClass}">${item.status}</td>
+      const facesRow = createEl("div", "faces-row");
+
+      const front = renderFace(u, "front", "Front");
+      const back  = renderFace(u, "back",  "Back");
+
+      facesRow.appendChild(front.el);
+      facesRow.appendChild(back.el);
+
+      unitBlock.appendChild(facesRow);
+      unitsContainer.appendChild(unitBlock);
+
+      totalFailed += front.failed + back.failed;
+      totalSkipped += (front.skipped ? 1 : 0) + (back.skipped ? 1 : 0);
+    });
+
+    document.getElementById("overallSummary").innerHTML = `
+      <div><strong>Total UHCs:</strong> 3</div>
+      <div><strong>Total Faces:</strong> 6</div>
+      <div><strong>Total Faces Skipped:</strong> ${totalSkipped}</div>
+      <div><strong>Total Failed Rows:</strong> ${totalFailed}</div>
+      <div><strong>Overall Status:</strong> ${totalFailed > 0 ? "Issues Found" : "All Clear"}</div>
     `;
+  }
 
-    table.appendChild(row);
-  });
+  renderReport();
 
-  // ⭐ Totals (unchanged — you said don’t modify)
-  document.getElementById("totalsBlock").innerHTML = `
-    TOTAL FRONT FAILED ROWS: ${totalFrontFailedRows}<br>
-    TOTAL BACK FAILED ROWS: ${totalBackFailedRows}
-  `;
-
-  document.getElementById("printBtn").onclick = () => window.print();
+  // ⭐ BUTTON LOGIC
+  document.getElementById("backBtn").onclick = () => {
+    window.history.back();
+  };
 
   document.getElementById("newTestBtn").onclick = () => {
     sessionStorage.clear();
     window.location.href = "index.html";
+  };
+
+  document.getElementById("pdfBtn").onclick = () => {
+    window.print();
   };
 </script>
 
