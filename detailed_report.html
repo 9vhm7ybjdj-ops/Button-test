@@ -103,10 +103,14 @@
     display: flex;
     gap: 10px;
     font-size: 12px;
+    padding: 4px 2px;
+    border-radius: 4px;
   }
 
+  /* ⭐ Center PASS / FAIL / --- horizontally */
   .cell {
     min-width: 40px;
+    text-align: center;
   }
 
   .cell-pass {
@@ -122,6 +126,22 @@
   .cell-un {
     color: #ffeb3b;
     text-shadow: 0 0 6px #ffeb3b;
+  }
+
+  /* ⭐ Row-level highlighting */
+  .row-pass {
+    background: rgba(0, 255, 0, 0.08);
+    border-left: 3px solid #00ff00;
+  }
+
+  .row-fail {
+    background: rgba(255, 0, 0, 0.08);
+    border-left: 3px solid #ff0000;
+  }
+
+  .row-skip {
+    background: rgba(255, 255, 0, 0.08);
+    border-left: 3px solid #ffeb3b;
   }
 
   .face-summary {
@@ -186,7 +206,6 @@
 
   <div id="unitsContainer"></div>
 
-  <!-- ⭐ BUTTONS ADDED HERE -->
   <div class="action-buttons">
     <button id="backBtn" class="glow-btn">Back</button>
     <button id="newTestBtn" class="glow-btn">New Test</button>
@@ -233,6 +252,7 @@
 
       const rowCells = createEl("div", "row-cells");
       let rowFail = false;
+      let rowUntested = false;
 
       row.forEach(state => {
         let cls = "cell";
@@ -240,12 +260,20 @@
 
         if (state === "PASS") cls += " cell-pass";
         else if (state === "FAIL") { cls += " cell-fail"; rowFail = true; }
-        else { cls += " cell-un"; text = "- - -"; }
+        else { cls += " cell-un"; text = "- - -"; rowUntested = true; }
 
         rowCells.appendChild(createEl("div", cls, text));
       });
 
-      if (rowFail) failedRows++;
+      if (rowFail) {
+        rowCells.classList.add("row-fail");
+        failedRows++;
+      } else if (rowUntested) {
+        rowCells.classList.add("row-skip");
+      } else {
+        rowCells.classList.add("row-pass");
+      }
+
       block.appendChild(rowCells);
     });
 
@@ -295,7 +323,6 @@
 
   renderReport();
 
-  // ⭐ BUTTON LOGIC
   document.getElementById("backBtn").onclick = () => {
     window.history.back();
   };
