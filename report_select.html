@@ -82,6 +82,10 @@
 
   <button id="summaryBtn" class="btn">Summary Report</button>
   <button id="detailedBtn" class="btn">Detailed Report</button>
+
+  <!-- NEW BUTTON -->
+  <button id="graphicalBtn" class="btn">Graphical Report</button>
+
   <button id="backBtn" class="btn">New Test</button>
 
 </div>
@@ -105,6 +109,11 @@
   /* Detailed → detailed_report.html */
   document.getElementById("detailedBtn").onclick = () => {
     window.location.href = "detailed_report.html";
+  };
+
+  /* NEW: Graphical → graphical_report.html */
+  document.getElementById("graphicalBtn").onclick = () => {
+    window.location.href = "graphical_report.html";
   };
 
   /* New Test → same behaviour as old Back button */
