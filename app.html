@@ -517,11 +517,18 @@
     unitHeader.textContent =
       `Unit ${step.unit} of ${TOTAL_UNITS} — ${face === 'front' ? 'Front' : 'Back'}`;
 
-    // Touchscreen skip logic (manual, not LED-based)
+    // Touchscreen skip logic (corrected)
     if (units[unitIndex].touchscreen) {
-      // Skip current face + opposite face
-      advanceStep();
-      advanceStep();
+      const nextUnit = step.unit + 1;
+
+      if (nextUnit > TOTAL_UNITS) {
+        showFinishButton();
+        return;
+      }
+
+      const nextIndex = steps.findIndex(s => s.unit === nextUnit && s.face === 'front');
+      currentStepIndex = nextIndex;
+      renderCurrentFace();
       return;
     }
 
@@ -572,9 +579,16 @@
     units[unitIndex].touchscreen = touchscreenToggle.checked;
 
     if (touchscreenToggle.checked) {
-      // Skip front + back immediately
-      advanceStep();
-      advanceStep();
+      const nextUnit = step.unit + 1;
+
+      if (nextUnit > TOTAL_UNITS) {
+        showFinishButton();
+        return;
+      }
+
+      const nextIndex = steps.findIndex(s => s.unit === nextUnit && s.face === 'front');
+      currentStepIndex = nextIndex;
+      renderCurrentFace();
     } else {
       renderCurrentFace();
     }
