@@ -141,6 +141,23 @@
   .face-status-skip {
     color: #ffeb3b;
   }
+
+  /* BUTTONS — minimal, layout‑safe */
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .action-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    background: #222;
+    color: #fff;
+    border: 1px solid #555;
+    font-size: 15px;
+  }
 </style>
 </head>
 
@@ -154,6 +171,13 @@
   <div class="overall-summary" id="overallSummary"></div>
 
   <div id="unitsContainer"></div>
+
+  <!-- BUTTONS ADDED HERE -->
+  <div class="action-buttons">
+    <button id="backBtn">Back</button>
+    <button id="newTestBtn">New Test</button>
+  </div>
+
 </div>
 
 <script>
@@ -255,6 +279,16 @@
   }
 
   renderReport();
+
+  // BUTTON LOGIC
+  document.getElementById("backBtn").onclick = () => {
+    window.history.back();
+  };
+
+  document.getElementById("newTestBtn").onclick = () => {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  };
 </script>
 
 </body>
