@@ -412,9 +412,12 @@
 
   const units = [];
 
+  /* CORRECT STEP ORDER */
   const steps = [];
-  for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'front' });
-  for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'back' });
+  for (let u = 1; u <= TOTAL_UNITS; u++) {
+    steps.push({ unit: u, face: 'front' });
+    steps.push({ unit: u, face: 'back' });
+  }
 
   let currentStepIndex = 0;
 
@@ -517,7 +520,7 @@
     unitHeader.textContent =
       `Unit ${step.unit} of ${TOTAL_UNITS} — ${face === 'front' ? 'Front' : 'Back'}`;
 
-    // Touchscreen skip logic (corrected)
+    // Touchscreen skip logic (corrected for new step order)
     if (units[unitIndex].touchscreen) {
       const nextUnit = step.unit + 1;
 
@@ -526,7 +529,10 @@
         return;
       }
 
-      const nextIndex = steps.findIndex(s => s.unit === nextUnit && s.face === 'front');
+      const nextIndex = steps.findIndex(
+        s => s.unit === nextUnit && s.face === 'front'
+      );
+
       currentStepIndex = nextIndex;
       renderCurrentFace();
       return;
@@ -586,7 +592,10 @@
         return;
       }
 
-      const nextIndex = steps.findIndex(s => s.unit === nextUnit && s.face === 'front');
+      const nextIndex = steps.findIndex(
+        s => s.unit === nextUnit && s.face === 'front'
+      );
+
       currentStepIndex = nextIndex;
       renderCurrentFace();
     } else {
