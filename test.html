@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Haptics Test</title>
+
+<style>
+  body {
+    background: #000;
+    color: #7CFC00;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    text-align: center;
+  }
+
+  .btn {
+    width: 180px;
+    padding: 12px;
+    margin: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+
+    background: #111;
+    color: #7CFC00;
+
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 12px #00ff00;
+
+    cursor: pointer;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+  }
+</style>
+</head>
+
+<body>
+
+<h2>Haptics Test</h2>
+
+<button class="btn" onclick="hapticLight()">Light Tap</button>
+<button class="btn" onclick="hapticMedium()">Medium Tap</button>
+<button class="btn" onclick="hapticHeavy()">Heavy Tap</button>
+<button class="btn" onclick="combo()">Tick + Thump Combo</button>
+
+<script>
+/* -----------------------------
+   iPhone WebKit Haptics Support
+--------------------------------*/
+function iosHaptic(style) {
+  if (window?.webkit?.messageHandlers?.hapticFeedback) {
+    try {
+      window.webkit.messageHandlers.hapticFeedback.postMessage({
+        type: "impact",
+        style: style
+      });
+    } catch (e) {}
+  }
+}
+
+/* -----------------------------
+   Android / fallback vibration
+--------------------------------*/
+function vibrate(ms) {
+  if (navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
+}
+
+/* -----------------------------
+   Haptic Types
+--------------------------------*/
+function hapticLight() {
+  iosHaptic("light");
+  vibrate(10);
+}
+
+function hapticMedium() {
+  iosHaptic("medium");
+  vibrate([20, 30, 20]);
+}
+
+function hapticHeavy() {
+  iosHaptic("heavy");
+  vibrate([40, 60, 40]);
+}
+
+/* -----------------------------
+   Tick + Thump Combo Sound
+--------------------------------*/
+function comboSound() {
+  const a = new AudioContext();
+
+  // Tick
+  const o1 = a.createOscillator();
+  const g1 = a.createGain();
+  o1.type = "triangle";
+  o1.frequency.value = 3200;
+  g1.gain.setValueAtTime(0.08, a.currentTime);
+  g1.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + 0.03);
+  o1.connect(g1).connect(a.destination);
+  o1.start();
+  o1.stop(a.currentTime + 0.03);
+
+  // Thump
+  const o2 = a.createOscillator();
+  const g2 = a.createGain();
+  o2.type = "sine";
+  o2.frequency.setValueAtTime(120, a.currentTime);
+  o2.frequency.exponentialRampToValueAtTime(60, a.currentTime + 0.12);
+  g2.gain.setValueAtTime(0.25, a.currentTime);
+  g2.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + 0.12);
+  o2.connect(g2).connect(a.destination);
+  o2.start();
+  o2.stop(a.currentTime + 0.12);
+}
+
+/* -----------------------------
+   Combo: Sound + Haptic
+--------------------------------*/
+function combo() {
+  comboSound();
+  iosHaptic("medium");
+  vibrate([20, 40, 20]);
+}
+</script>
+
+</body>
+</html>
