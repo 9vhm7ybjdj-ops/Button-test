@@ -251,6 +251,7 @@
     display: none;
   }
 
+  /* STRONG NEON GLOW BUTTONS */
   .nav-row {
     margin-top: 10px;
     display: flex;
@@ -258,28 +259,27 @@
     width: 100%;
   }
 
-  .nav-row button {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid #777;
-    background: #333;
-    color: #fff;
-    font-size: 14px;
+  .nav-row button,
+  #finishBtn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    background: #111;
+    color: #7CFC00;
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 14px #00ff00;
+    font-size: 16px;
     cursor: pointer;
+    transition: transform 0.1s ease;
   }
 
-  .nav-row button:active { transform: scale(0.98); }
+  .nav-row button:active,
+  #finishBtn:active {
+    transform: scale(0.97);
+  }
 
-  /* PATCHED FINISH BUTTON */
   #finishBtn {
     display: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 1px solid #777;
-    background: #333;
-    color: #fff;
-    font-size: 14px;
-    cursor: pointer;
     text-align: center;
   }
 </style>
@@ -378,7 +378,7 @@
       <div class="back-bottom-spacer"></div>
     </div>
 
-    <!-- NAVIGATION (PATCHED) -->
+    <!-- NAVIGATION -->
     <div class="nav-row">
       <button id="backBtn">Back</button>
       <button id="nextBtn">Next</button>
@@ -487,8 +487,9 @@
             'UN';
 
           units[unitIndex][face][rIndex][cIndex] = next;
+
+          // No auto progression
           renderCurrentFace();
-          checkAutoProgress();
         };
 
         const labelText =
@@ -508,37 +509,6 @@
     });
   }
 
-  function isFaceComplete(unitIndex, face) {
-    if (units[unitIndex].touchscreen) return true;
-    const grid = units[unitIndex][face];
-    for (let r = 0; r < grid.length; r++) {
-      for (let c = 0; c < grid[r].length; c++) {
-        if (grid[r][c] === 'UN') return false;
-      }
-    }
-    return true;
-  }
-
-  function checkAutoProgress() {
-    const step = steps[currentStepIndex];
-    const unitIndex = step.unit - 1;
-    const face = step.face;
-
-    if (units[unitIndex].touchscreen || isFaceComplete(unitIndex, face)) {
-      advanceStep();
-    }
-  }
-
-  function advanceStep() {
-    currentStepIndex++;
-
-    if (currentStepIndex >= steps.length) {
-      showFinishButton();
-    } else {
-      loadStep();
-    }
-  }
-
   function renderCurrentFace() {
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
@@ -546,6 +516,14 @@
 
     unitHeader.textContent =
       `Unit ${step.unit} of ${TOTAL_UNITS} — ${face === 'front' ? 'Front' : 'Back'}`;
+
+    // Touchscreen skip logic (manual, not LED-based)
+    if (units[unitIndex].touchscreen) {
+      // Skip current face + opposite face
+      advanceStep();
+      advanceStep();
+      return;
+    }
 
     if (face === 'front') {
       frontWrapper.style.display = 'flex';
@@ -555,10 +533,6 @@
       touchscreenToggle.checked = units[unitIndex].touchscreen;
       renderPanel(frontRows, units[unitIndex].front, unitIndex, 'front');
     } else {
-      if (units[unitIndex].touchscreen) {
-        advanceStep();
-        return;
-      }
       frontWrapper.style.display = 'none';
       backWrapper.style.display = 'flex';
       touchscreenRow.style.display = 'none';
@@ -567,15 +541,44 @@
     }
   }
 
-  function loadStep() {
-    renderCurrentFace();
+  function advanceStep() {
+    currentStepIndex++;
+
+    if (currentStepIndex >= steps.length) {
+      showFinishButton();
+    } else {
+      renderCurrentFace();
+    }
   }
 
-  /* NEXT → FINISH SWAP (Option D) */
   function showFinishButton() {
     nextBtn.style.display = "none";
     finishBtn.style.display = "block";
   }
+
+  nextBtn.onclick = () => advanceStep();
+
+  backBtn.onclick = () => {
+    if (currentStepIndex > 0) {
+      currentStepIndex--;
+      renderCurrentFace();
+    }
+  };
+
+  touchscreenToggle.onchange = () => {
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+
+    units[unitIndex].touchscreen = touchscreenToggle.checked;
+
+    if (touchscreenToggle.checked) {
+      // Skip front + back immediately
+      advanceStep();
+      advanceStep();
+    } else {
+      renderCurrentFace();
+    }
+  };
 
   finishBtn.onclick = () => {
     sessionStorage.setItem("uhcFullData", JSON.stringify(units));
@@ -587,22 +590,6 @@
     window.location.href = "report_select.html";
   };
 
-  nextBtn.onclick = () => advanceStep();
-
-  backBtn.onclick = () => {
-    if (currentStepIndex > 0) {
-      currentStepIndex--;
-      loadStep();
-    }
-  };
-
-  touchscreenToggle.onchange = () => {
-    const step = steps[currentStepIndex];
-    const unitIndex = step.unit - 1;
-    units[unitIndex].touchscreen = touchscreenToggle.checked;
-    renderCurrentFace();
-  };
-
   function parseParams() {
     const params = new URLSearchParams(window.location.search);
     storeName = params.get("store") || "";
@@ -612,7 +599,7 @@
 
   parseParams();
   initUnits();
-  loadStep();
+  renderCurrentFace();
 </script>
 
 </body>
