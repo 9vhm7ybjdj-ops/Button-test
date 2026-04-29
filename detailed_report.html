@@ -167,7 +167,11 @@
     transform: scale(0.97);
   }
 
+  /* ⭐ PRINT SCALING — 75% */
   @media print {
+    body {
+      zoom: 0.75;
+    }
     .action-buttons {
       display: none;
     }
@@ -186,7 +190,7 @@
 
   <div id="unitsContainer"></div>
 
-  <!-- ⭐ BUTTONS ADDED HERE -->
+  <!-- ⭐ BUTTONS -->
   <div class="action-buttons">
     <button id="backBtn" class="glow-btn">Back</button>
     <button id="newTestBtn" class="glow-btn">New Test</button>
@@ -286,29 +290,4 @@
 
     document.getElementById("overallSummary").innerHTML = `
       <div><strong>Total UHCs:</strong> 3</div>
-      <div><strong>Total Faces:</strong> 6</div>
-      <div><strong>Total Faces Skipped:</strong> ${totalSkipped}</div>
-      <div><strong>Total Failed Rows:</strong> ${totalFailed}</div>
-      <div><strong>Overall Status:</strong> ${totalFailed > 0 ? "Issues Found" : "All Clear"}</div>
-    `;
-  }
-
-  renderReport();
-
-  // ⭐ BUTTON LOGIC
-  document.getElementById("backBtn").onclick = () => {
-    window.history.back();
-  };
-
-  document.getElementById("newTestBtn").onclick = () => {
-    sessionStorage.clear();
-    window.location.href = "index.html";
-  };
-
-  document.getElementById("pdfBtn").onclick = () => {
-    window.print();
-  };
-</script>
-
-</body>
-</html>
+      <div><strong>Total Faces
