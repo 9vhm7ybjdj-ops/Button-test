@@ -16,6 +16,7 @@
     margin: 0;
     padding: 0;
     background: #0b0b0d;
+
     /* Diagnostic grid */
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
@@ -45,6 +46,7 @@
     text-align: center;
   }
 
+  /* Panels */
   .panel, .total-panel {
     background: linear-gradient(145deg, #2a2c31 0%, #1a1b1f 40%, #0f1013 100%);
     border: 1px solid #3a3c42;
@@ -94,6 +96,7 @@
     max-width: 420px;
   }
 
+  /* Sliders at bottom */
   .input-block {
     background: #15161a;
     border: 1px solid #262833;
@@ -130,6 +133,29 @@
     text-align: right;
     margin-top: -6px;
     margin-bottom: 8px;
+  }
+
+  /* BACK BUTTON (bottom) */
+  .btn {
+    display: block;
+    width: 140px;
+    padding: 8px 12px;
+    margin: 12px auto;
+    font-size: 16px;
+    border-radius: 8px;
+
+    background: #111;
+    color: #7CFC00;
+
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 12px #00ff00;
+
+    cursor: pointer;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
   }
 </style>
 
@@ -204,6 +230,9 @@
   <input type="range" id="cost_unit" min="8000" max="12000" value="8500" step="500">
   <div class="slider-value">Unit Cost: $<span id="cost_unit_val">8500</span></div>
 </div>
+
+<!-- BACK BUTTON AT BOTTOM -->
+<button id="backBtn" class="btn">Back</button>
 
 <script>
 function colorForFails(fails) {
@@ -294,6 +323,12 @@ document.querySelectorAll("input").forEach(i =>
 
 updateAll();
 
+/* BACK BUTTON → report_select.html */
+document.getElementById("backBtn").onclick = () => {
+  window.location.href = "report_select.html";
+};
+
+/* Your app will call this to update bars */
 window.updateFromApp = function(data) {
   window.l_f = data.leftFront;
   window.l_b = data.leftBack;
