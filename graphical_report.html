@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
+/* GLOBAL 10% SHRINK */
 html, body {
   margin: 0;
   padding: 0;
@@ -14,11 +15,13 @@ html, body {
   background-image:
     linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
-  background-size: 34px 34px;
+  background-size: 30px 30px;
 
   color: #f5f5f7;
   font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  transform: scale(0.90);
+  transform-origin: top center;
 }
 
 body {
@@ -28,22 +31,22 @@ body {
 }
 
 h1 {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   text-transform: uppercase;
   margin-top: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   text-align: center;
 }
 
 #storeLine {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   margin-top: -2px;
   color: #c0c2c7;
   text-align: center;
 }
 
 #timeLine {
-  font-size: 0.75rem;
+  font-size: 0.70rem;
   margin-top: -2px;
   margin-bottom: 10px;
   color: #a0a4b0;
@@ -53,7 +56,7 @@ h1 {
 .panel, .total-panel {
   background: linear-gradient(145deg, #2a2c31 0%, #1a1b1f 40%, #0f1013 100%);
   border: 1px solid #3a3c42;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   width: 90%;
   max-width: 380px;
@@ -69,7 +72,7 @@ h1 {
 }
 
 .panel-title, .total-title {
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
   margin-bottom: 6px;
   color: #d7d7d9;
@@ -79,30 +82,30 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   margin-top: 6px;
 }
 
 .bar-label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: #c0c2c7;
-  width: 60px;
+  width: 58px;
   text-align: right;
 }
 
 .bar {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   letter-spacing: 2px;
   user-select: none;
 }
 
 .legend {
   margin: 10px 0;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: #a0a4b0;
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   width: 90%;
   max-width: 380px;
 }
@@ -110,7 +113,7 @@ h1 {
 .input-block {
   background: #15161a;
   border: 1px solid #262833;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   width: 90%;
   max-width: 380px;
@@ -119,14 +122,14 @@ h1 {
 }
 
 .input-title {
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
   margin-bottom: 10px;
   text-align: center;
 }
 
 label {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   display: block;
   margin-bottom: 4px;
   color: #a0a4b0;
@@ -138,18 +141,24 @@ input[type="range"] {
 }
 
 .slider-value {
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   color: #c0c2c7;
   text-align: right;
   margin-top: -4px;
   margin-bottom: 6px;
 }
 
+.btn-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 .btn {
-  display: block;
   width: 140px;
   padding: 8px 12px;
-  margin: 12px auto;
   font-size: 14px;
   border-radius: 7px;
 
@@ -255,8 +264,10 @@ input[type="range"] {
   <div class="slider-value">Unit Cost: $<span id="cost_unit_val">8500</span></div>
 </div>
 
-<button id="shareBtn" class="btn">Share as PNG</button>
-<button id="backBtn" class="btn">Back</button>
+<div class="btn-row">
+  <button id="backBtn" class="btn">Back</button>
+  <button id="shareBtn" class="btn">Share PNG</button>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -268,19 +279,19 @@ document.getElementById("storeLine").textContent =
 document.getElementById("timeLine").textContent =
   sessionStorage.getItem("dateString") || "";
 
-/* Load summary data */
-const summary = sessionStorage.getItem("uhcSummary");
+/* Load correct data key: uhcFullData */
+const full = sessionStorage.getItem("uhcFullData");
 let result;
 
-if (summary) {
-  const d = JSON.parse(summary);
+if (full) {
+  const d = JSON.parse(full);
   result = {
-    leftFront:  d.leftFrontFails  || 0,
-    leftBack:   d.leftBackFails   || 0,
-    middleFront:d.middleFrontFails|| 0,
-    middleBack: d.middleBackFails || 0,
-    rightFront: d.rightFrontFails || 0,
-    rightBack:  d.rightBackFails  || 0
+    leftFront:  d.left.frontFails  || 0,
+    leftBack:   d.left.backFails   || 0,
+    middleFront:d.middle.frontFails|| 0,
+    middleBack: d.middle.backFails || 0,
+    rightFront: d.right.frontFails || 0,
+    rightBack:  d.right.backFails  || 0
   };
 } else {
   result = {
@@ -379,12 +390,12 @@ document.querySelectorAll("input").forEach(i => i.addEventListener("input", upda
 
 updateAll();
 
-/* Back button */
+/* Back button — GitHub Pages safe */
 document.getElementById("backBtn").onclick = () => {
-  window.location.href = "/report_select.html";
+  window.location.href = "report_select.html";
 };
 
-/* Share button */
+/* Share PNG */
 document.getElementById("shareBtn").onclick = async () => {
   const element = document.getElementById("captureArea");
 
