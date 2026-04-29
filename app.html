@@ -199,17 +199,10 @@
 
   .uhc-row-inner {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 6px;
-    padding: 10px 0;
-  }
-
-  .uhc-led-block {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 0 auto;
+    justify-content: space-between;
+    padding: 10px 12px;
+    gap: 10px;
   }
 
   .uhc-led {
@@ -237,6 +230,12 @@
     background: radial-gradient(circle at 30% 30%, #ffffff, #c0c0c0);
     box-shadow: inset 0 0 6px #000;
     border-color: #555;
+  }
+
+  .uhc-label {
+    width: 40px;
+    font-size: 14px;
+    text-align: left;
   }
 
   .uhc-row-btn {
@@ -505,20 +504,26 @@
     data.forEach((row, rIndex) => {
       const rowEl = createEl('div', 'uhc-row');
       const inner = createEl('div', 'uhc-row-inner');
-      const block = createEl('div', 'uhc-led-block');
-      row.forEach((state, cIndex) => {
-        const led = createEl('div', 'uhc-led ' + state.toLowerCase());
+
+      const labels = ["PASS", "FAIL", "---"];
+      /* LED + LABEL + LED + LABEL + LED + LABEL */
+      for (let c = 0; c < 3; c++) {
+        const led = createEl('div', 'uhc-led ' + row[c].toLowerCase());
         led.onclick = () => {
           const order = ['UN', 'PASS', 'FAIL'];
-          const next = order[(order.indexOf(state) + 1) % 3];
-          units[unitIndex][face][rIndex][cIndex] = next;
+          const next = order[(order.indexOf(row[c]) + 1) % 3];
+          units[unitIndex][face][rIndex][c] = next;
           playComboSound();
           renderCurrentFace();
         };
-        block.appendChild(led);
-      });
 
-      /* NEW 4TH BUTTON — row cycle */
+        const label = createEl('div', 'uhc-label', labels[c]);
+
+        inner.appendChild(led);
+        inner.appendChild(label);
+      }
+
+      /* NEW 4TH BUTTON — row cycle + sound */
       const btn = createEl('div', 'uhc-row-btn');
       btn.innerHTML = `
         <svg viewBox="0 0 24 24">
@@ -526,9 +531,11 @@
           <path d="M8 8h12v12H8z"/>
         </svg>
       `;
-      btn.onclick = () => cycleRow(unitIndex, face, rIndex);
+      btn.onclick = () => {
+        cycleRow(unitIndex, face, rIndex);
+        playComboSound();
+      };
 
-      inner.appendChild(block);
       inner.appendChild(btn);
 
       /* Row glow logic */
@@ -549,7 +556,8 @@
     storeHeader.textContent = `${storeName} — ${storeNumber}`;
     const uhcNames = ["Left UHC", "Middle UHC", "Right UHC"];
     uhcNameHeader.textContent = uhcNames[unitIndex];
-    unitHeader.textContent = `Unit ${step.unit} of ${TOTAL_UNITS} — ${face.charAt(0).toUpperCase() + face.slice(1)}`;
+    unitHeader.textContent =
+      `Unit ${step.unit} of ${TOTAL_UNITS} — ${face.charAt(0).toUpperCase() + face.slice(1)}`;
 
     /* PANEL VISIBILITY */
     frontWrapper.style.display = face === 'front' ? 'flex' : 'none';
@@ -592,9 +600,11 @@
     }
   };
 
+  /* FIXED: Finish now goes to report_select.html */
   finishBtn.onclick = () => {
     const payload = encodeURIComponent(JSON.stringify(units));
-    window.location.href = `graphical_report.html?data=${payload}&store=${storeName}&num=${storeNumber}`;
+    window.location.href =
+      `report_select.html?data=${payload}&store=${storeName}&num=${storeNumber}`;
   };
 
   /* URL PARSING */
