@@ -26,47 +26,18 @@
     margin-bottom: 10px;
   }
 
-  .summaryBox {
-    background: #000;
-    border: 2px solid #00ff00;
-    padding: 16px;
-    border-radius: 10px;
-    margin-bottom: 30px;
-    box-shadow: 0 0 12px #00ff00;
-  }
-
-  .summaryRow {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 16px;
-  }
-
-  .summaryLabel {
-    color: #7CFC00;
-  }
-
-  .summaryValue {
-    font-weight: bold;
-  }
-
-  .uhcContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-
   .uhcBox {
     background: #000;
     border: 2px solid #00ff00;
     border-radius: 10px;
     padding: 16px;
+    margin-bottom: 30px;
     box-shadow: 0 0 12px #00ff00;
   }
 
   .uhcTitle {
-    font-size: 20px;
-    margin-bottom: 12px;
+    font-size: 22px;
+    margin-bottom: 16px;
     color: #7CFC00;
     text-align: center;
   }
@@ -162,9 +133,7 @@
 <h2 id="storeInfo"></h2>
 <h2 id="dateInfo"></h2>
 
-<div class="summaryBox" id="summaryBox"></div>
-
-<div class="uhcContainer" id="uhcContainer"></div>
+<div id="uhcContainer"></div>
 
 <div class="reportActions">
   <button id="downloadPdfBtn">Download PDF</button>
@@ -181,58 +150,20 @@
     `${storeName} — ${storeNumber}`;
   document.getElementById("dateInfo").textContent = dateString;
 
-  const summaryBox = document.getElementById("summaryBox");
   const uhcContainer = document.getElementById("uhcContainer");
 
-  const totalUnits = fullData.length;
-  const totalFaces = totalUnits * 2;
-  let skipped = 0;
-  let failedRows = 0;
-
-  fullData.forEach(unit => {
-    if (unit.touchscreen) skipped++;
-
-    unit.front.forEach(row => {
-      if (row.includes("FAIL")) failedRows++;
-    });
-    unit.back.forEach(row => {
-      if (row.includes("FAIL")) failedRows++;
-    });
-  });
-
-  const status = failedRows === 0 ? "PASS" : "FAIL";
-
-  summaryBox.innerHTML = `
-    <div class="summaryRow">
-      <div class="summaryLabel">Total UHCs:</div>
-      <div class="summaryValue">${totalUnits}</div>
-    </div>
-    <div class="summaryRow">
-      <div class="summaryLabel">Total Faces:</div>
-      <div class="summaryValue">${totalFaces}</div>
-    </div>
-    <div class="summaryRow">
-      <div class="summaryLabel">Touchscreen Skipped:</div>
-      <div class="summaryValue">${skipped}</div>
-    </div>
-    <div class="summaryRow">
-      <div class="summaryLabel">Failed Rows:</div>
-      <div class="summaryValue">${failedRows}</div>
-    </div>
-    <div class="summaryRow">
-      <div class="summaryLabel">Status:</div>
-      <div class="summaryValue" style="color:${status === "PASS" ? "#00ff00" : "#ff0000"}">${status}</div>
-    </div>
-  `;
+  const unitNames = ["Left UHC", "Middle UHC", "Right UHC"];
 
   fullData.forEach((unit, index) => {
     const box = document.createElement("div");
     box.className = "uhcBox";
 
-    box.innerHTML = `<div class="uhcTitle">Unit ${index + 1}</div>`;
+    box.innerHTML = `<div class="uhcTitle">${unitNames[index] || "UHC"}</div>`;
 
     const faceRow = document.createElement("div");
     faceRow.className = "faceRow";
+
+    const convertVal = v => v === "UN" ? "- - -" : v;
 
     const frontCol = document.createElement("div");
     frontCol.className = "faceCol";
@@ -248,7 +179,7 @@
         line.className = "ledLine";
         line.innerHTML = `
           <div class="ledLabel">LED ${cIndex + 1}</div>
-          <div class="ledValue">${val}</div>
+          <div class="ledValue">${convertVal(val)}</div>
         `;
         rowDiv.appendChild(line);
       });
@@ -270,7 +201,7 @@
         line.className = "ledLine";
         line.innerHTML = `
           <div class="ledLabel">LED ${cIndex + 1}</div>
-          <div class="ledValue">${val}</div>
+          <div class="ledValue">${convertVal(val)}</div>
         `;
         rowDiv.appendChild(line);
       });
