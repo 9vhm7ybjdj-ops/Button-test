@@ -13,32 +13,39 @@
     background: #111;
     color: #fff;
     font-family: Arial, sans-serif;
+
+    /* ⭐ Restore diagnostic grid */
+    background-image:
+      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
   #app {
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 30px;
     text-align: center;
   }
 
   h1 {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
   }
 
+  /* ⭐ Compact button style */
   .btn {
     display: block;
     width: 100%;
-    padding: 16px;
-    margin: 15px 0;
-    font-size: 20px;
-    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 16px;
+    border-radius: 8px;
     background: #111;
     color: #7CFC00;
     border: 2px solid #00ff00;
-    text-shadow: 0 0 6px #00ff00;
-    box-shadow: 0 0 12px #00ff00;
+    text-shadow: 0 0 4px #00ff00;
+    box-shadow: 0 0 8px #00ff00;
     cursor: pointer;
   }
 
@@ -62,7 +69,7 @@
   <button id="summaryBtn" class="btn">Summary Report</button>
   <button id="detailedBtn" class="btn">Detailed Report</button>
 
-  <!-- ⭐ NEW BACK BUTTON -->
+  <!-- ⭐ Back button -->
   <button id="backBtn" class="btn">Back</button>
 
 </div>
@@ -76,9 +83,9 @@
     window.location.href = "detailed_report.html";
   };
 
-  // ⭐ Back button logic
+  // ⭐ Back to last unit tested
   document.getElementById("backBtn").onclick = () => {
-    window.location.href = "index.html";
+    window.history.back();
   };
 </script>
 
