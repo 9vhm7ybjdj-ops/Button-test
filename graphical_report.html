@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Graphical Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<style>
+  /* iPhone scaling system */
+  :root {
+    --base-height: 820; /* Baseline for iPhone */
+    --scale: calc(100vh / var(--base-height));
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0b0b0d;
+    /* Diagnostic grid */
+    background-image:
+      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  body {
+    transform: scale(var(--scale));
+    transform-origin: top center;
+    height: calc(var(--base-height) * 1px);
+    overflow: hidden;
+
+    color: #f5f5f7;
+    font-family: system-ui, -apple-system, sans-serif;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .panel, .total-panel {
+    background: linear-gradient(145deg, #2a2c31 0%, #1a1b1f 40%, #0f1013 100%);
+    border: 1px solid #3a3c42;
+    padding: 12px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    margin: 10px 0;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+  }
+
+  .total-panel {
+    background: linear-gradient(160deg, #3a3c42 0%, #1f2024 50%, #121316 100%);
+    border: 1px solid #4a4c52;
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.7);
+  }
+
+  .panel-title, .total-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #d7d7d9;
+  }
+
+  .sub-label {
+    font-size: 0.8rem;
+    color: #c0c2c7;
+    margin-top: 4px;
+  }
+
+  .bar {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    margin-top: 4px;
+    user-select: none;
+  }
+
+  .legend {
+    margin: 10px 0;
+    font-size: 0.8rem;
+    color: #a0a4b0;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    width: 90%;
+    max-width: 420px;
+  }
+
+  .input-block {
+    background: #15161a;
+    border: 1px solid #262833;
+    padding: 12px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 420px;
+    margin-top: auto;
+    margin-bottom: 10px;
+  }
+
+  .input-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  label {
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 4px;
+    color: #a0a4b0;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .slider-value {
+    font-size: 0.8rem;
+    color: #c0c2c7;
+    text-align: right;
+    margin-top: -6px;
+    margin-bottom: 8px;
+  }
+</style>
+
+</head>
+<body>
+
+<h1>UHC Cost Test</h1>
+
+<!-- GRAND TOTAL PANEL -->
+<div class="total-panel">
+  <div class="total-title">TOTAL ACROSS ALL UHCs</div>
+
+  <div class="sub-label">Front</div>
+  <div id="t_f_bar" class="bar"></div>
+
+  <div class="sub-label">Back</div>
+  <div id="t_b_bar" class="bar"></div>
+
+  <div id="t_summary" class="total-summary"></div>
+</div>
+
+<!-- LEGEND UNDER GRAND TOTAL -->
+<div class="legend">
+  <span>🟩 1 fail</span>
+  <span>🟨 2 fails</span>
+  <span>🟧 3–4 fails</span>
+  <span>🟥 5–6 fails</span>
+</div>
+
+<!-- LEFT UHC -->
+<div class="panel">
+  <div class="panel-title">Left UHC</div>
+
+  <div class="sub-label">Front</div>
+  <div id="l_f_bar" class="bar"></div>
+
+  <div class="sub-label">Back</div>
+  <div id="l_b_bar" class="bar"></div>
+</div>
+
+<!-- MIDDLE UHC -->
+<div class="panel">
+  <div class="panel-title">Middle UHC</div>
+
+  <div class="sub-label">Front</div>
+  <div id="m_f_bar" class="bar"></div>
+
+  <div class="sub-label">Back</div>
+  <div id="m_b_bar" class="bar"></div>
+</div>
+
+<!-- RIGHT UHC -->
+<div class="panel">
+  <div class="panel-title">Right UHC</div>
+
+  <div class="sub-label">Front</div>
+  <div id="r_f_bar" class="bar"></div>
+
+  <div class="sub-label">Back</div>
+  <div id="r_b_bar" class="bar"></div>
+</div>
+
+<!-- COST SLIDERS AT BOTTOM -->
+<div class="input-block">
+  <div class="input-title">Cost Settings</div>
+
+  <label>Cost Per Failed Row</label>
+  <input type="range" id="cost_row" min="700" max="1000" value="800" step="50">
+  <div class="slider-value">Row Cost: $<span id="cost_row_val">800</span></div>
+
+  <label>Cost Per Unit</label>
+  <input type="range" id="cost_unit" min="8000" max="12000" value="8500" step="500">
+  <div class="slider-value">Unit Cost: $<span id="cost_unit_val">8500</span></div>
+</div>
+
+<script>
+function colorForFails(fails) {
+  if (fails >= 5) return "red";
+  if (fails >= 3) return "orange";
+  if (fails === 2) return "yellow";
+  if (fails === 1) return "green";
+  return "none";
+}
+
+function buildBar(filled, color) {
+  const emoji = {
+    green:  "🟩",
+    yellow: "🟨",
+    orange: "🟧",
+    red:    "🟥",
+    none:   "⬛"
+  }[color];
+
+  const glow = {
+    green:  "0 0 6px #00ff80",
+    yellow: "0 0 6px #ffe066",
+    orange: "0 0 6px #ff9933",
+    red:    "0 0 6px #ff3333",
+    none:   "none"
+  }[color];
+
+  let bar = "";
+  for (let i = 1; i <= 6; i++) {
+    if (i <= filled) {
+      bar += `<span style="text-shadow:${glow}">${emoji}</span>`;
+    } else {
+      bar += "⬛";
+    }
+  }
+  return bar;
+}
+
+function updateUnit(prefix, f, b, rowCost) {
+  const frontColor = colorForFails(f);
+  const backColor  = colorForFails(b);
+
+  document.getElementById(prefix + "_f_bar").innerHTML =
+    buildBar(f, frontColor);
+  document.getElementById(prefix + "_b_bar").innerHTML =
+    buildBar(b, backColor);
+
+  return {
+    f, b,
+    frontCost: f * rowCost,
+    backCost:  b * rowCost
+  };
+}
+
+function updateAll() {
+  const rowCost = +document.getElementById("cost_row").value;
+  const unitCost = +document.getElementById("cost_unit").value;
+
+  document.getElementById("cost_row_val").textContent = rowCost;
+  document.getElementById("cost_unit_val").textContent = unitCost;
+
+  const L = updateUnit("l", window.l_f || 0, window.l_b || 0, rowCost);
+  const M = updateUnit("m", window.m_f || 0, window.m_b || 0, rowCost);
+  const R = updateUnit("r", window.r_f || 0, window.r_b || 0, rowCost);
+
+  const totalFront = L.f + M.f + R.f;
+  const totalBack  = L.b + M.b + R.b;
+  const totalFails = totalFront + totalBack;
+  const totalCost  = L.frontCost + L.backCost +
+                     M.frontCost + M.backCost +
+                     R.frontCost + R.backCost;
+
+  const frontColor = colorForFails(totalFront);
+  const backColor  = colorForFails(totalBack);
+
+  document.getElementById("t_f_bar").innerHTML =
+    buildBar(Math.min(totalFront, 6), frontColor);
+  document.getElementById("t_b_bar").innerHTML =
+    buildBar(Math.min(totalBack, 6), backColor);
+
+  document.getElementById("t_summary").textContent =
+    `Total: ${totalFails} failed rows → $${totalCost.toLocaleString()}`;
+}
+
+document.querySelectorAll("input").forEach(i =>
+  i.addEventListener("input", updateAll)
+);
+
+updateAll();
+
+window.updateFromApp = function(data) {
+  window.l_f = data.leftFront;
+  window.l_b = data.leftBack;
+  window.m_f = data.middleFront;
+  window.m_b = data.middleBack;
+  window.r_f = data.rightFront;
+  window.r_b = data.rightBack;
+  updateAll();
+};
+</script>
+
+</body>
+</html>
