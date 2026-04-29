@@ -142,21 +142,35 @@
     color: #ffeb3b;
   }
 
-  /* BUTTONS — minimal, layout‑safe */
+  /* ⭐ GREEN GLOW BUTTONS */
   .action-buttons {
     display: flex;
     gap: 12px;
     margin-top: 10px;
   }
 
-  .action-buttons button {
+  .glow-btn {
     flex: 1;
-    padding: 12px;
+    padding: 14px;
     border-radius: 8px;
-    background: #222;
-    color: #fff;
-    border: 1px solid #555;
-    font-size: 15px;
+    background: #111;
+    color: #7CFC00;
+    border: 2px solid #00ff00;
+    text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 14px #00ff00;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .glow-btn:active {
+    transform: scale(0.97);
+  }
+
+  @media print {
+    .action-buttons {
+      display: none;
+    }
   }
 </style>
 </head>
@@ -172,10 +186,11 @@
 
   <div id="unitsContainer"></div>
 
-  <!-- BUTTONS ADDED HERE -->
+  <!-- ⭐ BUTTONS ADDED HERE -->
   <div class="action-buttons">
-    <button id="backBtn">Back</button>
-    <button id="newTestBtn">New Test</button>
+    <button id="backBtn" class="glow-btn">Back</button>
+    <button id="newTestBtn" class="glow-btn">New Test</button>
+    <button id="pdfBtn" class="glow-btn">Export PDF</button>
   </div>
 
 </div>
@@ -280,7 +295,7 @@
 
   renderReport();
 
-  // BUTTON LOGIC
+  // ⭐ BUTTON LOGIC
   document.getElementById("backBtn").onclick = () => {
     window.history.back();
   };
@@ -288,6 +303,10 @@
   document.getElementById("newTestBtn").onclick = () => {
     sessionStorage.clear();
     window.location.href = "index.html";
+  };
+
+  document.getElementById("pdfBtn").onclick = () => {
+    window.print();
   };
 </script>
 
