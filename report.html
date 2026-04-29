@@ -65,23 +65,8 @@
     background: #1a1a1a;
   }
 
-  /* ⭐ Neon row rings */
-  .row-pass {
-    border: 2px solid #00ff00;
-    box-shadow: 0 0 10px #00ff00, inset 0 0 10px #00ff00;
-    border-radius: 6px;
-  }
-
-  .row-fail {
-    border: 2px solid #ff0000;
-    box-shadow: 0 0 10px #ff0000, inset 0 0 10px #ff0000;
-    border-radius: 6px;
-  }
-
-  .row-skip {
-    border: 2px solid #666;
-    border-radius: 6px;
-  }
+  /* ⭐ REMOVED row-pass, row-fail, row-skip */
+  /* No row highlighting at all */
 
   #totalsBlock {
     margin-top: 30px;
@@ -191,8 +176,7 @@
       summary.push({
         unit: index + 1,
         face: "front",
-        status: "Skipped (Touchscreen)",
-        type: "skip"
+        status: "Skipped (Touchscreen)"
       });
     } else {
       const failedFront = unit.front.filter(
@@ -202,8 +186,7 @@
       summary.push({
         unit: index + 1,
         face: "front",
-        status: `${failedFront} failed rows`,
-        type: failedFront > 0 ? "fail" : "pass"
+        status: `${failedFront} failed rows`
       });
 
       totalFrontFailedRows += failedFront;
@@ -214,8 +197,7 @@
       summary.push({
         unit: index + 1,
         face: "back",
-        status: "Skipped (Touchscreen)",
-        type: "skip"
+        status: "Skipped (Touchscreen)"
       });
     } else {
       const failedBack = unit.back.filter(
@@ -225,21 +207,16 @@
       summary.push({
         unit: index + 1,
         face: "back",
-        status: `${failedBack} failed rows`,
-        type: failedBack > 0 ? "fail" : "pass"
+        status: `${failedBack} failed rows`
       });
 
       totalBackFailedRows += failedBack;
     }
   });
 
-  // ⭐ Render summary rows with neon rings
+  // ⭐ Render summary rows (NO highlighting)
   summary.forEach(item => {
     const row = document.createElement("tr");
-
-    if (item.type === "fail") row.classList.add("row-fail");
-    else if (item.type === "pass") row.classList.add("row-pass");
-    else row.classList.add("row-skip");
 
     row.innerHTML = `
       <td>Unit ${item.unit}</td>
