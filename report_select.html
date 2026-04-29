@@ -13,8 +13,6 @@
     background: #111;
     color: #fff;
     font-family: Arial, sans-serif;
-
-    /* ⭐ Restore diagnostic grid */
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
@@ -33,7 +31,6 @@
     margin-bottom: 25px;
   }
 
-  /* ⭐ Compact button style */
   .btn {
     display: block;
     width: 100%;
@@ -68,26 +65,4 @@
 
   <button id="summaryBtn" class="btn">Summary Report</button>
   <button id="detailedBtn" class="btn">Detailed Report</button>
-
-  <!-- ⭐ Back button -->
-  <button id="backBtn" class="btn">Back</button>
-
-</div>
-
-<script>
-  document.getElementById("summaryBtn").onclick = () => {
-    window.location.href = "report_summary.html";
-  };
-
-  document.getElementById("detailedBtn").onclick = () => {
-    window.location.href = "detailed_report.html";
-  };
-
-  // ⭐ Back to last unit tested
-  document.getElementById("backBtn").onclick = () => {
-    window.history.back();
-  };
-</script>
-
-</body>
-</html>
+  <button id="backBtn" class="btn">
