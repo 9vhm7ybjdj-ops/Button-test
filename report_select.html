@@ -11,69 +11,75 @@
     margin: 0;
     padding: 0;
     background: #111;
-    font-family: Arial, sans-serif;
     color: #fff;
-
-    background-image:
-      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+    font-family: Arial, sans-serif;
   }
 
-  body {
-    display: flex;
-    justify-content: center;
-    padding: 40px 10px;
-  }
-
-  #selectApp {
+  #app {
     width: 100%;
-    max-width: 420px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    text-align: center;
   }
 
-  .title {
-    text-align: center;
+  h1 {
+    margin-bottom: 30px;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin: 15px 0;
     font-size: 20px;
-    font-weight: bold;
-  }
-
-  .button {
-    background: rgba(0,0,0,0.7);
-    border: 1px solid #44ff44;
-    padding: 14px;
     border-radius: 10px;
-    text-align: center;
-    font-size: 16px;
-    cursor: pointer;
+    background: #111;
+    color: #7CFC00;
+    border: 2px solid #00ff00;
     text-shadow: 0 0 6px #00ff00;
+    box-shadow: 0 0 12px #00ff00;
+    cursor: pointer;
   }
 
-  .button:hover {
-    background: rgba(0,0,0,0.9);
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  @media print {
+    .btn {
+      display: none;
+    }
   }
 </style>
 </head>
 
 <body>
-<div id="selectApp">
-  <div class="title">Select Report Type</div>
+<div id="app">
 
-  <div class="button" onclick="goSummary()">Summary Report</div>
-  <div class="button" onclick="goDetailed()">Detailed Report</div>
+  <h1>Select Report Type</h1>
+
+  <button id="summaryBtn" class="btn">Summary Report</button>
+  <button id="detailedBtn" class="btn">Detailed Report</button>
+
+  <!-- ⭐ NEW BACK BUTTON -->
+  <button id="backBtn" class="btn">Back</button>
 
 </div>
 
 <script>
-  function goSummary() {
-    window.location.href = "report.html";
-  }
+  document.getElementById("summaryBtn").onclick = () => {
+    window.location.href = "report_summary.html";
+  };
 
-  function goDetailed() {
+  document.getElementById("detailedBtn").onclick = () => {
     window.location.href = "detailed_report.html";
-  }
+  };
+
+  // ⭐ Back button logic
+  document.getElementById("backBtn").onclick = () => {
+    window.location.href = "index.html";
+  };
 </script>
 
 </body>
