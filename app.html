@@ -271,8 +271,9 @@
 
   .touchscreen-label input { transform: scale(1.4); }
 
+  /* FIXED: match touchscreen row height */
   .touchscreen-spacer {
-    height: 32px;
+    height: 52px;
     margin-top: 10px;
   }
 
@@ -370,7 +371,7 @@
             <div class="uhc-slot"></div>
           </div>
 
-        <div class="uhc-top-indicators invisible">
+          <div class="uhc-top-indicators invisible">
             <div class="uhc-top-led"></div>
             <div class="uhc-top-led"></div>
             <div class="uhc-top-led"></div>
@@ -396,6 +397,7 @@
         <div class="uhc-rows" id="backRows"></div>
       </div>
 
+      <!-- FIXED: matches touchscreen row height -->
       <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
@@ -473,7 +475,7 @@
           Array.from({ length: 3 }, () => 'UN')
         ),
         touchscreen: false,
-        skipped: false   // REQUIRED for auto-skip + reporting
+        skipped: false
       });
     }
   }
@@ -538,8 +540,12 @@
 
       inner.appendChild(btn);
 
-      if (row.every(v => v === 'PASS')) rowEl.classList.add('passRow');
-      else if (row.every(v => v === 'FAIL')) rowEl.classList.add('failRow');
+      /* FIXED: Row-level FAIL logic */
+      if (row.includes('FAIL')) {
+        rowEl.classList.add('failRow');
+      } else if (row.every(v => v === 'PASS')) {
+        rowEl.classList.add('passRow');
+      }
 
       rowEl.appendChild(inner);
       container.appendChild(rowEl);
@@ -547,7 +553,7 @@
   }
   function renderCurrentFace() {
 
-    /* AUTO‑SKIP BACK FACES FOR SKIPPED UNITS */
+    /* AUTO‑SKIP FORWARD over skipped BACK faces */
     while (currentStepIndex < steps.length) {
       const s = steps[currentStepIndex];
       const ui = s.unit - 1;
@@ -605,7 +611,6 @@
       units[unitIndex].front = Array.from({ length: 6 }, () => Array(3).fill('UN'));
       units[unitIndex].back  = Array.from({ length: 6 }, () => Array(3).fill('UN'));
 
-      /* Mark unit skipped AND touchscreen for reporting */
       units[unitIndex].skipped = true;
       units[unitIndex].touchscreen = true;
 
@@ -615,7 +620,6 @@
     }
 
     if (face === 'back') {
-      /* Skip ONLY this back */
       units[unitIndex].back = Array.from({ length: 6 }, () => Array(3).fill('UN'));
 
       currentStepIndex++;
@@ -638,6 +642,19 @@
   backBtn.onclick = () => {
     if (currentStepIndex > 0) {
       currentStepIndex--;
+
+      /* NEW: AUTO‑SKIP BACKWARD over skipped BACK faces */
+      while (currentStepIndex >= 0) {
+        const s = steps[currentStepIndex];
+        const ui = s.unit - 1;
+
+        if (s.face === 'back' && units[ui].skipped) {
+          currentStepIndex--;
+          continue;
+        }
+        break;
+      }
+
       renderCurrentFace();
     }
   };
