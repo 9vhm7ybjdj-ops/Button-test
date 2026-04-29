@@ -63,6 +63,14 @@
     font-weight: bold;
   }
 
+  .uhc-name-header {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.9;
+    text-align: center;
+    margin-top: -2px;
+  }
+
   .unit-header {
     font-size: 14px;
     opacity: 0.85;
@@ -192,6 +200,8 @@
   .uhc-row-inner {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 6px;
     padding: 10px 0;
   }
 
@@ -225,14 +235,31 @@
 
   .uhc-led.un {
     background: radial-gradient(circle at 30% 30%, #ffffff, #c0c0c0);
-    box-shadow: 0 0 6px #ffffaa;
-    border-color: #ffeb3b;
+    box-shadow: inset 0 0 6px #000;
+    border-color: #555;
   }
 
-  .uhc-label {
-    font-size: 14px;
-    min-width: 36px;
-    text-align: left;
+  .uhc-row-btn {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background: #dcdfe2;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.8);
+  }
+
+  .uhc-row-btn:active {
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.9);
+  }
+
+  .uhc-row-btn svg {
+    width: 12px;
+    height: 12px;
+    fill: #111;
   }
 
   .touchscreen-label {
@@ -251,11 +278,11 @@
     display: none;
   }
 
-  /* STRONG NEON GLOW BUTTONS */
   .nav-row {
     margin-top: 10px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 50px;
     width: 100%;
   }
 
@@ -287,10 +314,10 @@
 
 <body>
 <div id="app">
-
   <div id="testScreen" class="screen active">
     <div class="header-row">
       <div class="store-header" id="storeHeader"></div>
+      <div class="uhc-name-header" id="uhcNameHeader"></div>
       <div class="unit-header" id="unitHeader"></div>
     </div>
 
@@ -393,6 +420,7 @@
 
   const testScreen = document.getElementById('testScreen');
   const storeHeader = document.getElementById('storeHeader');
+  const uhcNameHeader = document.getElementById('uhcNameHeader');
   const unitHeader = document.getElementById('unitHeader');
 
   const frontWrapper = document.getElementById('frontWrapper');
@@ -461,6 +489,16 @@
     if (html !== undefined) e.innerHTML = html;
     return e;
   }
+
+  /* NEW: cycle entire row state */
+  function cycleRow(unitIndex, face, rIndex) {
+    const states = ['UN', 'PASS', 'FAIL'];
+    const current = units[unitIndex][face][rIndex][0];
+    const next = states[(states.indexOf(current) + 1) % 3];
+    units[unitIndex][face][rIndex] = Array(3).fill(next);
+    renderCurrentFace();
+  }
+
   function renderPanel(container, data, unitIndex, face) {
     container.innerHTML = '';
 
@@ -468,42 +506,35 @@
       const rowEl = createEl('div', 'uhc-row');
       const inner = createEl('div', 'uhc-row-inner');
       const block = createEl('div', 'uhc-led-block');
-
-      if (row.some(v => v === 'FAIL')) rowEl.classList.add('failRow');
-      else if (row.every(v => v === 'PASS')) rowEl.classList.add('passRow');
-
       row.forEach((state, cIndex) => {
-        const led = createEl('div', 'uhc-led');
-        if (state === 'PASS') led.classList.add('pass');
-        else if (state === 'FAIL') led.classList.add('fail');
-        else led.classList.add('un');
-
+        const led = createEl('div', 'uhc-led ' + state.toLowerCase());
         led.onclick = () => {
-          playComboSound();
-
-          const current = units[unitIndex][face][rIndex][cIndex];
-          const next =
-            current === 'UN'   ? 'PASS' :
-            current === 'PASS' ? 'FAIL' :
-            'UN';
-
+          const order = ['UN', 'PASS', 'FAIL'];
+          const next = order[(order.indexOf(state) + 1) % 3];
           units[unitIndex][face][rIndex][cIndex] = next;
-
+          playComboSound();
           renderCurrentFace();
         };
-
-        const labelText =
-          state === 'PASS' ? 'PASS' :
-          state === 'FAIL' ? 'FAIL' :
-          '- - -';
-
-        const label = createEl('div', 'uhc-label', labelText);
-
         block.appendChild(led);
-        block.appendChild(label);
       });
 
+      /* NEW 4TH BUTTON — row cycle */
+      const btn = createEl('div', 'uhc-row-btn');
+      btn.innerHTML = `
+        <svg viewBox="0 0 24 24">
+          <path d="M4 4h12v12H4z"/>
+          <path d="M8 8h12v12H8z"/>
+        </svg>
+      `;
+      btn.onclick = () => cycleRow(unitIndex, face, rIndex);
+
       inner.appendChild(block);
+      inner.appendChild(btn);
+
+      /* Row glow logic */
+      if (row.every(v => v === 'PASS')) rowEl.classList.add('passRow');
+      else if (row.every(v => v === 'FAIL')) rowEl.classList.add('failRow');
+
       rowEl.appendChild(inner);
       container.appendChild(rowEl);
     });
@@ -514,77 +545,45 @@
     const unitIndex = step.unit - 1;
     const face = step.face;
 
-    unitHeader.textContent =
-      `Unit ${step.unit} of ${TOTAL_UNITS} — ${face === 'front' ? 'Front' : 'Back'}`;
+    /* HEADER TEXT */
+    storeHeader.textContent = `${storeName} — ${storeNumber}`;
+    const uhcNames = ["Left UHC", "Middle UHC", "Right UHC"];
+    uhcNameHeader.textContent = uhcNames[unitIndex];
+    unitHeader.textContent = `Unit ${step.unit} of ${TOTAL_UNITS} — ${face.charAt(0).toUpperCase() + face.slice(1)}`;
 
-    /* TOUCHSCREEN SKIP — CORRECT FOR FRONT-FIRST-THEN-BACK ORDER */
-    if (units[unitIndex].touchscreen) {
+    /* PANEL VISIBILITY */
+    frontWrapper.style.display = face === 'front' ? 'flex' : 'none';
+    backWrapper.style.display = face === 'back' ? 'flex' : 'none';
 
-      if (face === 'front') {
-        const nextFrontIndex = steps.findIndex(
-          s => s.face === 'front' && s.unit === step.unit + 1
-        );
+    /* TOUCHSCREEN */
+    touchscreenToggle.checked = units[unitIndex].touchscreen;
+    touchscreenRow.style.display = face === 'front' ? 'flex' : 'none';
+    backSpacer.style.display = face === 'front' ? 'block' : 'none';
 
-        if (nextFrontIndex !== -1) {
-          currentStepIndex = nextFrontIndex;
-          renderCurrentFace();
-          return;
-        }
-
-        const firstBackIndex = steps.findIndex(s => s.face === 'back');
-        currentStepIndex = firstBackIndex;
-        renderCurrentFace();
-        return;
-      }
-
-      if (face === 'back') {
-        const nextBackIndex = steps.findIndex(
-          s => s.face === 'back' && s.unit === step.unit + 1
-        );
-
-        if (nextBackIndex !== -1) {
-          currentStepIndex = nextBackIndex;
-          renderCurrentFace();
-          return;
-        }
-
-        showFinishButton();
-        return;
-      }
-    }
-
+    /* RENDER ROWS */
     if (face === 'front') {
-      frontWrapper.style.display = 'flex';
-      backWrapper.style.display = 'none';
-      touchscreenRow.style.display = 'flex';
-      backSpacer.style.display = 'none';
-      touchscreenToggle.checked = units[unitIndex].touchscreen;
       renderPanel(frontRows, units[unitIndex].front, unitIndex, 'front');
     } else {
-      frontWrapper.style.display = 'none';
-      backWrapper.style.display = 'flex';
-      touchscreenRow.style.display = 'none';
-      backSpacer.style.display = 'block';
       renderPanel(backRows, units[unitIndex].back, unitIndex, 'back');
     }
+
+    /* NAV BUTTONS */
+    backBtn.style.visibility = currentStepIndex === 0 ? 'hidden' : 'visible';
+    nextBtn.style.display = currentStepIndex === steps.length - 1 ? 'none' : 'inline-block';
+    finishBtn.style.display = currentStepIndex === steps.length - 1 ? 'inline-block' : 'none';
   }
 
-  function advanceStep() {
-    currentStepIndex++;
+  /* NAVIGATION */
+  nextBtn.onclick = () => {
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+    units[unitIndex].touchscreen = touchscreenToggle.checked;
 
-    if (currentStepIndex >= steps.length) {
-      showFinishButton();
-    } else {
+    if (currentStepIndex < steps.length - 1) {
+      currentStepIndex++;
       renderCurrentFace();
     }
-  }
-
-  function showFinishButton() {
-    nextBtn.style.display = "none";
-    finishBtn.style.display = "block";
-  }
-
-  nextBtn.onclick = () => advanceStep();
+  };
 
   backBtn.onclick = () => {
     if (currentStepIndex > 0) {
@@ -593,67 +592,20 @@
     }
   };
 
-  touchscreenToggle.onchange = () => {
-    const step = steps[currentStepIndex];
-    const unitIndex = step.unit - 1;
-
-    units[unitIndex].touchscreen = touchscreenToggle.checked;
-
-    if (!touchscreenToggle.checked) {
-      renderCurrentFace();
-      return;
-    }
-
-    if (step.face === 'front') {
-      const nextFrontIndex = steps.findIndex(
-        s => s.face === 'front' && s.unit === step.unit + 1
-      );
-
-      if (nextFrontIndex !== -1) {
-        currentStepIndex = nextFrontIndex;
-        renderCurrentFace();
-        return;
-      }
-
-      const firstBackIndex = steps.findIndex(s => s.face === 'back');
-      currentStepIndex = firstBackIndex;
-      renderCurrentFace();
-      return;
-    }
-
-    if (step.face === 'back') {
-      const nextBackIndex = steps.findIndex(
-        s => s.face === 'back' && s.unit === step.unit + 1
-      );
-
-      if (nextBackIndex !== -1) {
-        currentStepIndex = nextBackIndex;
-        renderCurrentFace();
-        return;
-      }
-
-      showFinishButton();
-    }
-  };
-
   finishBtn.onclick = () => {
-    sessionStorage.setItem("uhcFullData", JSON.stringify(units));
-    sessionStorage.setItem("uhcSummary", JSON.stringify(units));
-    sessionStorage.setItem("storeName", storeName);
-    sessionStorage.setItem("storeNumber", storeNumber);
-    sessionStorage.setItem("dateString", new Date().toLocaleString());
-
-    window.location.href = "report_select.html";
+    const payload = encodeURIComponent(JSON.stringify(units));
+    window.location.href = `graphical_report.html?data=${payload}&store=${storeName}&num=${storeNumber}`;
   };
 
-  function parseParams() {
+  /* URL PARSING */
+  function parseURL() {
     const params = new URLSearchParams(window.location.search);
-    storeName = params.get("store") || "";
-    storeNumber = params.get("num") || "";
-    storeHeader.textContent = `${storeName} — ${storeNumber}`;
+    storeName = params.get('store') || 'Store';
+    storeNumber = params.get('num') || '';
   }
 
-  parseParams();
+  /* INIT */
+  parseURL();
   initUnits();
   renderCurrentFace();
 </script>
