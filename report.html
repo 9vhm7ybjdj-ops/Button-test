@@ -1,4 +1,3 @@
-Report.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,7 +89,6 @@ Report.html
     transform: scale(0.97);
   }
 
-  /* ⭐ New Test + Print on same line */
   .actionRow {
     display: flex;
     justify-content: center;
@@ -132,7 +130,6 @@ Report.html
 
   <div id="totalsBlock"></div>
 
-  <!-- ⭐ New Test + Print on same line -->
   <div class="actionRow">
     <button id="newTestBtn" class="actionBtn smallBtn">New Test</button>
     <button id="printBtn" class="actionBtn smallBtn">Print Report</button>
@@ -141,7 +138,7 @@ Report.html
 </div>
 
 <script>
-  const summary = JSON.parse(sessionStorage.getItem("uhcSummary") || "[]");
+  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData") || "[]");
   const storeName = sessionStorage.getItem("storeName") || "";
   const storeNumber = sessionStorage.getItem("storeNumber") || "";
 
@@ -166,29 +163,68 @@ Report.html
   let totalFrontFailedRows = 0;
   let totalBackFailedRows = 0;
 
+  // ⭐ Build summary directly from fullData
+  const summary = [];
+
+  fullData.forEach((unit, index) => {
+
+    // FRONT
+    if (unit.touchscreen) {
+      summary.push({
+        unit: index + 1,
+        face: "front",
+        status: "Skipped (Touchscreen)"
+      });
+    } else {
+      const failedFront = unit.front.filter(
+        row => row.includes("FAIL")
+      ).length;
+
+      summary.push({
+        unit: index + 1,
+        face: "front",
+        status: `${failedFront} failed rows`
+      });
+
+      totalFrontFailedRows += failedFront;
+    }
+
+    // BACK
+    if (unit.touchscreen) {
+      summary.push({
+        unit: index + 1,
+        face: "back",
+        status: "Skipped (Touchscreen)"
+      });
+    } else {
+      const failedBack = unit.back.filter(
+        row => row.includes("FAIL")
+      ).length;
+
+      summary.push({
+        unit: index + 1,
+        face: "back",
+        status: `${failedBack} failed rows`
+      });
+
+      totalBackFailedRows += failedBack;
+    }
+  });
+
+  // ⭐ Render summary rows
   summary.forEach(item => {
     const row = document.createElement("tr");
 
-    const faceLabel =
-      item.face.charAt(0).toUpperCase() + item.face.slice(1);
-
     row.innerHTML = `
       <td>Unit ${item.unit}</td>
-      <td>${faceLabel}</td>
+      <td>${item.face.charAt(0).toUpperCase() + item.face.slice(1)}</td>
       <td>${item.status}</td>
     `;
 
     table.appendChild(row);
-
-    // ⭐ Extract number of failed rows
-    const status = String(item.status).toLowerCase();
-    const match = status.match(/^(\d+)\s+failed rows/);
-    const failedRows = match ? parseInt(match[1], 10) : 0;
-
-    if (item.face === "front") totalFrontFailedRows += failedRows;
-    if (item.face === "back") totalBackFailedRows += failedRows;
   });
 
+  // ⭐ Totals
   document.getElementById("totalsBlock").innerHTML = `
     TOTAL FRONT FAILED ROWS: ${totalFrontFailedRows}<br>
     TOTAL BACK FAILED ROWS: ${totalBackFailedRows}
