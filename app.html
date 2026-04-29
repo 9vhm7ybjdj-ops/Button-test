@@ -412,12 +412,10 @@
 
   const units = [];
 
-  /* CORRECT STEP ORDER */
+  /* CORRECT ORDER: ALL FRONTS → THEN ALL BACKS */
   const steps = [];
-  for (let u = 1; u <= TOTAL_UNITS; u++) {
-    steps.push({ unit: u, face: 'front' });
-    steps.push({ unit: u, face: 'back' });
-  }
+  for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'front' });
+  for (let u = 1; u <= TOTAL_UNITS; u++) steps.push({ unit: u, face: 'back' });
 
   let currentStepIndex = 0;
 
@@ -491,7 +489,6 @@
 
           units[unitIndex][face][rIndex][cIndex] = next;
 
-          // No auto progression
           renderCurrentFace();
         };
 
@@ -520,22 +517,40 @@
     unitHeader.textContent =
       `Unit ${step.unit} of ${TOTAL_UNITS} — ${face === 'front' ? 'Front' : 'Back'}`;
 
-    // Touchscreen skip logic (corrected for new step order)
+    /* TOUCHSCREEN SKIP — CORRECT FOR FRONT-FIRST-THEN-BACK ORDER */
     if (units[unitIndex].touchscreen) {
-      const nextUnit = step.unit + 1;
 
-      if (nextUnit > TOTAL_UNITS) {
-        showFinishButton();
+      if (face === 'front') {
+        const nextFrontIndex = steps.findIndex(
+          s => s.face === 'front' && s.unit === step.unit + 1
+        );
+
+        if (nextFrontIndex !== -1) {
+          currentStepIndex = nextFrontIndex;
+          renderCurrentFace();
+          return;
+        }
+
+        const firstBackIndex = steps.findIndex(s => s.face === 'back');
+        currentStepIndex = firstBackIndex;
+        renderCurrentFace();
         return;
       }
 
-      const nextIndex = steps.findIndex(
-        s => s.unit === nextUnit && s.face === 'front'
-      );
+      if (face === 'back') {
+        const nextBackIndex = steps.findIndex(
+          s => s.face === 'back' && s.unit === step.unit + 1
+        );
 
-      currentStepIndex = nextIndex;
-      renderCurrentFace();
-      return;
+        if (nextBackIndex !== -1) {
+          currentStepIndex = nextBackIndex;
+          renderCurrentFace();
+          return;
+        }
+
+        showFinishButton();
+        return;
+      }
     }
 
     if (face === 'front') {
@@ -584,22 +599,40 @@
 
     units[unitIndex].touchscreen = touchscreenToggle.checked;
 
-    if (touchscreenToggle.checked) {
-      const nextUnit = step.unit + 1;
+    if (!touchscreenToggle.checked) {
+      renderCurrentFace();
+      return;
+    }
 
-      if (nextUnit > TOTAL_UNITS) {
-        showFinishButton();
+    if (step.face === 'front') {
+      const nextFrontIndex = steps.findIndex(
+        s => s.face === 'front' && s.unit === step.unit + 1
+      );
+
+      if (nextFrontIndex !== -1) {
+        currentStepIndex = nextFrontIndex;
+        renderCurrentFace();
         return;
       }
 
-      const nextIndex = steps.findIndex(
-        s => s.unit === nextUnit && s.face === 'front'
+      const firstBackIndex = steps.findIndex(s => s.face === 'back');
+      currentStepIndex = firstBackIndex;
+      renderCurrentFace();
+      return;
+    }
+
+    if (step.face === 'back') {
+      const nextBackIndex = steps.findIndex(
+        s => s.face === 'back' && s.unit === step.unit + 1
       );
 
-      currentStepIndex = nextIndex;
-      renderCurrentFace();
-    } else {
-      renderCurrentFace();
+      if (nextBackIndex !== -1) {
+        currentStepIndex = nextBackIndex;
+        renderCurrentFace();
+        return;
+      }
+
+      showFinishButton();
     }
   };
 
