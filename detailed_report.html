@@ -103,14 +103,10 @@
     display: flex;
     gap: 10px;
     font-size: 12px;
-    padding: 4px 2px;
-    border-radius: 4px;
   }
 
-  /* ⭐ Center PASS / FAIL / --- horizontally */
   .cell {
     min-width: 40px;
-    text-align: center;
   }
 
   .cell-pass {
@@ -124,21 +120,8 @@
   }
 
   .cell-un {
-    color: #ccc;
-    text-shadow: none;
-  }
-
-  /* ⭐ Clean row-level indicators (no background blocks) */
-  .row-pass {
-    border-left: 3px solid #00ff00;
-  }
-
-  .row-fail {
-    border-left: 3px solid #ff0000;
-  }
-
-  .row-skip {
-    border-left: 3px solid #666;
+    color: #ffeb3b;
+    text-shadow: 0 0 6px #ffeb3b;
   }
 
   .face-summary {
@@ -156,7 +139,7 @@
   }
 
   .face-status-skip {
-    color: #ccc;
+    color: #ffeb3b;
   }
 
   /* ⭐ GREEN GLOW BUTTONS */
@@ -203,6 +186,7 @@
 
   <div id="unitsContainer"></div>
 
+  <!-- ⭐ BUTTONS ADDED HERE -->
   <div class="action-buttons">
     <button id="backBtn" class="glow-btn">Back</button>
     <button id="newTestBtn" class="glow-btn">New Test</button>
@@ -249,7 +233,6 @@
 
       const rowCells = createEl("div", "row-cells");
       let rowFail = false;
-      let rowUntested = false;
 
       row.forEach(state => {
         let cls = "cell";
@@ -257,20 +240,12 @@
 
         if (state === "PASS") cls += " cell-pass";
         else if (state === "FAIL") { cls += " cell-fail"; rowFail = true; }
-        else { cls += " cell-un"; text = "- - -"; rowUntested = true; }
+        else { cls += " cell-un"; text = "- - -"; }
 
         rowCells.appendChild(createEl("div", cls, text));
       });
 
-      if (rowFail) {
-        rowCells.classList.add("row-fail");
-        failedRows++;
-      } else if (rowUntested) {
-        rowCells.classList.add("row-skip");
-      } else {
-        rowCells.classList.add("row-pass");
-      }
-
+      if (rowFail) failedRows++;
       block.appendChild(rowCells);
     });
 
@@ -320,6 +295,7 @@
 
   renderReport();
 
+  // ⭐ BUTTON LOGIC
   document.getElementById("backBtn").onclick = () => {
     window.history.back();
   };
