@@ -5,10 +5,7 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>UHC Test Loader</title>
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<link rel="apple-touch-icon" href="icon-512.PNG">
+
 <style>
   html, body {
     margin: 0;
@@ -188,9 +185,6 @@
     window.location.href =
       `app.html?store=${encodeURIComponent(storeName)}&num=${storeNumber}`;
   };
-  if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
 </script>
 
 </body>
