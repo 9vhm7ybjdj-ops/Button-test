@@ -37,9 +37,9 @@
   /* ⭐ EXACT SAME BUTTON SIZE AS OTHER PAGES */
   .btn {
     display: block;
-    width: 180px;              /* identical width */
-    padding: 8px 12px;         /* identical padding */
-    margin: 12px auto;         /* centered */
+    width: 180px;
+    padding: 8px 12px;
+    margin: 12px auto;
     font-size: 16px;
     border-radius: 8px;
 
@@ -77,17 +77,23 @@
 </div>
 
 <script>
-  /* Summary → report.html */
+  /* ⭐ Hide Back button if a report has already been opened */
+  if (sessionStorage.getItem("reportOpened") === "1") {
+    document.getElementById("backBtn").style.display = "none";
+  }
+
+  /* ⭐ Mark that a report has been opened BEFORE leaving */
   document.getElementById("summaryBtn").onclick = () => {
+    sessionStorage.setItem("reportOpened", "1");
     window.location.href = "report.html";
   };
 
-  /* Detailed → detailed_report.html */
   document.getElementById("detailedBtn").onclick = () => {
+    sessionStorage.setItem("reportOpened", "1");
     window.location.href = "detailed_report.html";
   };
 
-  /* ⭐ Back → ALWAYS return to last unit tested */
+  /* ⭐ Back → ALWAYS return to last unit tested (when visible) */
   document.getElementById("backBtn").onclick = () => {
     const lastUnit = sessionStorage.getItem("lastUnit");
     const lastFace = sessionStorage.getItem("lastFace");
