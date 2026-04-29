@@ -15,65 +15,169 @@
     font-family: Arial, sans-serif;
     color: #fff;
     overflow: hidden;
+
+    /* DIAGNOSTIC GRID BACKGROUND */
+    background-image:
+      linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
-  #loaderScreen, #startScreen {
+  /* CRT flicker */
+  @keyframes crtFlicker {
+    0%   { opacity: 0; }
+    10%  { opacity: 1; }
+    13%  { opacity: 0.3; }
+    16%  { opacity: 1; }
+    20%  { opacity: 0.6; }
+    25%  { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  /* Scanline sweep */
+  @keyframes scanSweep {
+    0%   { top: -100%; opacity: 0.15; }
+    100% { top: 200%; opacity: 0; }
+  }
+
+  .scanline {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(to bottom, rgba(0,255,0,0.15), rgba(0,255,0,0));
+    animation: scanSweep 1.4s linear forwards;
+    pointer-events: none;
+  }
+
+  /* LOADER SCREEN */
+  #loaderScreen {
     width: 100%;
     height: 100vh;
+    position: absolute;
+    top: 0; left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s ease;
+  }
+
+  /* PANEL */
+  .panel {
+    width: 300px;
+    padding: 26px 0;
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border-radius: 14px;
+    animation: crtFlicker 0.6s ease-out;
+
+    box-shadow:
+      0 0 22px rgba(0,255,0,0.35),
+      0 0 0 2px rgba(0,255,0,0.4),
+      inset 2px 2px 4px rgba(255,255,255,0.06),
+      inset -2px -2px 6px rgba(0,0,0,0.7);
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    position: absolute;
-    top: 0; left: 0;
-    transition: opacity 0.6s ease;
+    gap: 18px;
+    position: relative;
+
+    min-height: 200px;
   }
 
-  #loaderScreen {
-    background: linear-gradient(145deg, #3a3a3a, #1a1a1a);
-  }
-
-  .nameplate {
-    width: 260px;
-    height: 80px;
-    background: linear-gradient(145deg, #d7d9dc, #a5a7aa);
-    border-radius: 12px;
-    box-shadow:
-      0 0 0 2px #777,
-      0 12px 20px rgba(0,0,0,0.6),
-      inset 0 0 12px rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .title {
     font-size: 26px;
     font-weight: bold;
-    color: #111;
-    margin-bottom: 30px;
-    text-shadow: 0 0 4px #fff;
+    color: #7CFC00;
+    text-shadow: 0 0 6px #00ff00;
+    text-align: center;
   }
 
+  /* LOADING BAR */
   .loadingBarOuter {
     width: 240px;
-    height: 14px;
-    background: #222;
-    border-radius: 8px;
+    height: 16px;
+    background: #0d0d0d;
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
+    box-shadow:
+      inset 0 0 10px rgba(0,255,0,0.25),
+      0 0 12px rgba(0,255,0,0.25);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  @keyframes pulseGlow {
+    0%   { box-shadow: 0 0 8px #00ff00; }
+    50%  { box-shadow: 0 0 14px #00ff00; }
+    100% { box-shadow: 0 0 8px #00ff00; }
   }
 
   .loadingBarInner {
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #00ff00, #009900);
-    box-shadow: 0 0 10px #00ff00;
+    background:
+      repeating-linear-gradient(
+        to right,
+        #00ff00,
+        #00ff00 12px,
+        #009900 12px,
+        #009900 16px
+      );
+    animation: pulseGlow 1.2s infinite ease-in-out;
     transition: width 1.5s ease;
+  }
+
+  /* INITIALIZING + BOOT COMPLETE TEXT */
+  .initializingText,
+  .bootComplete {
+    height: 18px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 6px #00ff00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+  }
+
+  .initializingText {
+    color: #7CFC00;
+    opacity: 0.8;
+    animation: initPulse 1.4s infinite ease-in-out;
+  }
+
+  @keyframes initPulse {
+    0%   { opacity: 0.4; }
+    50%  { opacity: 1; }
+    100% { opacity: 0.4; }
+  }
+
+  .bootComplete {
+    color: #00ff00;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .bootComplete.show {
+    opacity: 1;
   }
 
   /* START SCREEN */
   #startScreen {
+    width: 100%;
+    height: 100vh;
     background: #111;
+    position: absolute;
+    top: 0; left: 0;
     opacity: 0;
     pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s ease;
   }
 
   #startScreen.active {
@@ -95,7 +199,6 @@
 
   label {
     font-size: 14px;
-    margin-bottom: 4px;
     opacity: 0.9;
   }
 
@@ -128,10 +231,18 @@
 
 <!-- LOADING SCREEN -->
 <div id="loaderScreen">
-  <div class="nameplate">UHC TEST v1.0</div>
+  <div class="panel">
+    <div class="scanline"></div>
 
-  <div class="loadingBarOuter">
-    <div class="loadingBarInner" id="loadingBar"></div>
+    <div class="title">UHC TEST v2.0</div>
+
+    <div class="loadingBarOuter">
+      <div class="loadingBarInner" id="loadingBar"></div>
+    </div>
+
+    <div class="initializingText" id="initText">SYSTEM INITIALIZING…</div>
+
+    <div class="bootComplete" id="bootDone">BOOT SEQUENCE COMPLETE</div>
   </div>
 </div>
 
@@ -153,23 +264,25 @@
 </div>
 
 <script>
-  const loader = document.getElementById("loaderScreen");
-  const startScreen = document.getElementById("startScreen");
-  const loadingBar = document.getElementById("loadingBar");
-
-  // Animate loading bar
+  // Fill loading bar
   setTimeout(() => {
-    loadingBar.style.width = "100%";
-  }, 100);
+    document.getElementById("loadingBar").style.width = "100%";
+  }, 200);
+
+  // After loading finishes, show boot complete
+  setTimeout(() => {
+    document.getElementById("initText").style.visibility = "hidden";
+    document.getElementById("bootDone").classList.add("show");
+  }, 1800);
 
   // Fade out loader → show start screen
   setTimeout(() => {
-    loader.style.opacity = 0;
+    loaderScreen.style.opacity = 0;
     setTimeout(() => {
-      loader.style.display = "none";
+      loaderScreen.style.display = "none";
       startScreen.classList.add("active");
     }, 600);
-  }, 1600);
+  }, 2600);
 
   // Start button
   document.getElementById("startBtn").onclick = () => {
@@ -180,7 +293,6 @@
       return;
     }
 
-    // Split into name + number
     const [storeName, storeNumber] = store.split(" — ");
 
     window.location.href =
