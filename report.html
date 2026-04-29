@@ -54,7 +54,7 @@
   th, td {
     padding: 12px;
     border-bottom: 1px solid #444;
-    text-align: left;
+    text-align: center;
   }
 
   th {
@@ -63,6 +63,24 @@
 
   tr:nth-child(even) {
     background: #1a1a1a;
+  }
+
+  /* ⭐ Neon row rings */
+  .row-pass {
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00, inset 0 0 10px #00ff00;
+    border-radius: 6px;
+  }
+
+  .row-fail {
+    border: 2px solid #ff0000;
+    box-shadow: 0 0 10px #ff0000, inset 0 0 10px #ff0000;
+    border-radius: 6px;
+  }
+
+  .row-skip {
+    border: 2px solid #666;
+    border-radius: 6px;
   }
 
   #totalsBlock {
@@ -131,6 +149,7 @@
   <div id="totalsBlock"></div>
 
   <div class="actionRow">
+    <button id="backBtn" class="actionBtn smallBtn">Back</button>
     <button id="newTestBtn" class="actionBtn smallBtn">New Test</button>
     <button id="printBtn" class="actionBtn smallBtn">Print Report</button>
   </div>
@@ -163,7 +182,6 @@
   let totalFrontFailedRows = 0;
   let totalBackFailedRows = 0;
 
-  // ⭐ Build summary directly from fullData
   const summary = [];
 
   fullData.forEach((unit, index) => {
@@ -173,7 +191,8 @@
       summary.push({
         unit: index + 1,
         face: "front",
-        status: "Skipped (Touchscreen)"
+        status: "Skipped (Touchscreen)",
+        type: "skip"
       });
     } else {
       const failedFront = unit.front.filter(
@@ -183,7 +202,8 @@
       summary.push({
         unit: index + 1,
         face: "front",
-        status: `${failedFront} failed rows`
+        status: `${failedFront} failed rows`,
+        type: failedFront > 0 ? "fail" : "pass"
       });
 
       totalFrontFailedRows += failedFront;
@@ -194,7 +214,8 @@
       summary.push({
         unit: index + 1,
         face: "back",
-        status: "Skipped (Touchscreen)"
+        status: "Skipped (Touchscreen)",
+        type: "skip"
       });
     } else {
       const failedBack = unit.back.filter(
@@ -204,16 +225,21 @@
       summary.push({
         unit: index + 1,
         face: "back",
-        status: `${failedBack} failed rows`
+        status: `${failedBack} failed rows`,
+        type: failedBack > 0 ? "fail" : "pass"
       });
 
       totalBackFailedRows += failedBack;
     }
   });
 
-  // ⭐ Render summary rows
+  // ⭐ Render summary rows with neon rings
   summary.forEach(item => {
     const row = document.createElement("tr");
+
+    if (item.type === "fail") row.classList.add("row-fail");
+    else if (item.type === "pass") row.classList.add("row-pass");
+    else row.classList.add("row-skip");
 
     row.innerHTML = `
       <td>Unit ${item.unit}</td>
@@ -235,6 +261,10 @@
   document.getElementById("newTestBtn").onclick = () => {
     sessionStorage.clear();
     window.location.href = "index.html";
+  };
+
+  document.getElementById("backBtn").onclick = () => {
+    window.location.href = "report_select.html";
   };
 </script>
 
