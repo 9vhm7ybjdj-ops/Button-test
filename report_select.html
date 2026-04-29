@@ -13,6 +13,7 @@
     background: #111;
     color: #fff;
     font-family: Arial, sans-serif;
+
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
@@ -21,28 +22,33 @@
 
   #app {
     width: 100%;
-    max-width: 500px;
+    max-width: 420px;
     margin: 0 auto;
     padding: 30px;
     text-align: center;
   }
 
   h1 {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
+    font-size: 22px;
   }
 
+  /* ⭐ COMPACT BUTTONS */
   .btn {
     display: block;
     width: 100%;
-    padding: 10px 14px;
-    margin: 12px 0;
-    font-size: 16px;
-    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 10px 0;
+    font-size: 14px;
+    border-radius: 6px;
+
     background: #111;
     color: #7CFC00;
-    border: 2px solid #00ff00;
-    text-shadow: 0 0 4px #00ff00;
-    box-shadow: 0 0 8px #00ff00;
+
+    border: 1px solid #00ff00;
+    text-shadow: 0 0 3px #00ff00;
+    box-shadow: 0 0 6px #00ff00;
+
     cursor: pointer;
   }
 
@@ -65,4 +71,24 @@
 
   <button id="summaryBtn" class="btn">Summary Report</button>
   <button id="detailedBtn" class="btn">Detailed Report</button>
-  <button id="backBtn" class="btn">
+  <button id="backBtn" class="btn">Back</button>
+
+</div>
+
+<script>
+  document.getElementById("summaryBtn").onclick = () => {
+    window.location.href = "report.html";   // ✔ fixed link
+  };
+
+  document.getElementById("detailedBtn").onclick = () => {
+    window.location.href = "detailed_report.html";
+  };
+
+  // ✔ Back to last unit tested
+  document.getElementById("backBtn").onclick = () => {
+    window.history.back();
+  };
+</script>
+
+</body>
+</html>
