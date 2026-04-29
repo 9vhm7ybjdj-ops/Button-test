@@ -13,6 +13,7 @@
     background: #111;
     font-family: Arial, sans-serif;
     color: #fff;
+
     background-image:
       linear-gradient(rgba(0,255,0,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,0,0.05) 1px, transparent 1px);
@@ -141,7 +142,7 @@
     color: #ffeb3b;
   }
 
-  /* GREEN GLOW BUTTONS */
+  /* ⭐ GREEN GLOW BUTTONS */
   .action-buttons {
     display: flex;
     gap: 12px;
@@ -166,11 +167,7 @@
     transform: scale(0.97);
   }
 
-  /* PRINT SCALING — 75% */
   @media print {
-    body {
-      zoom: 0.75;
-    }
     .action-buttons {
       display: none;
     }
@@ -189,34 +186,22 @@
 
   <div id="unitsContainer"></div>
 
-  <!-- BUTTONS -->
+  <!-- ⭐ BUTTONS ADDED HERE -->
   <div class="action-buttons">
     <button id="backBtn" class="glow-btn">Back</button>
     <button id="newTestBtn" class="glow-btn">New Test</button>
     <button id="pdfBtn" class="glow-btn">Export PDF</button>
   </div>
+
 </div>
 
 <script>
   const UHC_NAMES = ["Left UHC", "Middle UHC", "Right UHC"];
 
-  // Safe fallback dataset
-  const raw = sessionStorage.getItem("uhcFullData");
-  const fullData = raw ? JSON.parse(raw) : [
-    { front:[["PASS","PASS","PASS"],["PASS","PASS","PASS"],["PASS","PASS","PASS"]],
-      back:[["PASS","PASS","PASS"],["PASS","PASS","PASS"],["PASS","PASS","PASS"]],
-      touchscreen:false },
-    { front:[["PASS","PASS","PASS"],["PASS","PASS","PASS"],["PASS","PASS","PASS"]],
-      back:[["PASS","PASS","PASS"],["PASS","PASS","PASS"],["PASS","PASS","PASS"]],
-      touchscreen:false },
-    { front:[["PASS","PASS","PASS"],["PASS","PASS","PASS"],["PASS","PASS","PASS"]],
-      back:[["PASS","PASS","PASS"],["PASS","PASS","PASS"],["PASS","PASS","PASS"]],
-      touchscreen:false }
-  ];
-
-  const storeName = sessionStorage.getItem("storeName") || "Store";
-  const storeNumber = sessionStorage.getItem("storeNumber") || "000";
-  const dateString = sessionStorage.getItem("dateString") || new Date().toLocaleDateString();
+  const fullData = JSON.parse(sessionStorage.getItem("uhcFullData"));
+  const storeName = sessionStorage.getItem("storeName");
+  const storeNumber = sessionStorage.getItem("storeNumber");
+  const dateString = sessionStorage.getItem("dateString");
 
   document.getElementById("storeLine").textContent =
     `${storeName} — ${storeNumber}`;
@@ -281,4 +266,49 @@
     let totalSkipped = 0;
 
     fullData.forEach((u, idx) => {
-      const unitBlock
+      const unitBlock = createEl("div", "unit-block");
+      unitBlock.appendChild(createEl("div", "unit-title", UHC_NAMES[idx]));
+
+      const facesRow = createEl("div", "faces-row");
+
+      const front = renderFace(u, "front", "Front");
+      const back  = renderFace(u, "back",  "Back");
+
+      facesRow.appendChild(front.el);
+      facesRow.appendChild(back.el);
+
+      unitBlock.appendChild(facesRow);
+      unitsContainer.appendChild(unitBlock);
+
+      totalFailed += front.failed + back.failed;
+      totalSkipped += (front.skipped ? 1 : 0) + (back.skipped ? 1 : 0);
+    });
+
+    document.getElementById("overallSummary").innerHTML = `
+      <div><strong>Total UHCs:</strong> 3</div>
+      <div><strong>Total Faces:</strong> 6</div>
+      <div><strong>Total Faces Skipped:</strong> ${totalSkipped}</div>
+      <div><strong>Total Failed Rows:</strong> ${totalFailed}</div>
+      <div><strong>Overall Status:</strong> ${totalFailed > 0 ? "Issues Found" : "All Clear"}</div>
+    `;
+  }
+
+  renderReport();
+
+  // ⭐ BUTTON LOGIC
+  document.getElementById("backBtn").onclick = () => {
+    window.history.back();
+  };
+
+  document.getElementById("newTestBtn").onclick = () => {
+    sessionStorage.clear();
+    window.location.href = "index.html";
+  };
+
+  document.getElementById("pdfBtn").onclick = () => {
+    window.print();
+  };
+</script>
+
+</body>
+</html>
