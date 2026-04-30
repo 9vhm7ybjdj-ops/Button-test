@@ -191,7 +191,15 @@
     justify-content: center;
   }
 
-  .uhc-row.skippedRow {
+  .passRow {
+    box-shadow: 0 0 14px #00ff00, inset 0 0 6px rgba(0,0,0,0.8);
+  }
+
+  .failRow {
+    box-shadow: 0 0 14px #ff0000, inset 0 0 6px rgba(0,0,0,0.8);
+  }
+
+  .skippedRow {
     box-shadow: 0 0 14px orange, inset 0 0 6px rgba(0,0,0,0.8);
     font-size: 18px;
     font-weight: bold;
@@ -424,7 +432,6 @@
         Touchscreen
       </label>
 
-      <!-- Spacer (never used on back face now) -->
       <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
@@ -635,6 +642,7 @@
 
       inner.appendChild(btn);
 
+      /* PASS/FAIL HIGHLIGHTING */
       if (row.includes('FAIL')) {
         rowEl.classList.add('failRow');
       } else if (row.every(v => v === 'PASS')) {
