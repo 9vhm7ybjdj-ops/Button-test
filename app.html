@@ -259,6 +259,31 @@
     fill: #111;
   }
 
+  /* CUSTOM CHECKBOX (front) */
+  .touch-box {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    background: #222;
+    box-shadow: inset 0 0 4px #000;
+  }
+
+  .touch-box.checked {
+    background: #00a000;
+    box-shadow: 0 0 8px #00ff00;
+    border-color: #0f0;
+  }
+
+  /* BACK FACE DISABLED CHECKBOX */
+  .touch-box.disabled {
+    opacity: 0.4;
+    filter: grayscale(100%);
+    pointer-events: none;
+    box-shadow: inset 0 0 4px #000 !important;
+    border-color: #666 !important;
+  }
+
   .touchscreen-label {
     display: flex;
     align-items: center;
@@ -267,11 +292,13 @@
     font-size: 16px;
   }
 
-  .touchscreen-label input { transform: scale(1.4); }
+  .touchscreen-label.disabled {
+    opacity: 0.4;
+    filter: grayscale(100%);
+  }
 
-  /* Spacer will be dynamically synced */
   .touchscreen-spacer {
-    height: 0px;
+    height: 32px; /* fixed height for custom checkbox */
     margin-top: 10px;
   }
 
@@ -353,10 +380,14 @@
         <div class="uhc-rows" id="frontRows"></div>
       </div>
 
+      <!-- FRONT FACE TOUCHSCREEN CONTROL -->
       <label class="touchscreen-label" id="touchscreenRow">
-        <input type="checkbox" id="touchscreenToggle">
+        <div id="touchscreenBox" class="touch-box"></div>
         Touchscreen
       </label>
+
+      <!-- Hidden real checkbox (logic only) -->
+      <input type="checkbox" id="touchscreenToggle" style="display:none;">
     </div>
 
     <!-- BACK PANEL -->
@@ -395,7 +426,13 @@
         <div class="uhc-rows" id="backRows"></div>
       </div>
 
-      <!-- Dynamic spacer (height set by JS) -->
+      <!-- BACK FACE DISABLED MIRROR CHECKBOX -->
+      <label class="touchscreen-label disabled" id="touchscreenRowBack">
+        <div id="touchscreenBoxBack" class="touch-box disabled"></div>
+        Touchscreen
+      </label>
+
+      <!-- Spacer matches front checkbox height -->
       <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
@@ -421,8 +458,14 @@
   const backWrapper = document.getElementById('backWrapper');
   const frontRows = document.getElementById('frontRows');
   const backRows = document.getElementById('backRows');
+
   const touchscreenRow = document.getElementById('touchscreenRow');
   const touchscreenToggle = document.getElementById('touchscreenToggle');
+  const touchscreenBox = document.getElementById('touchscreenBox');
+
+  const touchscreenRowBack = document.getElementById('touchscreenRowBack');
+  const touchscreenBoxBack = document.getElementById('touchscreenBoxBack');
+
   const backSpacer = document.getElementById('backSpacer');
 
   const nextBtn = document.getElementById('nextBtn');
@@ -538,7 +581,7 @@
 
       inner.appendChild(btn);
 
-      /* FIXED: Row-level FAIL logic */
+      /* Row-level FAIL logic */
       if (row.includes('FAIL')) {
         rowEl.classList.add('failRow');
       } else if (row.every(v => v === 'PASS')) {
@@ -549,15 +592,65 @@
       container.appendChild(rowEl);
     });
   }
-  /* DYNAMIC SPACER SYNC — prevents nav-row drift */
-  function syncSpacerHeight() {
-    const h = touchscreenRow.offsetHeight;
-    backSpacer.style.height = h + "px";
+  /* MIRROR BACK CHECKBOX (visual only, no glow) */
+  function mirrorBackCheckbox(isChecked) {
+    if (isChecked) {
+      touchscreenBoxBack.classList.add("checked");
+    } else {
+      touchscreenBoxBack.classList.remove("checked");
+    }
   }
 
+  /* FRONT CUSTOM CHECKBOX CLICK */
+  touchscreenBox.onclick = () => {
+    touchscreenBox.classList.toggle("checked");
+    const isChecked = touchscreenBox.classList.contains("checked");
+
+    touchscreenToggle.checked = isChecked;
+    mirrorBackCheckbox(isChecked);
+
+    touchscreenToggle.dispatchEvent(new Event("change"));
+  };
+
+  /* FRONT CHECKBOX LOGIC */
+  touchscreenToggle.onchange = () => {
+    const checked = touchscreenToggle.checked;
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+    const face = step.face;
+
+    units[unitIndex].touchscreen = checked;
+
+    if (!checked) return;
+
+    playComboSound();
+
+    if (face === 'front') {
+      /* Skip FRONT + BACK */
+      units[unitIndex].front = Array.from({ length: 6 }, () => Array(3).fill('UN'));
+      units[unitIndex].back  = Array.from({ length: 6 }, () => Array(3).fill('UN'));
+
+      units[unitIndex].skipped = true;
+
+      currentStepIndex++;
+      renderCurrentFace();
+      return;
+    }
+
+    if (face === 'back') {
+      /* Back skip ONLY (front untouched) */
+      units[unitIndex].back = Array.from({ length: 6 }, () => Array(3).fill('UN'));
+
+      currentStepIndex++;
+      renderCurrentFace();
+      return;
+    }
+  };
+
+  /* RENDER CURRENT FACE */
   function renderCurrentFace() {
 
-    /* AUTO‑SKIP FORWARD over skipped BACK faces */
+    /* AUTO-SKIP FORWARD over skipped BACK faces */
     while (currentStepIndex < steps.length) {
       const s = steps[currentStepIndex];
       const ui = s.unit - 1;
@@ -582,8 +675,13 @@
     frontWrapper.style.display = face === 'front' ? 'flex' : 'none';
     backWrapper.style.display = face === 'back' ? 'flex' : 'none';
 
-    touchscreenToggle.checked = units[unitIndex].touchscreen;
+    /* Sync checkbox states */
+    touchscreenBox.classList.toggle("checked", units[unitIndex].touchscreen);
+    mirrorBackCheckbox(units[unitIndex].touchscreen);
+
     touchscreenRow.style.display = face === 'front' ? 'flex' : 'none';
+    touchscreenRowBack.style.display = face === 'back' ? 'flex' : 'none';
+
     backSpacer.style.display = face === 'back' ? 'block' : 'none';
 
     if (face === 'front') {
@@ -595,46 +693,9 @@
     backBtn.style.visibility = currentStepIndex === 0 ? 'hidden' : 'visible';
     nextBtn.style.display = currentStepIndex === steps.length - 1 ? 'none' : 'inline-block';
     finishBtn.style.display = currentStepIndex === steps.length - 1 ? 'inline-block' : 'none';
-
-    /* LOCK NAV ROW — dynamic spacer sync */
-    syncSpacerHeight();
   }
 
-  /* TOUCHSCREEN SKIP LOGIC */
-  touchscreenToggle.onchange = () => {
-    const checked = touchscreenToggle.checked;
-    const step = steps[currentStepIndex];
-    const unitIndex = step.unit - 1;
-    const face = step.face;
-
-    units[unitIndex].touchscreen = checked;
-
-    if (!checked) return;
-
-    playComboSound();
-
-    if (face === 'front') {
-      /* Skip FRONT + BACK */
-      units[unitIndex].front = Array.from({ length: 6 }, () => Array(3).fill('UN'));
-      units[unitIndex].back  = Array.from({ length: 6 }, () => Array(3).fill('UN'));
-
-      units[unitIndex].skipped = true;
-      units[unitIndex].touchscreen = true;
-
-      currentStepIndex++;
-      renderCurrentFace();
-      return;
-    }
-
-    if (face === 'back') {
-      units[unitIndex].back = Array.from({ length: 6 }, () => Array(3).fill('UN'));
-
-      currentStepIndex++;
-      renderCurrentFace();
-      return;
-    }
-  };
-
+  /* NEXT BUTTON */
   nextBtn.onclick = () => {
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
@@ -646,11 +707,12 @@
     }
   };
 
+  /* BACK BUTTON */
   backBtn.onclick = () => {
     if (currentStepIndex > 0) {
       currentStepIndex--;
 
-      /* AUTO‑SKIP BACKWARD over skipped BACK faces */
+      /* AUTO-SKIP BACKWARD over skipped BACK faces */
       while (currentStepIndex >= 0) {
         const s = steps[currentStepIndex];
         const ui = s.unit - 1;
@@ -666,7 +728,7 @@
     }
   };
 
-  /* FINALIZE TEST → SEND DATA TO REPORTS */
+  /* FINISH BUTTON */
   finishBtn.onclick = () => {
     sessionStorage.setItem("uhcFullData", JSON.stringify(units));
     sessionStorage.setItem("storeName", storeName);
