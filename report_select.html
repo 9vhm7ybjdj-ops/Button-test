@@ -56,7 +56,6 @@
     transform: scale(0.97);
   }
 
-  /* RED destructive button */
   .red-btn {
     padding: 12px 24px;
     border-radius: 8px;
@@ -76,7 +75,6 @@
     transform: scale(0.97);
   }
 
-  /* Modal overlay */
   #confirmOverlay {
     position: fixed;
     top: 0;
@@ -90,7 +88,6 @@
     z-index: 999;
   }
 
-  /* Modal box */
   #confirmBox {
     width: 300px;
     padding: 20px;
@@ -147,15 +144,21 @@
 
   <div class="header">Select Report</div>
 
-  <button class="btn" onclick="goSummary()">Summary Report</button>
+  <!-- SUMMARY REPORT (report.html) -->
+  <button class="btn" onclick="goMain()">Summary</button>
+
+  <!-- DETAILED REPORT -->
+  <button class="btn" onclick="goDetailed()">Detailed Report</button>
+
+  <!-- GRAPHICAL REPORT -->
   <button class="btn" onclick="goGraphical()">Graphical Report</button>
 
-  <!-- RED destructive button -->
+  <!-- NEW TEST -->
   <button class="red-btn" onclick="openConfirm()">New Test</button>
 
 </div>
 
-<!-- Custom Confirmation Modal -->
+<!-- Confirmation Modal -->
 <div id="confirmOverlay">
   <div id="confirmBox">
     <div>Are you sure you want to clear all data and start a new test</div>
@@ -168,8 +171,12 @@
 </div>
 
 <script>
-  function goSummary() {
-    window.location.href = "summary_report.html";
+  function goMain() {
+    window.location.href = "report.html";
+  }
+
+  function goDetailed() {
+    window.location.href = "detailed_report.html";
   }
 
   function goGraphical() {
