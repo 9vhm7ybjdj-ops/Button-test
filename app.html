@@ -185,14 +185,17 @@
     box-shadow: inset 0 0 6px rgba(0,0,0,0.8);
     transition: box-shadow 0.2s ease;
     box-sizing: border-box;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .uhc-row.passRow {
-    box-shadow: 0 0 14px #00ff00, inset 0 0 6px rgba(0,0,0,0.8);
-  }
-
-  .uhc-row.failRow {
-    box-shadow: 0 0 14px #ff0000, inset 0 0 6px rgba(0,0,0,0.8);
+  .uhc-row.skippedRow {
+    box-shadow: 0 0 14px orange, inset 0 0 6px rgba(0,0,0,0.8);
+    font-size: 18px;
+    font-weight: bold;
+    color: orange;
   }
 
   .uhc-row-inner {
@@ -201,6 +204,7 @@
     justify-content: space-between;
     padding: 10px 12px;
     gap: 10px;
+    width: 100%;
   }
 
   .uhc-led {
@@ -293,7 +297,6 @@
     filter: grayscale(100%);
   }
 
-  /* Spacer only used when checkbox row is hidden */
   .touchscreen-spacer {
     height: 32px;
     margin-top: 10px;
@@ -421,7 +424,7 @@
         Touchscreen
       </label>
 
-      <!-- Spacer is NOT used on back face -->
+      <!-- Spacer (never used on back face now) -->
       <div class="touchscreen-spacer" id="backSpacer"></div>
     </div>
 
@@ -516,23 +519,81 @@
     if (html !== undefined) e.innerHTML = html;
     return e;
   }
-
-  function cycleRow(unitIndex, face, rIndex) {
-    const states = ['UN', 'PASS', 'FAIL'];
-    const current = units[unitIndex][face][rIndex][0];
-    const next = states[(states.indexOf(current) + 1) % 3];
-    units[unitIndex][face][rIndex] = Array(3).fill(next);
-    renderCurrentFace();
+  /* MIRROR BACK CHECKBOX (visual only, no glow) */
+  function mirrorBackCheckbox(isChecked) {
+    if (isChecked) {
+      touchscreenBoxBack.classList.add("checked");
+    } else {
+      touchscreenBoxBack.classList.remove("checked");
+    }
   }
 
+  /* FRONT CUSTOM CHECKBOX CLICK */
+  touchscreenBox.onclick = () => {
+    touchscreenBox.classList.toggle("checked");
+    const isChecked = touchscreenBox.classList.contains("checked");
+
+    touchscreenToggle.checked = isChecked;
+    mirrorBackCheckbox(isChecked);
+
+    touchscreenToggle.dispatchEvent(new Event("change"));
+  };
+
+  /* FRONT CHECKBOX LOGIC — MARK UNIT AS SKIPPED */
+  touchscreenToggle.onchange = () => {
+    const checked = touchscreenToggle.checked;
+    const step = steps[currentStepIndex];
+    const unitIndex = step.unit - 1;
+
+    units[unitIndex].touchscreen = checked;
+
+    if (checked) {
+      playComboSound();
+
+      units[unitIndex].skipped = true;
+
+      /* Replace all rows with SKIPPED */
+      units[unitIndex].front = Array.from({ length: 6 }, () =>
+        Array.from({ length: 3 }, () => 'SKIPPED')
+      );
+      units[unitIndex].back = Array.from({ length: 6 }, () =>
+        Array.from({ length: 3 }, () => 'SKIPPED')
+      );
+    } else {
+      /* Unskip — restore UN rows */
+      units[unitIndex].skipped = false;
+
+      units[unitIndex].front = Array.from({ length: 6 }, () =>
+        Array.from({ length: 3 }, () => 'UN')
+      );
+      units[unitIndex].back = Array.from({ length: 6 }, () =>
+        Array.from({ length: 3 }, () => 'UN')
+      );
+    }
+
+    renderCurrentFace();
+  };
+
+  /* RENDER PANEL (handles normal + SKIPPED rows) */
   function renderPanel(container, data, unitIndex, face) {
     container.innerHTML = '';
 
+    const isSkipped = units[unitIndex].skipped;
+
     data.forEach((row, rIndex) => {
       const rowEl = createEl('div', 'uhc-row');
+
+      if (isSkipped) {
+        /* SKIPPED ROW */
+        rowEl.classList.add('skippedRow');
+        rowEl.textContent = "SKIPPED";
+        container.appendChild(rowEl);
+        return;
+      }
+
+      /* NORMAL ROW */
       const inner = createEl('div', 'uhc-row-inner');
 
-      /* LED + dynamic label triplets */
       for (let c = 0; c < 3; c++) {
         const state = row[c];
 
@@ -564,13 +625,16 @@
         </svg>
       `;
       btn.onclick = () => {
-        cycleRow(unitIndex, face, rIndex);
+        const states = ['UN', 'PASS', 'FAIL'];
+        const current = units[unitIndex][face][rIndex][0];
+        const next = states[(states.indexOf(current) + 1) % 3];
+        units[unitIndex][face][rIndex] = Array(3).fill(next);
         playComboSound();
+        renderCurrentFace();
       };
 
       inner.appendChild(btn);
 
-      /* Row-level FAIL logic */
       if (row.includes('FAIL')) {
         rowEl.classList.add('failRow');
       } else if (row.every(v => v === 'PASS')) {
@@ -581,76 +645,9 @@
       container.appendChild(rowEl);
     });
   }
-  /* MIRROR BACK CHECKBOX (visual only, no glow) */
-  function mirrorBackCheckbox(isChecked) {
-    if (isChecked) {
-      touchscreenBoxBack.classList.add("checked");
-    } else {
-      touchscreenBoxBack.classList.remove("checked");
-    }
-  }
-
-  /* FRONT CUSTOM CHECKBOX CLICK */
-  touchscreenBox.onclick = () => {
-    touchscreenBox.classList.toggle("checked");
-    const isChecked = touchscreenBox.classList.contains("checked");
-
-    touchscreenToggle.checked = isChecked;
-    mirrorBackCheckbox(isChecked);
-
-    touchscreenToggle.dispatchEvent(new Event("change"));
-  };
-
-  /* FRONT CHECKBOX LOGIC */
-  touchscreenToggle.onchange = () => {
-    const checked = touchscreenToggle.checked;
-    const step = steps[currentStepIndex];
-    const unitIndex = step.unit - 1;
-    const face = step.face;
-
-    units[unitIndex].touchscreen = checked;
-
-    if (!checked) return;
-
-    playComboSound();
-
-    if (face === 'front') {
-      /* Skip FRONT + BACK */
-      units[unitIndex].front = Array.from({ length: 6 }, () => Array(3).fill('UN'));
-      units[unitIndex].back  = Array.from({ length: 6 }, () => Array(3).fill('UN'));
-
-      units[unitIndex].skipped = true;
-
-      currentStepIndex++;
-      renderCurrentFace();
-      return;
-    }
-
-    if (face === 'back') {
-      /* Back skip ONLY (front untouched) */
-      units[unitIndex].back = Array.from({ length: 6 }, () => Array(3).fill('UN'));
-
-      currentStepIndex++;
-      renderCurrentFace();
-      return;
-    }
-  };
 
   /* RENDER CURRENT FACE */
   function renderCurrentFace() {
-
-    /* AUTO-SKIP FORWARD over skipped BACK faces */
-    while (currentStepIndex < steps.length) {
-      const s = steps[currentStepIndex];
-      const ui = s.unit - 1;
-
-      if (s.face === 'back' && units[ui].skipped) {
-        currentStepIndex++;
-        continue;
-      }
-      break;
-    }
-
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
     const face = step.face;
@@ -661,11 +658,15 @@
     unitHeader.textContent =
       `Unit ${step.unit} of ${TOTAL_UNITS} — ${face.charAt(0).toUpperCase() + face.slice(1)}`;
 
-    /* Show correct wrapper */
     frontWrapper.style.display = face === 'front' ? 'flex' : 'none';
     backWrapper.style.display = face === 'back' ? 'flex' : 'none';
 
-    /* Checkbox visibility + spacing fix */
+    /* Sync checkbox state properly */
+    touchscreenToggle.checked = units[unitIndex].touchscreen;
+    touchscreenBox.classList.toggle("checked", units[unitIndex].touchscreen);
+    mirrorBackCheckbox(units[unitIndex].touchscreen);
+
+    /* Show correct checkbox row */
     if (face === 'front') {
       touchscreenRow.style.display = 'flex';
       touchscreenRowBack.style.display = 'none';
@@ -673,14 +674,10 @@
     } else {
       touchscreenRow.style.display = 'none';
       touchscreenRowBack.style.display = 'flex';
-      backSpacer.style.display = 'none'; /* FIXED: no spacer on back */
+      backSpacer.style.display = 'none';
     }
 
-    /* Sync checkbox states */
-    touchscreenBox.classList.toggle("checked", units[unitIndex].touchscreen);
-    mirrorBackCheckbox(units[unitIndex].touchscreen);
-
-    /* Render correct panel */
+    /* Render rows */
     if (face === 'front') {
       renderPanel(frontRows, units[unitIndex].front, unitIndex, 'front');
     } else {
@@ -697,6 +694,7 @@
   nextBtn.onclick = () => {
     const step = steps[currentStepIndex];
     const unitIndex = step.unit - 1;
+
     units[unitIndex].touchscreen = touchscreenToggle.checked;
 
     if (currentStepIndex < steps.length - 1) {
@@ -709,19 +707,6 @@
   backBtn.onclick = () => {
     if (currentStepIndex > 0) {
       currentStepIndex--;
-
-      /* AUTO-SKIP BACKWARD over skipped BACK faces */
-      while (currentStepIndex >= 0) {
-        const s = steps[currentStepIndex];
-        const ui = s.unit - 1;
-
-        if (s.face === 'back' && units[ui].skipped) {
-          currentStepIndex--;
-          continue;
-        }
-        break;
-      }
-
       renderCurrentFace();
     }
   };
